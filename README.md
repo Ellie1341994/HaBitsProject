@@ -20,7 +20,7 @@ follow their progress.
 - W.I.P
 
 ## Other
-- W.I.P
+This section contains related project information and details
 
 ### Built with
 - [DJango](https://www.djangoproject.com/start/overview/)
