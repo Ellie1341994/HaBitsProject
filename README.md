@@ -34,15 +34,15 @@ This section contains related project information and details
 - [Isomorphic Fetch](https://www.npmjs.com/package/isomorphic-fetch)
 
 ### Python Dependencies
-asgiref==3.3.1
-Django==3.1.6
-django-filter==2.4.0
-djangorestframework==3.12.2
-Markdown==3.3.3
-nodeenv==1.5.0
-pytz==2021.1
-six==1.15.0
-sqlparse==0.4.1
+asgiref==3.3.1  
+Django==3.1.6  
+django-filter==2.4.0  
+djangorestframework==3.12.2  
+Markdown==3.3.3  
+nodeenv==1.5.0  
+pytz==2021.1  
+six==1.15.0  
+sqlparse==0.4.1  
 
 ### Node Dependencies
-create-react-app@4.0.2
+create-react-app@4.0.2  
