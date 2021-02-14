@@ -32,6 +32,7 @@ This section contains related project information and details
 - [Create React App](https://create-react-app.dev/docs/adding-typescript/)
 - [Dimple](http://dimplejs.org/)
 - [Isomorphic Fetch](https://www.npmjs.com/package/isomorphic-fetch)
+- [Selenium](https://pypi.org/project/selenium/)
 
 ### Python Dependencies
 asgiref==3.3.1  
