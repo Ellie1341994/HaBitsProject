@@ -42,11 +42,12 @@ class Habit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="habits")
     class Meta:
         ordering = ["-date_created"]
-        #constraints = [
-            #models.CheckConstraint(name="NON_VOID_HABIT_TIME_WINDOW",
-            #                       check=models.Q(end_time_hour__gt=models.F("start_time_hour"))
-            #                       & models.Q(end_time_hour__lte=24)
-            #                       & models.Q(end_time_minutes__lte=59))]
+        constraints = [
+            models.CheckConstraint(name="NON_VOID_HABIT_TIME_WINDOW",
+                                   check=models.Q(end_time_hour__gt=models.F("start_time_hour"))
+                                   & models.Q(end_time_hour__lte=24)
+                                   & models.Q(end_time_minutes__lte=59)
+                                   & models.Q(start_time_minutes__lte=59))]
 
 class Trace(models.Model):
     """
@@ -63,7 +64,7 @@ class Trace(models.Model):
     # Non-relational fields
     date = models.DateTimeField(auto_now=True)
     state = models.CharField(max_length=1, choices=Status.choices, default=Status.PENDING)
-    note = models.TextField(default=' ')
+    note = models.TextField(default='')
 
     # Relational fields
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE, related_name="traces")
