@@ -1,6 +1,6 @@
 """
 """
-from .models import Habit, User
+from .models import Habit, User, Trace
 from .views import HabitViewSet
 from .serializers import UserSerializer, HabitSerializer, TraceSerializer
 from rest_framework import status
@@ -18,9 +18,28 @@ class UserModelTest(APITestCase):
     @classmethod
     def setup_class(cls):
         """
-        Test data for all tests 
+        This methods prepares the overall state for all tests within the UserModelTest class 
         """
+        # Common User
         User.objects.create(username='deleteme', password='please')
+        User.objects.create(username='otherUser', password='iamwhoiam')
+        # Admin User
+        User.objects.create_superuser(username="admin", password="passwordAdmin")
+        # print("TESTADMINUSER: " + str(testAdminUser.is_staff)) --> TRUE
+    def setUp(self):
+        """
+        This methods prepares the state before each test method
+        """
+        # LogIn
+        # Note: Must use non-hashed account password to log in
+        isLoggedIn = self.client.login(username="admin", password="passwordAdmin")
+
+    def tearDown(self):
+        """
+        This methods refreshes the state after each test method
+        """
+        self.client.logout()
+        pass
 
     def test_list_users(self):
         """
@@ -32,12 +51,14 @@ class UserModelTest(APITestCase):
 
         # Assertions
         self.assertEqual(user_list_response.status_code , status.HTTP_200_OK)
-        self.assertEqual(user_list_response.json()["count"] , 1)
+        self.assertEqual(user_list_response.json()["count"] , 3)
 
     def test_create_user(self):
         """
         UserModelTest method that tests CreateModelMixin
         """
+        # Checking that permissions work correctly ( allow any for this view )
+        self.client.logout()
         # Requests 
         create_user_url = reverse('user-list')
         new_user_data = {'username' : 'Ellie',
@@ -79,6 +100,13 @@ class UserModelTest(APITestCase):
         # Assertions
         self.assertEqual(retrieve_user_response.status_code, status.HTTP_200_OK)
         self.assertEqual(retrieve_nonexistent_user_response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_reset_user_password(self):
+        """
+        """
+        url = reverse('user-change_password', kwargs={'pk' : 1})
+        print(url)
+
 
 
 class HabitModelTest(APITestCase):
@@ -99,14 +127,20 @@ class HabitModelTest(APITestCase):
            Habit.objects.create(user=testUser, name="h" + str(i))
            i += 1
 
-    # def setUp(self):
+    def setUp(self):
         """
-        Test data for each test
+        This methods prepares the state before each test method
         """
-    # def tearDown(self):
+        # LogIn
+        # Note: Must use non-hashed account password to log in
+        isLoggedIn = self.client.login(username="admin", password="passwordAdmin")
+
+    def tearDown(self):
         """
-        Routine executed after each test
+        This methods refreshes the state after each test method
         """
+        self.client.logout()
+        pass
 
     def test_list_habit(self):
         """
@@ -194,12 +228,29 @@ class TraceModelTest(APITestCase):
     """
     Trace Model C.R.U.D funcionality test
     """
-    def setUp_class(self):
+    @classmethod
+    def setup_class(cls):
         """
         Pre-test set of data. Valid for each and in between tests
         """
         testUser = User.objects.create(username="testUser", password="testPassword")
-        Habit.objects.create(name="testHabit", user=testUser)
+        testHabit = Habit.objects.create(name="testHabit", user=testUser)
+        testTrace = Trace.objects.create(habit=testHabit)
+
+    def setUp(self):
+        """
+        This methods prepares the state before each test method
+        """
+        # LogIn
+        # Note: Must use non-hashed account password to log in
+        isLoggedIn = self.client.login(username="admin", password="passwordAdmin")
+
+    def tearDown(self):
+        """
+        This methods refreshes the state after each test method
+        """
+        self.client.logout()
+        pass
 
     def test_list_traces(self):
         """
@@ -208,36 +259,54 @@ class TraceModelTest(APITestCase):
         # Data
             # Constants
         TRACES_CREATION_LIMIT = 200
-            #
+            # Other
         testHabit = Habit.objects.get(name="testHabit")
         i = 0
         while i < TRACES_CREATION_LIMIT:
             Trace.objects.create(habit=testHabit)
+            i += 1
 
         # Requests 
-        # Responses
+        traces_list_url = reverse('trace-list')
+        get_list_response = self.client.get(traces_list_url, format='json')
+
         # Assertions
-        pass
+        self.assertEqual(get_list_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(get_list_response.json()["count"], 201)
+
     def test_retrieve_trace(self):
         """
         TraceModelTest method that tests RetrieveModelMixin
         """
         # Data
+        trace_to_retrieve = Trace.objects.first()
         # Requests
-        # Responses
+        retrieve_trace_url = reverse('trace-detail', kwargs={'pk' : trace_to_retrieve.id})
+        retrieve_trace_response = self.client.get(retrieve_trace_url, format='json')
         # Assertions
-        pass
+        self.assertEqual(retrieve_trace_response.status_code, status.HTTP_200_OK)
+
     def test_create_trace(self):
         """
         TraceModelTest method that tests CreateModelMixin
         """
         # Data
+        testHabit = Habit.objects.first()
+        data = { "habit" : reverse('habit-detail', kwargs={'pk' : testHabit.id}) }
         # Requests 
-        # Responses
+        create_trace_url = reverse('trace-list')
+        create_trace_responce = self.client.post(create_trace_url, data, format='json')
         # Assertions
-        pass
+        self.assertEqual(create_trace_responce.status_code, status.HTTP_201_CREATED)
+
     def test_delete_trace(self):
         """
         TraceModelTest method that tests DestroyModelMixin
         """
-        pass
+        # Data
+        testTrace = Trace.objects.first()
+        # Requests 
+        delete_trace_url = reverse('trace-detail', kwargs={'pk' : testTrace.id})
+        delete_trace_response = self.client.delete(delete_trace_url, format='json')
+        # Assertions
+        self.assertEqual(delete_trace_response.status_code, status.HTTP_204_NO_CONTENT)
