@@ -14,7 +14,7 @@ from django.contrib.auth.hashers import make_password
 
 class UserModelTest(APITestCase):
     """
-    Class that extends APITestCase to test User class model
+    Class that extends APITestCase to test User class model against their corresponding server views
     """
     @classmethod
     def setup_class(cls):
@@ -27,6 +27,12 @@ class UserModelTest(APITestCase):
         # Admin User
         User.objects.create_superuser(username="admin", password="passwordAdmin")
         # print("TESTADMINUSER: " + str(testAdminUser.is_staff)) --> TRUE
+    def teardown_class(cls):
+        """
+        UserModelTest method that cleans all data used for and during the tests
+        """
+        User.objects.all().delete()
+
     def setUp(self):
         """
         This methods prepares the state before each test method
@@ -109,7 +115,8 @@ class UserModelTest(APITestCase):
         # LogOut Admin to test IsAuthenticated permissions
         self.client.logout()
         # LogIn non-admin user
-        print(self.client.login(username='otherUser', password='iamwhoiam'))
+        userLogIn = self.client.login(username='otherUser', password='iamwhoiam')
+        # print(userLogIn)
 
         # Data
         user = User.objects.get(username='otherUser')
@@ -119,7 +126,7 @@ class UserModelTest(APITestCase):
         user_url = reverse('user-detail', kwargs={'pk' : user.id})
         user_updated_response = self.client.patch(user_url, new_user_data, format='json')
         response_data = user_updated_response.json()
-        print(response_data)
+        #print(response_data)
         user = User.objects.get(username='otherUser')
         # Assertions
         self.assertEqual(user_updated_response.status_code, status.HTTP_200_OK)
@@ -132,14 +139,15 @@ class UserModelTest(APITestCase):
         # LogOut Admin to test IsAuthenticated permissions
         self.client.logout()
         # LogIn non-admin user
-        print(self.client.login(username='otherUser', password='iamwhoiam'))
+        #print()
+        self.client.login(username='otherUser', password='iamwhoiam')
         # Data
         user = User.objects.get(username='otherUser')
         data = {'password' : 'np'}
         # Requests
         user_change_pass_url = reverse('user-change_password', kwargs={'pk' : user.id})
         change_pass_response = self.client.post(user_change_pass_url, data, format='json')
-        print(change_pass_response.json())
+        #print(change_pass_response.json())
         # Assertions
         self.assertEqual(change_pass_response.status_code, status.HTTP_200_OK)
         self.client.logout()
@@ -156,12 +164,21 @@ class HabitModelTest(APITestCase):
         """
         # Data
         HABIT_CREATION_LIMIT = 200
-        testUser = User.objects.create(username='Ellie', password='123')
+        # Common Users
+        testUser = User.objects.create(username='Ellie', password=make_password('123'))
+        User.objects.create(username='otherUser', password=make_password('iamwhoiam'))
+        # Admin User
+        User.objects.create_superuser(username="admin", password="passwordAdmin")
         # To test pagination on viewsets
         i = 0
         while i < HABIT_CREATION_LIMIT:
            Habit.objects.create(user=testUser, name="h" + str(i))
            i += 1
+
+    def teardown_class(cls):
+        """
+        """
+        Habit.objects.all().delete()
 
     def setUp(self):
         """
@@ -201,43 +218,64 @@ class HabitModelTest(APITestCase):
         """
         HabitModelTest method that tests DestroyModelMixin
         """
-        # Data
-        habit = Habit.objects.all().first()
+        # LogOut admin
+        self.client.logout()
+        # Common user logs in
+        self.assertTrue(self.client.login(username='Ellie', password='123'))
+        # General data for testing
+        user = User.objects.get(username='Ellie')
+        adminUser = User.objects.get(username='admin')
 
-        # Request
-        url = reverse('habit-detail', kwargs={'pk' : habit.id})
-        delete_resource_response = self.client.delete(url, format='json')
-        get_deleted_resource_response = self.client.get(url, format='json')
+        anAdminHabit = Habit.objects.create(name="smoking", user=adminUser)
+        aUserHabit = Habit.objects.filter(user=user).first()
 
-        # Assertions
+        # Requests
+        # User attempt to delete its habit succeeds
+        delete_habit_url = reverse('habit-detail', kwargs={'pk' : aUserHabit.id})
+        delete_resource_response = self.client.delete(delete_habit_url, format='json')
         self.assertEqual(delete_resource_response.status_code , status.HTTP_204_NO_CONTENT)
-        self.assertEqual(get_deleted_resource_response.status_code , status.HTTP_404_NOT_FOUND)
+        # User attempt to delete a habit that is not his own correctly informs that such request is forbidden
+        admin_habit_url = reverse('habit-detail', kwargs={'pk' : anAdminHabit.id})
+        delete_admin_habit_response = self.client.delete(admin_habit_url, format='json')
+        self.assertEqual(delete_admin_habit_response.status_code , status.HTTP_403_FORBIDDEN)
 
     def test_create_habit(self):
         """
         HabitModelTest method that tests CreateModelMixin
         """
-        # Data
-        user = User.objects.get(username='Ellie')
+        # LogOut admin
+        self.client.logout()
+        # LogIn common user should succeed
+        self.assertTrue(self.client.login(username='otherUser', password='iamwhoiam'))
 
-        # Requests U.R.Ls
-        url = reverse('habit-list')
+        # General data for testing
+        other_user = User.objects.get(username='admin')
+        user = User.objects.get(username='otherUser')
+
+        # Requests
+        create_habit_url = reverse('habit-list')
+        # User correctly creates a habit record for himself
         # Note: HyperlinkedModelSerializer requires a url to the related resource instead of its primary key
         user_url = reverse('user-detail', kwargs=({'pk' : user.id}))
-
-        # Post Requests Data
-        data = {"name": "Running",
+        habit_data = {"name": "Running",
                 #"time": timezone.now().isoformat(),
                 #"effectiveness": 0,
                 "description": "Test description",
                 "user": user_url}
+        create_habit_response = self.client.post(create_habit_url, habit_data, format='json')
+        self.assertEqual(create_habit_response.status_code, status.HTTP_201_CREATED)
+        print(create_habit_response.json())
 
-        # Responses
-        response = self.client.post(url, data, format='json')
-
-        # Assertions
-        self.assertEqual(response.status_code , status.HTTP_201_CREATED)
-        self.assertEqual(Habit.objects.get(name="Running").name, "Running")
+        # User attempt to create a habit for another user is forbidden
+        wrong_user_url = reverse('user-detail', kwargs=({'pk' : other_user.id}))
+        wrong_habit_data = {"name": "Smoking",
+                #"time": timezone.now().isoformat(),
+                #"effectiveness": 0,
+                "description": "Test description",
+                "user": wrong_user_url}
+        wrong_create_habit_response = self.client.post(create_habit_url, wrong_habit_data, format='json')
+        print(wrong_create_habit_response.json())
+        self.assertEqual(wrong_create_habit_response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_retrieve_habit(self):
         """
@@ -259,6 +297,8 @@ class HabitModelTest(APITestCase):
         # Assertions
         self.assertEqual(habit_get_response.status_code, status.HTTP_200_OK)
         self.assertEqual(nonexistent_habit_get_response.status_code, status.HTTP_404_NOT_FOUND)
+
+
 
 class TraceModelTest(APITestCase):
     """

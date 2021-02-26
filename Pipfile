@@ -17,6 +17,7 @@ coverage = "*"
 pylint-django = "*"
 pytest-django = "*"
 pytest = "*"
+pytest-xdist = "*"
 
 [dev-packages]
 
