@@ -10,6 +10,7 @@ from django.utils import timezone
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 import io
+from django.contrib.auth.hashers import make_password
 
 class UserModelTest(APITestCase):
     """
@@ -21,8 +22,8 @@ class UserModelTest(APITestCase):
         This methods prepares the overall state for all tests within the UserModelTest class 
         """
         # Common User
-        User.objects.create(username='deleteme', password='please')
-        User.objects.create(username='otherUser', password='iamwhoiam')
+        User.objects.create(username='deleteme', password=make_password('please'))
+        User.objects.create(username='otherUser', password=make_password('iamwhoiam'))
         # Admin User
         User.objects.create_superuser(username="admin", password="passwordAdmin")
         # print("TESTADMINUSER: " + str(testAdminUser.is_staff)) --> TRUE
@@ -32,7 +33,7 @@ class UserModelTest(APITestCase):
         """
         # LogIn
         # Note: Must use non-hashed account password to log in
-        isLoggedIn = self.client.login(username="admin", password="passwordAdmin")
+        self.client.login(username="admin", password="passwordAdmin")
 
     def tearDown(self):
         """
@@ -101,13 +102,26 @@ class UserModelTest(APITestCase):
         self.assertEqual(retrieve_user_response.status_code, status.HTTP_200_OK)
         self.assertEqual(retrieve_nonexistent_user_response.status_code, status.HTTP_404_NOT_FOUND)
     
-    def test_reset_user_password(self):
+    def test_update_user(self):
         """
+        UserModelTest method that tests UpdateModelMixin
         """
-        url = reverse('user-change_password', kwargs={'pk' : 1})
-        print(url)
+        # LogOut Admin to test IsAuthenticated permissions
+        self.client.logout()
+        # LogIn non-admin user
+        print(self.client.login(username='otherUser', password='iamwhoiam'))
 
+        # Data
+        user = User.objects.get(username='otherUser')
+        new_user_data = {'password' : "newPassword"}
 
+        # Requests
+        user_url = reverse('user-detail', kwargs={'pk' : user.id})
+        user_updated_response = self.client.patch(user_url, new_user_data, format='json')
+        print(user_updated_response.json())
+
+        # Assertions
+        self.assertEqual(user_updated_response.status_code, status.HTTP_200_OK)
 
 class HabitModelTest(APITestCase):
     """
