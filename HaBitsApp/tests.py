@@ -14,12 +14,12 @@ from django.contrib.auth.hashers import make_password
 
 class UserModelTest(APITestCase):
     """
-    Class that extends APITestCase to test User class model 
+    Class that extends APITestCase to test User class model
     """
     @classmethod
     def setup_class(cls):
         """
-        This methods prepares the overall state for all tests within the UserModelTest class 
+        This methods prepares the overall state for all tests within the UserModelTest class
         """
         # Common User
         User.objects.create(username='deleteme', password=make_password('please'))
@@ -46,7 +46,7 @@ class UserModelTest(APITestCase):
         """
         UserModelTest method that tests ListModelMixin
         """
-        # Requests 
+        # Requests
         users_list_url = reverse('user-list')
         user_list_response = self.client.get(users_list_url, format='json')
 
@@ -60,7 +60,7 @@ class UserModelTest(APITestCase):
         """
         # Checking that permissions work correctly ( allow any for this view )
         self.client.logout()
-        # Requests 
+        # Requests
         create_user_url = reverse('user-list')
         new_user_data = {'username' : 'Ellie',
                 'password' : '123'}
@@ -76,7 +76,7 @@ class UserModelTest(APITestCase):
         # Data
         user = User.objects.get(username='deleteme')
 
-        # Requests 
+        # Requests
         delete_user_url = reverse('user-detail', kwargs={'pk': user.id})
         delete_user_response = self.client.delete(delete_user_url, format='json')
 
@@ -93,7 +93,7 @@ class UserModelTest(APITestCase):
 
         # Requests
         user_url = reverse('user-detail', kwargs={'pk' : user.id})
-        retrieve_user_response = self.client.get(user_url, format='json') 
+        retrieve_user_response = self.client.get(user_url, format='json')
 
         nonexisten_user_url = reverse('user-detail', kwargs={'pk' : NONEXISTENT_USER_ID})
         retrieve_nonexistent_user_response = self.client.get(nonexisten_user_url, format='json')
@@ -101,8 +101,8 @@ class UserModelTest(APITestCase):
         # Assertions
         self.assertEqual(retrieve_user_response.status_code, status.HTTP_200_OK)
         self.assertEqual(retrieve_nonexistent_user_response.status_code, status.HTTP_404_NOT_FOUND)
-    
-    def test_update_user(self):
+
+    def test_change_user_email(self):
         """
         UserModelTest method that tests UpdateModelMixin
         """
@@ -113,15 +113,37 @@ class UserModelTest(APITestCase):
 
         # Data
         user = User.objects.get(username='otherUser')
-        new_user_data = {'password' : "newPassword"}
+        new_user_data = {'email' : "a@b.com"}
 
         # Requests
         user_url = reverse('user-detail', kwargs={'pk' : user.id})
         user_updated_response = self.client.patch(user_url, new_user_data, format='json')
-        print(user_updated_response.json())
-
+        response_data = user_updated_response.json()
+        print(response_data)
+        user = User.objects.get(username='otherUser')
         # Assertions
         self.assertEqual(user_updated_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response_data["email"], 'a@b.com')
+
+    def test_change_user_password(self):
+        """
+        UserModelTest method that tests custom action change_password
+        """
+        # LogOut Admin to test IsAuthenticated permissions
+        self.client.logout()
+        # LogIn non-admin user
+        print(self.client.login(username='otherUser', password='iamwhoiam'))
+        # Data
+        user = User.objects.get(username='otherUser')
+        data = {'password' : 'np'}
+        # Requests
+        user_change_pass_url = reverse('user-change_password', kwargs={'pk' : user.id})
+        change_pass_response = self.client.post(user_change_pass_url, data, format='json')
+        print(change_pass_response.json())
+        # Assertions
+        self.assertEqual(change_pass_response.status_code, status.HTTP_200_OK)
+        self.client.logout()
+        self.assertTrue(self.client.login(username='otherUser', password='np'))
 
 class HabitModelTest(APITestCase):
     """
@@ -130,7 +152,7 @@ class HabitModelTest(APITestCase):
     @classmethod
     def setup_class(cls):
         """
-        Test data for all tests 
+        Test data for all tests
         """
         # Data
         HABIT_CREATION_LIMIT = 200
@@ -161,7 +183,7 @@ class HabitModelTest(APITestCase):
         HabitModelTest method that tests ListModelMixin
         Note: Trying to reverse the view url with page_query_param does not work
         """
-        # Requests 
+        # Requests
         list_url = reverse('habit-list')
         get_initial_list_response = self.client.get(list_url, format='json')
 
@@ -179,7 +201,7 @@ class HabitModelTest(APITestCase):
         """
         HabitModelTest method that tests DestroyModelMixin
         """
-        # Data 
+        # Data
         habit = Habit.objects.all().first()
 
         # Request
@@ -195,7 +217,7 @@ class HabitModelTest(APITestCase):
         """
         HabitModelTest method that tests CreateModelMixin
         """
-        # Data 
+        # Data
         user = User.objects.get(username='Ellie')
 
         # Requests U.R.Ls
@@ -221,12 +243,12 @@ class HabitModelTest(APITestCase):
         """
         HabitModelTest method that tests RetrieveModelMixin
         """
-        # Data 
+        # Data
          # Constants
         THIS_ID_DOESNOT_EXIST = Habit.objects.count() + 9
-         # DB Data 
+         # DB Data
         habit = Habit.objects.all().first()
-        
+
         # Requests
         habit_url = reverse('habit-detail', kwargs={'pk' : habit.id})
         habit_get_response = self.client.get(habit_url, format='json')
@@ -235,8 +257,8 @@ class HabitModelTest(APITestCase):
         nonexistent_habit_get_response = self.client.get(nonexistent_habit_url, format='json')
 
         # Assertions
-        self.assertEqual(habit_get_response.status_code, status.HTTP_200_OK) 
-        self.assertEqual(nonexistent_habit_get_response.status_code, status.HTTP_404_NOT_FOUND) 
+        self.assertEqual(habit_get_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(nonexistent_habit_get_response.status_code, status.HTTP_404_NOT_FOUND)
 
 class TraceModelTest(APITestCase):
     """
@@ -280,7 +302,7 @@ class TraceModelTest(APITestCase):
             Trace.objects.create(habit=testHabit)
             i += 1
 
-        # Requests 
+        # Requests
         traces_list_url = reverse('trace-list')
         get_list_response = self.client.get(traces_list_url, format='json')
 
@@ -307,7 +329,7 @@ class TraceModelTest(APITestCase):
         # Data
         testHabit = Habit.objects.first()
         data = { "habit" : reverse('habit-detail', kwargs={'pk' : testHabit.id}) }
-        # Requests 
+        # Requests
         create_trace_url = reverse('trace-list')
         create_trace_responce = self.client.post(create_trace_url, data, format='json')
         # Assertions
@@ -319,7 +341,7 @@ class TraceModelTest(APITestCase):
         """
         # Data
         testTrace = Trace.objects.first()
-        # Requests 
+        # Requests
         delete_trace_url = reverse('trace-detail', kwargs={'pk' : testTrace.id})
         delete_trace_response = self.client.delete(delete_trace_url, format='json')
         # Assertions

@@ -19,12 +19,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
         if self.action == 'create':
             self.permission_classes = [permissions.AllowAny]
-        # Only allows the current logged in user to modify its password
+        # Only allows the current logged in user to modify its email
         elif self.action == 'partial_update' \
              and self.request.method == 'PATCH' \
              and len(self.request.data) == 1 \
-             and 'password' in self.request.data \
-             and str(self.request.user.id) in self.request.path:
+             and 'email' in self.request.data \
+             and str(self.request.user.id) in self.request.path \
+             or self.action == 'set_password':
             self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.IsAdminUser]
@@ -33,23 +34,18 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'],
             detail=True,
-            permission_classes=[permissions.IsAdminUser],
+            permission_classes=[permissions.IsAuthenticated],
             url_path='change-password',
             url_name='change_password')
     def set_password(self, request, pk=None):
         user = self.get_object()
-        serializer = UserSerializer(data=request.data)
-        response_http_status = status.HTTP_200_OK
-        data = ""
+        serializer = UserSerializer(data=request.data, partial=True)
         if serializer.is_valid():
-            user.password = make_password(serializer.data["password"])
+            user.password = make_password(request.data["password"])
             user.save()
-            data = serializer.data
+            return Response({}, status=status.HTTP_200_OK)
         else:
-            response_http_status = status.HTTP_400_BAD_REQUEST
-            data = serializer.errors
-
-        return Response(data, status=response_http_status)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class HabitViewSet(viewsets.ModelViewSet):
     """
