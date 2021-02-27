@@ -172,9 +172,11 @@ class HabitModelTest(APITestCase):
         # To test pagination on viewsets
         i = 0
         while i < HABIT_CREATION_LIMIT:
-           Habit.objects.create(user=testUser, name="h" + str(i))
+           h = Habit.objects.create(user=testUser, name="h" + str(i))
+           h.save()
            i += 1
 
+    @classmethod
     def teardown_class(cls):
         """
         """
@@ -193,35 +195,59 @@ class HabitModelTest(APITestCase):
         This methods refreshes the state after each test method
         """
         self.client.logout()
+        Habit.objects.all().delete()
         pass
 
     def test_list_habit(self):
         """
-        HabitModelTest method that tests ListModelMixin
+        HabitModelTest method that tests the customized list action behaviour inherited from ListModelMixin
         Note: Trying to reverse the view url with page_query_param does not work
         """
+        # General data for testing
+        user = User.objects.get(username='Ellie')
+
+        # LogOut admin
+        self.client.logout()
+
+        # Common user logs in
+        self.assertTrue(self.client.login(username='Ellie', password='123'))
+
         # Requests
-        list_url = reverse('habit-list')
-        get_initial_list_response = self.client.get(list_url, format='json')
+        # User asks for their habits and the view correctly returns a page of them
+        user_habit_list_url = reverse('habit-list')
+        get_list_response = self.client.get(user_habit_list_url, format='json')
+        self.assertEqual(get_list_response.status_code , status.HTTP_200_OK)
+        get_list_response_data = get_list_response.json()
+        #print(get_list_response_data)
+        self.assertEqual(len(get_list_response.json()["results"]) , 100)
+        user_habit_list = get_list_response_data["results"]
+        user_url = reverse('user-detail', kwargs={'pk': user.id})
+        for habit in user_habit_list:
+            self.assertTrue(user_url in habit["user"])
 
-        next_list_url = get_initial_list_response.json()["next"]
+        # Pagination test ( user habits' next page )
+        next_list_url = get_list_response.json()["next"]
         get_next_list_response = self.client.get(next_list_url, format='json')
+        self.assertEqual(get_list_response.json()["count"] , 200)
+        self.assertNotEqual(get_list_response.json()["previous"], get_next_list_response.json()["previous"])
+        self.assertTrue(get_list_response.data["previous"] is None)
+        self.assertTrue(get_next_list_response.data["next"] is None)
 
-        # Assertions
-        self.assertEqual(get_initial_list_response.status_code , status.HTTP_200_OK)
-        self.assertEqual(len(get_initial_list_response.json()["results"]) , 100)
-            # Pagination test
-        self.assertEqual(get_initial_list_response.json()["count"] , 200)
-        self.assertNotEqual(get_initial_list_response.json()["previous"], get_next_list_response.json()["previous"])
+        # Anonymous user attempt to see habits is correctly prohibited
+        self.client.logout()
+        get_anonym_list_response = self.client.get(user_habit_list_url, format='json')
+        self.assertEqual(get_anonym_list_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_delete_habit(self):
         """
-        HabitModelTest method that tests DestroyModelMixin
+        HabitModelTest method that tests the customized destroy action behaviour inherited from DestroyModelMixin
         """
         # LogOut admin
         self.client.logout()
+
         # Common user logs in
         self.assertTrue(self.client.login(username='Ellie', password='123'))
+
         # General data for testing
         user = User.objects.get(username='Ellie')
         adminUser = User.objects.get(username='admin')
@@ -235,25 +261,31 @@ class HabitModelTest(APITestCase):
         delete_resource_response = self.client.delete(delete_habit_url, format='json')
         self.assertEqual(delete_resource_response.status_code , status.HTTP_204_NO_CONTENT)
         # User attempt to delete a habit that is not his own correctly informs that such request is forbidden
+
         admin_habit_url = reverse('habit-detail', kwargs={'pk' : anAdminHabit.id})
         delete_admin_habit_response = self.client.delete(admin_habit_url, format='json')
         self.assertEqual(delete_admin_habit_response.status_code , status.HTTP_403_FORBIDDEN)
 
+        # Anonymous user attempt to delete a habit correctly identifyies him as non-authenticated
+        self.client.logout()
+        delete_habit_anonym_response = self.client.delete(admin_habit_url, format='json')
+        self.assertEqual(delete_habit_anonym_response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_create_habit(self):
         """
-        HabitModelTest method that tests CreateModelMixin
+        HabitModelTest method that tests the customized create action behaviour inherited from CreateModelMixin
         """
         # LogOut admin
         self.client.logout()
         # LogIn common user should succeed
         self.assertTrue(self.client.login(username='otherUser', password='iamwhoiam'))
+        # LogIn common user should succeed
 
         # General data for testing
         other_user = User.objects.get(username='admin')
         user = User.objects.get(username='otherUser')
 
         # Requests
-        create_habit_url = reverse('habit-list')
         # User correctly creates a habit record for himself
         # Note: HyperlinkedModelSerializer requires a url to the related resource instead of its primary key
         user_url = reverse('user-detail', kwargs=({'pk' : user.id}))
@@ -262,6 +294,7 @@ class HabitModelTest(APITestCase):
                 #"effectiveness": 0,
                 "description": "Test description",
                 "user": user_url}
+        create_habit_url = reverse('habit-list')
         create_habit_response = self.client.post(create_habit_url, habit_data, format='json')
         self.assertEqual(create_habit_response.status_code, status.HTTP_201_CREATED)
         print(create_habit_response.json())
@@ -276,6 +309,11 @@ class HabitModelTest(APITestCase):
         wrong_create_habit_response = self.client.post(create_habit_url, wrong_habit_data, format='json')
         print(wrong_create_habit_response.json())
         self.assertEqual(wrong_create_habit_response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Anonymous user attempt to create a habit correctly identifyies him as non-authenticated
+        self.client.logout()
+        create_habit_anonym_response = self.client.post(create_habit_url, habit_data, format='json')
+        self.assertEqual(create_habit_anonym_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_retrieve_habit(self):
         """
@@ -297,6 +335,13 @@ class HabitModelTest(APITestCase):
         # Assertions
         self.assertEqual(habit_get_response.status_code, status.HTTP_200_OK)
         self.assertEqual(nonexistent_habit_get_response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_partial_update_habit(self):
+        """
+        HabitModelTest method that tests the customized list action behaviour inherited from ListModelMixin
+        todo: range, day and time modifications test
+        """
+
 
 
 

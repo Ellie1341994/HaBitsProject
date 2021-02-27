@@ -76,6 +76,9 @@ class HabitViewSet(viewsets.ModelViewSet):
         if self.action == 'create' \
            and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]: 
             self.permission_classes = [permissions.IsAuthenticated]
+        elif self.action == 'list' and self.request.user.id is not None:
+            self.queryset = self.queryset.filter(user=self.request.user.id)
+            self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'destroy':
             habitIdPattern = re.compile('/\\d+/') 
             match = habitIdPattern.search(self.request.path)
@@ -86,7 +89,6 @@ class HabitViewSet(viewsets.ModelViewSet):
                     self.permission_classes = [permissions.IsAuthenticated]
                 else:
                     self.permission_classes = [permissions.IsAdminUser]
-                    print('forbidden')
         else:
             self.permission_classes = [permissions.IsAdminUser]
 
