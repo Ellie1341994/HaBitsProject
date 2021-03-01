@@ -71,24 +71,55 @@ class HabitViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser]
     def get_permissions(self):
         """
-        HaitViewSet method that sets each action permission:
+        HabitViewSet method that sets each action permission:
         """
+        def correctFields(data):
+            """
+            Determines if the given fields storaged on the request data
+            are allowed to be modified
+            """
+            dataIs = False
+            for field in data:
+                if field in ['name', 'date_created', 'user']:
+                    return False
+                if field in ['date_edited', 
+                             'description',
+                             'effectiveness'
+                             'time_frame', 
+                             'day', 
+                             'start_hour', 
+                             'start_minutes', 
+                             'end_hour', 
+                             'end_minutes']:
+                    dataIs = True
+
+            return dataIs
+
+        def habitOwnerIsUSer(request_user, request_path):
+            """
+            Determines whether the habit object was
+            created by the current logged in user or not
+            """
+            habitIdPattern = re.compile('/\\d+/') 
+            match = habitIdPattern.search(request_path)
+            if match:
+                habitId = int(match.group().strip('/'))
+                habitObj = Habit.objects.get(id=habitId)
+                return habitObj.user == request_user
+
         if self.action == 'create' \
            and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]: 
             self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'list' and self.request.user.id is not None:
             self.queryset = self.queryset.filter(user=self.request.user.id)
             self.permission_classes = [permissions.IsAuthenticated]
-        elif self.action == 'destroy':
-            habitIdPattern = re.compile('/\\d+/') 
-            match = habitIdPattern.search(self.request.path)
-            if match:
-                habitId = int(match.group().strip('/'))
-                habitObj = Habit.objects.get(id=habitId)
-                if habitObj.user == self.request.user:
-                    self.permission_classes = [permissions.IsAuthenticated]
-                else:
-                    self.permission_classes = [permissions.IsAdminUser]
+        elif self.action == 'destroy' and habitOwnerIsUSer(self.request.user, self.request.path):
+            self.permission_classes = [permissions.IsAuthenticated]
+        elif self.action == 'partial_update' \
+            and self.request.user.id is not None \
+            and correctFields(self.request.data):
+            self.queryset = self.queryset.filter(user=self.request.user.id)
+            self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.IsAdminUser]
 
@@ -102,4 +133,17 @@ class TraceViewSet(viewsets.ModelViewSet):
     queryset = Trace.objects.all()
     serializer_class = TraceSerializer
     ordering_fields = '__all__'
-    permission_classes = [permissions.IsAdminUser]
+    def get_permissions(self):
+        """
+        TraceViewSet method that sets each action permission:
+        """
+
+        if self.action == 'list' and self.request.user.id is not None:
+            self.queryset = Trace.objects.filter(habit__user=self.request.user)
+            self.permission_classes = [permissions.IsAuthenticated]
+        elif self.action == 'create' and 'habit' in self.request.data:
+            self.permission_classes = [permissions.IsAuthenticated]
+        else:
+            self.permission_classes = [permissions.IsAdminUser]
+
+        return super().get_permissions()

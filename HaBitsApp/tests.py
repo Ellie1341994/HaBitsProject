@@ -180,7 +180,7 @@ class HabitModelTest(APITestCase):
     def teardown_class(cls):
         """
         """
-        Habit.objects.all().delete()
+        User.objects.all().delete()
 
     def setUp(self):
         """
@@ -279,7 +279,6 @@ class HabitModelTest(APITestCase):
         self.client.logout()
         # LogIn common user should succeed
         self.assertTrue(self.client.login(username='otherUser', password='iamwhoiam'))
-        # LogIn common user should succeed
 
         # General data for testing
         other_user = User.objects.get(username='admin')
@@ -338,11 +337,29 @@ class HabitModelTest(APITestCase):
 
     def test_partial_update_habit(self):
         """
-        HabitModelTest method that tests the customized list action behaviour inherited from ListModelMixin
-        todo: range, day and time modifications test
+        HabitModelTest method that tests the customized partial_update action behaviour inherited from UpdateModelMixin
         """
+        # LogOut admin
+        self.client.logout()
+        # LogIn common user should succeed
+        self.assertTrue(self.client.login(username='Ellie', password='123'))
 
+        # General data
+        anElliesHabit = Habit.objects.filter(user__username='Ellie').first()
 
+        # User attempt to modify one of its habits name correctly fail
+        data = {'name' : 'somethingElse', 'end_minutes' : 5}
+        update_habit_url = reverse('habit-detail', kwargs={'pk' : anElliesHabit.id}) 
+        wrong_update_habit_request = self.client.patch(update_habit_url, data, format='json')
+        self.assertEqual(wrong_update_habit_request.status_code, status.HTTP_403_FORBIDDEN)
+        # User attempt to modify one of its habits day correctly succeeds
+        data = {'day' : 'FR', 'start_hour': 6}
+        update_habit_request = self.client.patch(update_habit_url, data, format='json')
+        self.assertEqual(update_habit_request.status_code, status.HTTP_200_OK)
+        # Not logged attempt to modify a habit should be unuthorized
+        self.client.logout()
+        update_habit_request = self.client.patch(update_habit_url, data, format='json')
+        self.assertEqual(update_habit_request.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class TraceModelTest(APITestCase):
@@ -354,9 +371,28 @@ class TraceModelTest(APITestCase):
         """
         Pre-test set of data. Valid for each and in between tests
         """
-        testUser = User.objects.create(username="testUser", password="testPassword")
-        testHabit = Habit.objects.create(name="testHabit", user=testUser)
-        testTrace = Trace.objects.create(habit=testHabit)
+        # Data
+        TRACE_CREATION_LIMIT = 200
+        # Common Users
+        user_ellie = User.objects.create(username='Ellie', password=make_password('123'))
+        ellie_habit = Habit.objects.create(user=user_ellie, name="videogaming")
+        other_user = User.objects.create(username='otherUser', password=make_password('iamwhoiam'))
+        other_user_habit = Habit.objects.create(user=other_user, name="walking")
+        Trace.objects.create(habit=other_user_habit)
+        # Admin User
+        User.objects.create_superuser(username="admin", password="passwordAdmin")
+        # To test pagination on viewsets
+        i = 0
+        while i < TRACE_CREATION_LIMIT:
+           t = Trace.objects.create(habit=ellie_habit, date=timezone.now() + timezone.timedelta(days=i))
+           t.save()
+           i += 1
+
+    @classmethod
+    def teardown_class(cls):
+        """
+        """
+        User.objects.all().delete()
 
     def setUp(self):
         """
@@ -364,70 +400,51 @@ class TraceModelTest(APITestCase):
         """
         # LogIn
         # Note: Must use non-hashed account password to log in
-        isLoggedIn = self.client.login(username="admin", password="passwordAdmin")
+        #isLoggedIn = self.client.login(username="admin", password="passwordAdmin")
 
     def tearDown(self):
         """
         This methods refreshes the state after each test method
         """
-        self.client.logout()
-        pass
 
     def test_list_traces(self):
         """
         TraceModelTest method that tests ListModelMixin
         """
-        # Data
-            # Constants
-        TRACES_CREATION_LIMIT = 200
-            # Other
-        testHabit = Habit.objects.get(name="testHabit")
-        i = 0
-        while i < TRACES_CREATION_LIMIT:
-            Trace.objects.create(habit=testHabit)
-            i += 1
+        # General Data
+        user_ellie = User.objects.get(username='Ellie')
+        ellie_habit = Habit.objects.filter(user=user_ellie).first()
+        #Log user in should succeed
+        self.assertTrue(self.client.login(username='Ellie', password='123'))
 
-        # Requests
-        traces_list_url = reverse('trace-list')
-        get_list_response = self.client.get(traces_list_url, format='json')
-
-        # Assertions
-        self.assertEqual(get_list_response.status_code, status.HTTP_200_OK)
-        self.assertEqual(get_list_response.json()["count"], 201)
+        # User attempt to check habit traces history should succeed
+        trace_list_url = reverse('trace-list')
+        trace_list_request = self.client.get(trace_list_url, format='json')
+        trace_list = trace_list_request.json()
+        first_trace = trace_list["results"][0]
+        #print(trace_list["results"])
+        self.assertEqual(trace_list_request.status_code, status.HTTP_200_OK)        
+        # Total traces should be 201
+        self.assertEqual(Trace.objects.count(), 201)
+        # Total habit's traces should be 200
+        self.assertEqual(trace_list["count"], 200)        
+        # check that every trace has the same habit url
+        for trace in trace_list["results"]:
+            self.assertEqual(trace["habit"], first_trace["habit"])
+        # check that non logged in user is unauthorized
+        self.client.logout()
+        trace_list_request = self.client.get(trace_list_url, format='json')
+        self.assertEqual(trace_list_request.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_retrieve_trace(self):
         """
         TraceModelTest method that tests RetrieveModelMixin
         """
-        # Data
-        trace_to_retrieve = Trace.objects.first()
-        # Requests
-        retrieve_trace_url = reverse('trace-detail', kwargs={'pk' : trace_to_retrieve.id})
-        retrieve_trace_response = self.client.get(retrieve_trace_url, format='json')
-        # Assertions
-        self.assertEqual(retrieve_trace_response.status_code, status.HTTP_200_OK)
-
     def test_create_trace(self):
         """
         TraceModelTest method that tests CreateModelMixin
         """
-        # Data
-        testHabit = Habit.objects.first()
-        data = { "habit" : reverse('habit-detail', kwargs={'pk' : testHabit.id}) }
-        # Requests
-        create_trace_url = reverse('trace-list')
-        create_trace_responce = self.client.post(create_trace_url, data, format='json')
-        # Assertions
-        self.assertEqual(create_trace_responce.status_code, status.HTTP_201_CREATED)
-
     def test_delete_trace(self):
         """
         TraceModelTest method that tests DestroyModelMixin
         """
-        # Data
-        testTrace = Trace.objects.first()
-        # Requests
-        delete_trace_url = reverse('trace-detail', kwargs={'pk' : testTrace.id})
-        delete_trace_response = self.client.delete(delete_trace_url, format='json')
-        # Assertions
-        self.assertEqual(delete_trace_response.status_code, status.HTTP_204_NO_CONTENT)
