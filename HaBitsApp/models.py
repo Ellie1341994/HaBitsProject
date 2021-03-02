@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 from datetime import date
 # Create your models here.
 class User(AbstractUser):
@@ -31,8 +32,8 @@ class Habit(models.Model):
         """
         Habit class's enumeration
         Enumerates week day names
-        Has a method <today> that determines the correct enumeration value
-        for today
+        Method/s:
+        Today(): 
         """
         MONDAY = 'MO', _('Monday')
         TUESDAY = 'TU', _('Tuesday')
@@ -42,21 +43,25 @@ class Habit(models.Model):
         SUNDAY = 'SU', _('Sunday')
         SATURDAY = 'SA', _('Saturday')
 
-        def today(self):
-            TODAY = date.today().strftime("%A").upper()
-            return [getattr(self, DAY) for DAY in dir(self) if DAY in TODAY].pop()
+    def today():
+        """
+        DayNames method
+        Determines the correct enumeration value
+        for today
+        """
+        return date.today().strftime("%A").upper()[:2]
 
     # Non-relational fields
         # Mutable
     time_frame = models.CharField(max_length=1, choices=TimeFrame.choices, default=TimeFrame.DAY)
-    day = models.CharField(max_length=2,choices=DayNames.choices, default="LU")
+    day = models.CharField(max_length=2,choices=DayNames.choices, default=today)
     # 24 hours clock
-    start_hour = models.PositiveIntegerField(default=0)
-    start_minutes = models.PositiveIntegerField(default=0)
-    end_hour = models.PositiveIntegerField(default=1)
-    end_minutes = models.PositiveIntegerField(default=0)
+    start_hour = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(23)])
+    start_minutes = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(59)])
+    end_hour = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(23)])
+    end_minutes = models.PositiveIntegerField(validators=[MinValueValidator(0), MaxValueValidator(59)])
     date_edited = models.DateTimeField(auto_now=True)
-    effectiveness = models.IntegerField(default=0)
+    effectiveness = models.IntegerField(default=0 , validators=[MinValueValidator(0), MaxValueValidator(10)])
     description = models.TextField(default='')
         # Inmutable
     name = models.CharField(max_length=25)
@@ -68,10 +73,7 @@ class Habit(models.Model):
         ordering = ["-date_created"]
         constraints = [
             models.CheckConstraint(name="NON_VOID_HABIT_TIME_WINDOW",
-                                   check=models.Q(end_hour__gt=models.F("start_hour"))
-                                   & models.Q(end_hour__lte=24)
-                                   & models.Q(end_minutes__lte=59)
-                                   & models.Q(start_minutes__lte=59))]
+                                   check=models.Q(end_hour__gt=models.F("start_hour")))]
 
 class Trace(models.Model):
     """
@@ -86,11 +88,11 @@ class Trace(models.Model):
         FAILED = 'F', _('Failed')
 
     # Non-relational fields
-    date = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now=True)
     state = models.CharField(max_length=1, choices=Status.choices, default=Status.PENDING)
     note = models.TextField(default='')
 
     # Relational fields
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE, related_name="traces")
     class Meta:
-        ordering = ["-date"]
+        ordering = ["-date_created"]

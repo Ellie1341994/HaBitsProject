@@ -5,6 +5,7 @@ from rest_framework import viewsets, permissions, status
 from .serializers import UserSerializer, TraceSerializer, HabitSerializer
 from .models import Habit, Trace, User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout, authenticate
 from rest_framework.decorators import action
 from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
@@ -24,9 +25,9 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         UserViewSet method that sets each action permission:
         Permission: AllowAny Action: create
-        Permission: IsAuthenticated Actions: set_password 
-            partial_update(PATCH method) custom permission: email field only, own information only
-        Permission: IsAdminUser Action: any others
+        Permission: IsAuthenticated Actions: c_password
+        Custom permission: IsAuthenticated own email information only Action: partial_update(PATCH method)
+        Permission: IsAdminUser Action: Any other
         """
         if self.action == 'create':
             self.permission_classes = [permissions.AllowAny]
@@ -36,7 +37,7 @@ class UserViewSet(viewsets.ModelViewSet):
              and len(self.request.data) == 1 \
              and 'email' in self.request.data \
              and str(self.request.user.id) in self.request.path \
-             or self.action == 'set_password':
+             or self.action == 'c_password':
             self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.IsAdminUser]
@@ -48,7 +49,7 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes=[permissions.IsAuthenticated],
             url_path='change-password',
             url_name='change_password')
-    def set_password(self, request, pk=None):
+    def c_password(self, request, pk=None):
         """
         UserViewSet method that allows an authenticated users to change its password
         """
@@ -61,10 +62,47 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class AuthViewSet(viewsets.ViewSet):
+    """
+    """
+    queryset = User.objects.all()
+    serializer_class = None
+
+    @action(methods=['post'],
+            detail=False,
+            permission_classes=[permissions.AllowAny],
+            url_path='login',
+            url_name='login')
+    def log_in(self, request, pk=None):
+        """
+        """
+        print(request.POST)
+        username = request.data['username']
+        password = request.data['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return Response(data='',status=status.HTTP_201_CREATED)
+
+        return Response(data='',status=status.HTTP_404_NOT_FOUND)
+
+    @action(methods=['get'],
+            detail=False,
+            permission_classes=[permissions.IsAuthenticated],
+            url_path='logout',
+            url_name='logout')
+    def log_out(self, request, pk=None):
+        """
+        """
+        logout(request)
+        if request.user is None:
+            return Response(data='', status=status.HTTP_200_OK)
+
+        return Response(data='', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class HabitViewSet(viewsets.ModelViewSet):
     """
-    Subclass model that inherits viewsets.ModelViewSet from rest_framework module
-    Brief: ModelViewSet adds default C.R.U.D actions to the model.
     """
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
@@ -73,47 +111,57 @@ class HabitViewSet(viewsets.ModelViewSet):
         """
         HabitViewSet method that sets each action permission:
         """
-        def correctFields(data):
+        def correctFields(data: dict) -> bool:
             """
-            Determines if the given fields storaged on the request data
-            are allowed to be modified
+            Determines if the post request data fields
+            for the partial_update action are allowed to be modified or not
             """
             dataIs = False
             for field in data:
                 if field in ['name', 'date_created', 'user']:
                     return False
-                if field in ['date_edited', 
+                if field in ['date_edited',
                              'description',
                              'effectiveness'
-                             'time_frame', 
-                             'day', 
-                             'start_hour', 
-                             'start_minutes', 
-                             'end_hour', 
+                             'time_frame',
+                             'day',
+                             'start_hour',
+                             'start_minutes',
+                             'end_hour',
                              'end_minutes']:
                     dataIs = True
 
             return dataIs
-
-        def habitOwnerIsUSer(request_user, request_path):
+        def habitOwnerIsUser(request_user: User , request_path: str) -> bool:
             """
-            Determines whether the habit object was
-            created by the current logged in user or not
+            Determines whether the habit object referrenced on the path
+            is owned by the current logged in user or not
             """
-            habitIdPattern = re.compile('/\\d+/') 
+            habitIdPattern = re.compile('/\\d+/')
             match = habitIdPattern.search(request_path)
             if match:
                 habitId = int(match.group().strip('/'))
                 habitObj = Habit.objects.get(id=habitId)
                 return habitObj.user == request_user
 
-        if self.action == 'create' \
-           and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]: 
+        def checkHabitTime(habit_data: dict) -> bool:
+            """
+            Determines whether a habit's start hour is lower than its end hour
+            """
+            s = 'start_hour'
+            e = 'end_hour'
+            return s in habit_data and e in habit_data and habit_data[s] < habit_data[e]
+            #return start_hour < end_hour
+
+        if ( self.action == 'create'
+            and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]
+            and checkHabitTime(self.request.data) ):
+            #print(self.request.data)
             self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'list' and self.request.user.id is not None:
             self.queryset = self.queryset.filter(user=self.request.user.id)
             self.permission_classes = [permissions.IsAuthenticated]
-        elif self.action == 'destroy' and habitOwnerIsUSer(self.request.user, self.request.path):
+        elif self.action == 'destroy' and habitOwnerIsUser(self.request.user, self.request.path):
             self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'partial_update' \
             and self.request.user.id is not None \

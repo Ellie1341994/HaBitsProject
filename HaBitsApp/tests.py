@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, URLPatternsTestCase, force_authenticate, APIClient
 from django.urls import include, path, reverse
 from django.utils import timezone
+from django.db.utils import IntegrityError
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 import io
@@ -172,7 +173,13 @@ class HabitModelTest(APITestCase):
         # To test pagination on viewsets
         i = 0
         while i < HABIT_CREATION_LIMIT:
-           h = Habit.objects.create(user=testUser, name="h" + str(i))
+           h = Habit.objects.create(user=testUser, 
+                                    name="h" + str(i),
+                                    start_hour=3,
+                                    start_minutes=7,
+                                    end_hour=7,
+                                    end_minutes=44,
+                                    )
            h.save()
            i += 1
 
@@ -194,8 +201,6 @@ class HabitModelTest(APITestCase):
         """
         This methods refreshes the state after each test method
         """
-        self.client.logout()
-        Habit.objects.all().delete()
         pass
 
     def test_list_habit(self):
@@ -252,7 +257,13 @@ class HabitModelTest(APITestCase):
         user = User.objects.get(username='Ellie')
         adminUser = User.objects.get(username='admin')
 
-        anAdminHabit = Habit.objects.create(name="smoking", user=adminUser)
+        anAdminHabit = Habit.objects.create(name="smoking",
+                                            user=adminUser,
+                                            start_hour=3,
+                                            start_minutes=7,
+                                            end_hour=7,
+                                            end_minutes=44,
+                                            )
         aUserHabit = Habit.objects.filter(user=user).first()
 
         # Requests
@@ -289,25 +300,51 @@ class HabitModelTest(APITestCase):
         # Note: HyperlinkedModelSerializer requires a url to the related resource instead of its primary key
         user_url = reverse('user-detail', kwargs=({'pk' : user.id}))
         habit_data = {"name": "Running",
-                #"time": timezone.now().isoformat(),
-                #"effectiveness": 0,
-                "description": "Test description",
-                "user": user_url}
+                      "description": "Test description",
+                      "start_hour" : "3",
+                      "start_minutes" : "7",
+                      "end_hour" : "7",
+                      "end_minutes" : "44",
+                      "user": user_url}
         create_habit_url = reverse('habit-list')
         create_habit_response = self.client.post(create_habit_url, habit_data, format='json')
         self.assertEqual(create_habit_response.status_code, status.HTTP_201_CREATED)
-        print(create_habit_response.json())
+        #print(create_habit_response.json())
 
         # User attempt to create a habit for another user is forbidden
         wrong_user_url = reverse('user-detail', kwargs=({'pk' : other_user.id}))
         wrong_habit_data = {"name": "Smoking",
-                #"time": timezone.now().isoformat(),
-                #"effectiveness": 0,
-                "description": "Test description",
-                "user": wrong_user_url}
+                            "description": "Test description",
+                            "start_hour" : "3",
+                            "start_minutes" : "7",
+                            "end_hour" : "7",
+                            "end_minutes" : "44",
+                            "user": wrong_user_url}
         wrong_create_habit_response = self.client.post(create_habit_url, wrong_habit_data, format='json')
-        print(wrong_create_habit_response.json())
+        #print(wrong_create_habit_response.json())
         self.assertEqual(wrong_create_habit_response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # User attempt to create a habit with wrong start and end hours is forbidden
+        wrong_habit_data_0 = {"name" : "wrong habit",
+                              "description" : "this habit's time is wrong",
+                              "start_hour" : "8",
+                              "start_minutes" : "7",
+                              "end_hour" : "6",
+                              "end_minutes" : "44",
+                              "user" : user_url}
+        wrong_create_habit_response_0 = self.client.post(create_habit_url, wrong_habit_data_0, format='json')
+        self.assertEqual(wrong_create_habit_response_0.status_code, status.HTTP_403_FORBIDDEN)
+
+        # User attempt to create a habit were its time fields are out of clock system boundaries returns a bad request status code
+        wrong_habit_data_1 = {"name" : "wrong habit",
+                              "description" : "this habit's time is wrong",
+                              "start_hour" : "25",
+                              "start_minutes" : "77",
+                              "end_hour" : "27",
+                              "end_minutes" : "-4",
+                              "user" : user_url}
+        wrong_create_habit_response_1 = self.client.post(create_habit_url, wrong_habit_data_1, format='json')
+        self.assertEqual(wrong_create_habit_response_1.status_code, status.HTTP_400_BAD_REQUEST)
 
         # Anonymous user attempt to create a habit correctly identifyies him as non-authenticated
         self.client.logout()
@@ -318,6 +355,10 @@ class HabitModelTest(APITestCase):
         """
         HabitModelTest method that tests RetrieveModelMixin
         """
+        # AuthViewSet test
+        url = reverse('auth-login')
+        r = self.client.post(url, {"username" : "admin", "password" : "passwordAdmin"}, format='json')
+        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
         # Data
          # Constants
         THIS_ID_DOESNOT_EXIST = Habit.objects.count() + 9
@@ -375,16 +416,30 @@ class TraceModelTest(APITestCase):
         TRACE_CREATION_LIMIT = 200
         # Common Users
         user_ellie = User.objects.create(username='Ellie', password=make_password('123'))
-        ellie_habit = Habit.objects.create(user=user_ellie, name="videogaming")
+        ellie_habit = Habit.objects.create(user=user_ellie,
+                                           name="videogaming",
+                                            start_hour=3,
+                                            start_minutes=7,
+                                            end_hour=7,
+                                            end_minutes=44,
+                                           )
         other_user = User.objects.create(username='otherUser', password=make_password('iamwhoiam'))
-        other_user_habit = Habit.objects.create(user=other_user, name="walking")
+        other_user_habit = Habit.objects.create(user=other_user,
+                                                name="walking",
+                                                start_hour=3,
+                                                start_minutes=7,
+                                                end_hour=7,
+                                                end_minutes=44,
+                                                )
         Trace.objects.create(habit=other_user_habit)
         # Admin User
         User.objects.create_superuser(username="admin", password="passwordAdmin")
         # To test pagination on viewsets
         i = 0
         while i < TRACE_CREATION_LIMIT:
-           t = Trace.objects.create(habit=ellie_habit, date=timezone.now() + timezone.timedelta(days=i))
+           t = Trace.objects.create(habit=ellie_habit)
+           #if i < 10:
+               #print(t.date_created)
            t.save()
            i += 1
 

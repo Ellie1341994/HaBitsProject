@@ -26,7 +26,7 @@ class HabitSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Habit
-        fields = ['traces', 'url', 'id', 'name', 'date_created', 'date_edited', 'effectiveness', 'description', 'user']
+        fields = '__all__'
 
 class TraceSerializer(serializers.HyperlinkedModelSerializer):
     """

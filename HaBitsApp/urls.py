@@ -1,12 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import HabitViewSet, UserViewSet, TraceViewSet
+from .views import HabitViewSet, UserViewSet, TraceViewSet, AuthViewSet
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r'habit', HabitViewSet)
 router.register(r'user', UserViewSet)
 router.register(r'trace', TraceViewSet)
+router.register(r'auth', AuthViewSet, basename='auth')
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
