@@ -1,11 +1,11 @@
 # Ha!Bits - W.I.P
-**Our daily behaviour shapes our daily future.** 
+**Our daily behaviour shapes our daily future.**
 
 ## General
 
 ### Introduction
 Ha-Bits is a simple Web-App to track habits either new or current ones and
-follow their progress. 
+follow their progress.
 
 ### Features
 - W.I.P
@@ -31,19 +31,19 @@ This section contains related project information and details
 - [React](https://reactjs.org/)
 - [Create React App](https://create-react-app.dev/docs/adding-typescript/)
 - [Dimple](http://dimplejs.org/)
-- [Isomorphic Fetch](https://www.npmjs.com/package/isomorphic-fetch)
+- [Axios](https://www.npmjs.com/package/axios)
 - [Selenium](https://pypi.org/project/selenium/)
 
 ### Python Dependencies
-asgiref==3.3.1  
-Django==3.1.6  
-django-filter==2.4.0  
-djangorestframework==3.12.2  
-Markdown==3.3.3  
-nodeenv==1.5.0  
-pytz==2021.1  
-six==1.15.0  
-sqlparse==0.4.1  
+asgiref==3.3.1
+Django==3.1.6
+django-filter==2.4.0
+djangorestframework==3.12.2
+Markdown==3.3.3
+nodeenv==1.5.0
+pytz==2021.1
+six==1.15.0
+sqlparse==0.4.1
 
 ### Node Dependencies
-create-react-app@4.0.2  
+create-react-app@4.0.2

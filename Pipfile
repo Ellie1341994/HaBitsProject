@@ -18,6 +18,9 @@ pylint-django = "*"
 pytest-django = "*"
 pytest = "*"
 pytest-xdist = "*"
+bleach = "*"
+testfixtures = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

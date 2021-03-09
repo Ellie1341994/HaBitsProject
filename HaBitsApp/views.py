@@ -32,12 +32,12 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == 'create':
             self.permission_classes = [permissions.AllowAny]
         # Only allows the current logged in user to modify its email
-        elif self.action == 'partial_update' \
-             and self.request.method == 'PATCH' \
-             and len(self.request.data) == 1 \
-             and 'email' in self.request.data \
-             and str(self.request.user.id) in self.request.path \
-             or self.action == 'c_password':
+        elif ( self.action == 'partial_update'
+             and self.request.method == 'PATCH'
+             and len(self.request.data) == 1
+             and 'email' in self.request.data
+             and str(self.request.user.id) in self.request.path
+             or self.action == 'c_password'):
             self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.IsAdminUser]
@@ -65,7 +65,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class AuthViewSet(viewsets.ViewSet):
     """
     """
-    queryset = User.objects.all()
+    queryset = None
     serializer_class = None
 
     @action(methods=['post'],
@@ -76,15 +76,17 @@ class AuthViewSet(viewsets.ViewSet):
     def log_in(self, request, pk=None):
         """
         """
-        print(request.POST)
+        #serializer = UserSerializer(data=request.data, partial=True)
+        #serializer.is_valid()
         username = request.data['username']
         password = request.data['password']
         user = authenticate(request, username=username, password=password)
+        #print(serializer.errors)
         if user is not None:
             login(request, user)
             return Response(data='',status=status.HTTP_201_CREATED)
 
-        return Response(data='',status=status.HTTP_404_NOT_FOUND)
+        return Response(data='',status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(methods=['get'],
             detail=False,
@@ -95,7 +97,8 @@ class AuthViewSet(viewsets.ViewSet):
         """
         """
         logout(request)
-        if request.user is None:
+        from django.contrib.auth.models import AnonymousUser
+        if type(request.user) == AnonymousUser:
             return Response(data='', status=status.HTTP_200_OK)
 
         return Response(data='', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -156,7 +159,6 @@ class HabitViewSet(viewsets.ModelViewSet):
         if ( self.action == 'create'
             and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]
             and checkHabitTime(self.request.data) ):
-            #print(self.request.data)
             self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'list' and self.request.user.id is not None:
             self.queryset = self.queryset.filter(user=self.request.user.id)

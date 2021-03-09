@@ -10,8 +10,8 @@ from django.utils import timezone
 from django.db.utils import IntegrityError
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-import io
 from django.contrib.auth.hashers import make_password
+from testfixtures import log_capture
 
 class UserModelTest(APITestCase):
     """
@@ -27,7 +27,7 @@ class UserModelTest(APITestCase):
         User.objects.create(username='otherUser', password=make_password('iamwhoiam'))
         # Admin User
         User.objects.create_superuser(username="admin", password="passwordAdmin")
-        # print("TESTADMINUSER: " + str(testAdminUser.is_staff)) --> TRUE
+    @classmethod
     def teardown_class(cls):
         """
         UserModelTest method that cleans all data used for and during the tests
@@ -173,7 +173,7 @@ class HabitModelTest(APITestCase):
         # To test pagination on viewsets
         i = 0
         while i < HABIT_CREATION_LIMIT:
-           h = Habit.objects.create(user=testUser, 
+           h = Habit.objects.create(user=testUser,
                                     name="h" + str(i),
                                     start_hour=3,
                                     start_minutes=7,
@@ -356,9 +356,19 @@ class HabitModelTest(APITestCase):
         HabitModelTest method that tests RetrieveModelMixin
         """
         # AuthViewSet test
-        url = reverse('auth-login')
-        r = self.client.post(url, {"username" : "admin", "password" : "passwordAdmin"}, format='json')
-        self.assertEqual(r.status_code, status.HTTP_201_CREATED)
+        # LogOut current user
+        self.client.logout()
+        # General Data
+        login_url = reverse('auth-login')
+        data = {"username" : "admin", "password" : "passwordAdmin"}
+        bad_data = {"username" : "admin", "password" : "123"}
+        # Requests
+        # User attempt to log in with wrong credentials fails
+        bad_login_response = self.client.post(login_url, bad_data, format='json')
+        self.assertEqual(bad_login_response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # User attempt to log in with correct data succeed
+        login_response = self.client.post(login_url, data, format='json')
+        self.assertEqual(login_response.status_code, status.HTTP_201_CREATED)
         # Data
          # Constants
         THIS_ID_DOESNOT_EXIST = Habit.objects.count() + 9
@@ -390,7 +400,7 @@ class HabitModelTest(APITestCase):
 
         # User attempt to modify one of its habits name correctly fail
         data = {'name' : 'somethingElse', 'end_minutes' : 5}
-        update_habit_url = reverse('habit-detail', kwargs={'pk' : anElliesHabit.id}) 
+        update_habit_url = reverse('habit-detail', kwargs={'pk' : anElliesHabit.id})
         wrong_update_habit_request = self.client.patch(update_habit_url, data, format='json')
         self.assertEqual(wrong_update_habit_request.status_code, status.HTTP_403_FORBIDDEN)
         # User attempt to modify one of its habits day correctly succeeds
@@ -401,6 +411,49 @@ class HabitModelTest(APITestCase):
         self.client.logout()
         update_habit_request = self.client.patch(update_habit_url, data, format='json')
         self.assertEqual(update_habit_request.status_code, status.HTTP_401_UNAUTHORIZED)
+
+class AuthViewTest(APITestCase):
+    """
+    """
+    @classmethod
+    def setup_class(cls):
+        # Common Users
+        testUser = User.objects.create(username='Ellie', password=make_password('123'))
+        User.objects.create(username='otherUser', password=make_password('iamwhoiam'))
+        # Admin User
+        User.objects.create_superuser(username="admin", password="passwordAdmin")
+
+    @classmethod
+    def teardown_class(cls):
+        User.objects.all().delete()
+
+    @log_capture()
+    def test_login(self, capture):
+        """
+        """
+        # User attempt to login with correct credentials succeeds
+        login_url = reverse('auth-login')
+        login_credentials = {'username' : 'Ellie', 'password' : '123'}
+        login_response = self.client.post(login_url, login_credentials, format='json')
+        self.assertEqual(login_response.status_code, status.HTTP_201_CREATED)
+
+        # User attempt to login with wrong credentials fails
+        bad_login_credentials = {'username' : 'asd', 'password' : '123'}
+        bad_login_response = self.client.post(login_url,bad_login_credentials, format='json')
+        capture.check(
+            ('django.request', 'ERROR', 'Internal Server Error: /auth/login/')
+        )
+
+
+    def test_logout(self):
+        """
+        """
+        # LogIn User
+        self.client.login(username='admin', password='passwordAdmin')
+        # Logged in user attempt to log out succeed
+        logout_url = reverse('auth-logout')
+        logout_response = self.client.get(logout_url, format='json')
+        self.assertEqual(logout_response.status_code, status.HTTP_200_OK)
 
 
 class TraceModelTest(APITestCase):
@@ -478,11 +531,11 @@ class TraceModelTest(APITestCase):
         trace_list = trace_list_request.json()
         first_trace = trace_list["results"][0]
         #print(trace_list["results"])
-        self.assertEqual(trace_list_request.status_code, status.HTTP_200_OK)        
+        self.assertEqual(trace_list_request.status_code, status.HTTP_200_OK)
         # Total traces should be 201
         self.assertEqual(Trace.objects.count(), 201)
         # Total habit's traces should be 200
-        self.assertEqual(trace_list["count"], 200)        
+        self.assertEqual(trace_list["count"], 200)
         # check that every trace has the same habit url
         for trace in trace_list["results"]:
             self.assertEqual(trace["habit"], first_trace["habit"])
