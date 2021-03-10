@@ -33,6 +33,7 @@ This section contains related project information and details
 - [Dimple](http://dimplejs.org/)
 - [Axios](https://www.npmjs.com/package/axios)
 - [Selenium](https://pypi.org/project/selenium/)
+- [React-Helmet](https://www.npmjs.com/package/react-helmet)
 
 ### Python Dependencies
 asgiref==3.3.1

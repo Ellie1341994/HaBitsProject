@@ -31,19 +31,21 @@ class App extends React.Component<AIP, AIS> { constructor(props: any) {
     }
     render () {
         return (
-            <div className="application">
+            <div className="font-serif flex flex-col justify-center items-center min-h-screen bg-yellow-200 text-gray-800">
                 <Helmet>
-                    <meta charSet="utf-8" />
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
                     <title>{this.state.pageTitle}</title>
                 </Helmet>
-                <WebSiteIntro title={"HaBits"} onPageChange={this.getPageTitle}/>
+                <WebIndex title={"HaBits"} onPageChange={this.getPageTitle}/>
+                <div className="flex w-2/4" id="SLInterface">
+                    <SignUpInterface className={"m-1 w-2/4 rounded-xl shadow-lg bg-yellow-50 p-2"}/>
+                    <LogInInterface className={"m-1 w-2/4 rounded-xl shadow-lg bg-yellow-50 p-2"}/>
+                </div>
             </div>
         );
     }
 };
 
-class WebSiteIntro extends React.Component<IP, IS> {
+class WebIndex extends React.Component<IP, IS> {
     constructor(props: IP){
         super(props);
         this.state = { links : {}};
@@ -67,26 +69,49 @@ class WebSiteIntro extends React.Component<IP, IS> {
             .catch( e => console.log(e));
     }
 
+
     render() {
         return (
-            <div className="p-6 bg-color-yellow max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center txt-center space-x-4">
-                <h1 className="">
-                    Welcome to {this.props.title}
-                </h1>
-                <ul className="">
-                    {Object
-                        .keys(this.state.links)
-                            .map(link =>
-                                <li key={link}>{ link }</li>
-                            )
-                    }
-                </ul>
+            <div className="p-6 w-2/4 h-2/4 bg-yellow-50 rounded-xl shadow-lg  flex justify-center items-center  text-center">
+                <h1 className=" text-7xl font-bold tracking-widest text-gray-700"> {this.props.title} </h1>
             </div>
         )
     }
 };
-
-
+class LogInInterface extends React.Component<any> {
+    render() {
+        return (
+            <div className={this.props.className}>
+                <form id="logInForm" className="flex flex-col" action="" method="post">
+                    <label htmlFor="">E-Mail
+                        <input className="m-1 rounded-xl p-1" type="text" placeholder="Enter Your electronic mail" id="username"/>
+                    </label>
+                    <label htmlFor="">Password
+                        <input className="m-1 rounded-xl p-1 " type="password" placeholder="Enter your secret sequence of characters" name="password" id="password"/>
+                    </label>
+                    <button className="text-shadow-sm text-3xl m-1 text-3xl" form="logInForm" type="submit">Log In!</button>
+                </form>
+            </div>
+        )
+    }
+}
+class SignUpInterface extends React.Component<any> {
+    render() {
+        return ( 
+            <div className={this.props.className}>
+                <form className="flex flex-col" action="" method="post">
+                    <label htmlFor="">E-Mail
+                        <input className="m-1 rounded-xl p-1" type="email" placeholder="Your electronic mail" id="email"/>
+                    </label>
+                    <label htmlFor="">Password
+                        <input className="m-1 rounded-xl p-1" type="password" placeholder="Write a secret sequence of characters" name="password" id="password"/>
+                    </label>
+                    <button className="text-shadow-sm m-1 text-3xl" type="submit">Sign Up!</button>
+                </form>
+            </div>
+        )
+    }
+}
 ReactDOM.render(
   <React.StrictMode>
       <App />
