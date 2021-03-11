@@ -27,6 +27,7 @@ class UserModelTest(APITestCase):
         User.objects.create(username='otherUser', password=make_password('iamwhoiam'))
         # Admin User
         User.objects.create_superuser(username="admin", password="passwordAdmin")
+
     @classmethod
     def teardown_class(cls):
         """
@@ -132,27 +133,6 @@ class UserModelTest(APITestCase):
         # Assertions
         self.assertEqual(user_updated_response.status_code, status.HTTP_200_OK)
         self.assertEqual(response_data["email"], 'a@b.com')
-
-    def test_change_user_password(self):
-        """
-        UserModelTest method that tests custom action change_password
-        """
-        # LogOut Admin to test IsAuthenticated permissions
-        self.client.logout()
-        # LogIn non-admin user
-        #print()
-        self.client.login(username='otherUser', password='iamwhoiam')
-        # Data
-        user = User.objects.get(username='otherUser')
-        data = {'password' : 'np'}
-        # Requests
-        user_change_pass_url = reverse('user-change_password', kwargs={'pk' : user.id})
-        change_pass_response = self.client.post(user_change_pass_url, data, format='json')
-        #print(change_pass_response.json())
-        # Assertions
-        self.assertEqual(change_pass_response.status_code, status.HTTP_200_OK)
-        self.client.logout()
-        self.assertTrue(self.client.login(username='otherUser', password='np'))
 
 class HabitModelTest(APITestCase):
     """
@@ -355,20 +335,6 @@ class HabitModelTest(APITestCase):
         """
         HabitModelTest method that tests RetrieveModelMixin
         """
-        # AuthViewSet test
-        # LogOut current user
-        self.client.logout()
-        # General Data
-        login_url = reverse('auth-login')
-        data = {"username" : "admin", "password" : "passwordAdmin"}
-        bad_data = {"username" : "admin", "password" : "123"}
-        # Requests
-        # User attempt to log in with wrong credentials fails
-        bad_login_response = self.client.post(login_url, bad_data, format='json')
-        self.assertEqual(bad_login_response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        # User attempt to log in with correct data succeed
-        login_response = self.client.post(login_url, data, format='json')
-        self.assertEqual(login_response.status_code, status.HTTP_201_CREATED)
         # Data
          # Constants
         THIS_ID_DOESNOT_EXIST = Habit.objects.count() + 9
@@ -411,50 +377,6 @@ class HabitModelTest(APITestCase):
         self.client.logout()
         update_habit_request = self.client.patch(update_habit_url, data, format='json')
         self.assertEqual(update_habit_request.status_code, status.HTTP_401_UNAUTHORIZED)
-
-class AuthViewTest(APITestCase):
-    """
-    """
-    @classmethod
-    def setup_class(cls):
-        # Common Users
-        testUser = User.objects.create(username='Ellie', password=make_password('123'))
-        User.objects.create(username='otherUser', password=make_password('iamwhoiam'))
-        # Admin User
-        User.objects.create_superuser(username="admin", password="passwordAdmin")
-
-    @classmethod
-    def teardown_class(cls):
-        User.objects.all().delete()
-
-    @log_capture()
-    def test_login(self, capture):
-        """
-        """
-        # User attempt to login with correct credentials succeeds
-        login_url = reverse('auth-login')
-        login_credentials = {'username' : 'Ellie', 'password' : '123'}
-        login_response = self.client.post(login_url, login_credentials, format='json')
-        self.assertEqual(login_response.status_code, status.HTTP_201_CREATED)
-
-        # User attempt to login with wrong credentials fails
-        bad_login_credentials = {'username' : 'asd', 'password' : '123'}
-        bad_login_response = self.client.post(login_url,bad_login_credentials, format='json')
-        capture.check(
-            ('django.request', 'ERROR', 'Internal Server Error: /auth/login/')
-        )
-
-
-    def test_logout(self):
-        """
-        """
-        # LogIn User
-        self.client.login(username='admin', password='passwordAdmin')
-        # Logged in user attempt to log out succeed
-        logout_url = reverse('auth-logout')
-        logout_response = self.client.get(logout_url, format='json')
-        self.assertEqual(logout_response.status_code, status.HTTP_200_OK)
-
 
 class TraceModelTest(APITestCase):
     """

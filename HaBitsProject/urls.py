@@ -18,7 +18,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('HaBitsApp/', include((routers.urls, 'HaBits'))),
     path('', include('HaBitsApp.urls')),
-    path('api-auth/', include('rest_framework.urls'))
+    #path('', include('rest_framework.urls')),
+    path('', include('dj_rest_auth.urls')),
+    path('registration/', include('dj_rest_auth.registration.urls')),
 ]

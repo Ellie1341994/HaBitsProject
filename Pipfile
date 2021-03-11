@@ -21,6 +21,8 @@ pytest-xdist = "*"
 bleach = "*"
 testfixtures = "*"
 django-cors-headers = "*"
+dj-rest-auth = "*"
+django-allauth = "*"
 
 [dev-packages]
 

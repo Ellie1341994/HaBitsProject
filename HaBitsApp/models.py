@@ -33,7 +33,7 @@ class Habit(models.Model):
         Habit class's enumeration
         Enumerates week day names
         Method/s:
-        Today(): 
+        Today():
         """
         MONDAY = 'MO', _('Monday')
         TUESDAY = 'TU', _('Tuesday')

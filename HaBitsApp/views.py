@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from django.urls import reverse
+from HaBitsApp import permissions as custom_permissions  
 import re
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -44,66 +45,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return super().get_permissions()
 
-    @action(methods=['post'],
-            detail=True,
-            permission_classes=[permissions.IsAuthenticated],
-            url_path='change-password',
-            url_name='change_password')
-    def c_password(self, request, pk=None):
-        """
-        UserViewSet method that allows an authenticated users to change its password
-        """
-        user = self.get_object()
-        serializer = UserSerializer(data=request.data, partial=True)
-        if serializer.is_valid():
-            user.password = make_password(request.data["password"])
-            user.save()
-            return Response({}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class AuthViewSet(viewsets.ViewSet):
-    """
-    """
-    queryset = None
-    serializer_class = None
-
-    @action(methods=['post'],
-            detail=False,
-            permission_classes=[permissions.AllowAny],
-            url_path='login',
-            url_name='login')
-    def log_in(self, request, pk=None):
-        """
-        """
-        #serializer = UserSerializer(data=request.data, partial=True)
-        #serializer.is_valid()
-        username = request.data['username']
-        password = request.data['password']
-        user = authenticate(request, username=username, password=password)
-        #print(serializer.errors)
-        if user is not None:
-            login(request, user)
-            return Response(data='',status=status.HTTP_201_CREATED)
-
-        return Response(data='',status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    @action(methods=['get'],
-            detail=False,
-            permission_classes=[permissions.IsAuthenticated],
-            url_path='logout',
-            url_name='logout')
-    def log_out(self, request, pk=None):
-        """
-        """
-        logout(request)
-        from django.contrib.auth.models import AnonymousUser
-        if type(request.user) == AnonymousUser:
-            return Response(data='', status=status.HTTP_200_OK)
-
-        return Response(data='', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 class HabitViewSet(viewsets.ModelViewSet):
     """
     """
@@ -135,17 +76,6 @@ class HabitViewSet(viewsets.ModelViewSet):
                     dataIs = True
 
             return dataIs
-        def habitOwnerIsUser(request_user: User , request_path: str) -> bool:
-            """
-            Determines whether the habit object referrenced on the path
-            is owned by the current logged in user or not
-            """
-            habitIdPattern = re.compile('/\\d+/')
-            match = habitIdPattern.search(request_path)
-            if match:
-                habitId = int(match.group().strip('/'))
-                habitObj = Habit.objects.get(id=habitId)
-                return habitObj.user == request_user
 
         def checkHabitTime(habit_data: dict) -> bool:
             """
@@ -154,7 +84,6 @@ class HabitViewSet(viewsets.ModelViewSet):
             s = 'start_hour'
             e = 'end_hour'
             return s in habit_data and e in habit_data and habit_data[s] < habit_data[e]
-            #return start_hour < end_hour
 
         if ( self.action == 'create'
             and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]
@@ -163,8 +92,8 @@ class HabitViewSet(viewsets.ModelViewSet):
         elif self.action == 'list' and self.request.user.id is not None:
             self.queryset = self.queryset.filter(user=self.request.user.id)
             self.permission_classes = [permissions.IsAuthenticated]
-        elif self.action == 'destroy' and habitOwnerIsUser(self.request.user, self.request.path):
-            self.permission_classes = [permissions.IsAuthenticated]
+        elif self.action == 'destroy':
+            self.permission_classes = [custom_permissions.IsAuthor]
         elif self.action == 'partial_update' \
             and self.request.user.id is not None \
             and correctFields(self.request.data):
