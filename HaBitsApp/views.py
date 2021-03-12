@@ -11,7 +11,11 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from django.urls import reverse
 from HaBitsApp import permissions as custom_permissions  
+from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 import re
+
+admin.site.login = login_required(admin.site.login)
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -84,8 +88,8 @@ class HabitViewSet(viewsets.ModelViewSet):
             s = 'start_hour'
             e = 'end_hour'
             return s in habit_data and e in habit_data and habit_data[s] < habit_data[e]
-
         if ( self.action == 'create'
+            and 'user' in self.request.data
             and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]
             and checkHabitTime(self.request.data) ):
             self.permission_classes = [permissions.IsAuthenticated]
