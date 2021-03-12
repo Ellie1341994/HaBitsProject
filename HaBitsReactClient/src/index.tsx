@@ -19,7 +19,8 @@ interface AIS {
     pageTitle : string
 }
 
-class App extends React.Component<AIP, AIS> { constructor(props: any) {
+class App extends React.Component<AIP, AIS> {
+    constructor(props: any) {
         super(props);
         this.state = { pageTitle : "HaBits ~ Track & Trace" }
         this.getPageTitle = this.getPageTitle.bind(this)
@@ -35,18 +36,25 @@ class App extends React.Component<AIP, AIS> { constructor(props: any) {
                 <Helmet>
                     <title>{this.state.pageTitle}</title>
                 </Helmet>
-                <WebIndex title={"HaBits"} onPageChange={this.getPageTitle}/>
-                <div className="flex w-2/4" id="SLInterface">
-                    <SignUpInterface className={"m-1 w-2/4 rounded-xl shadow-lg bg-yellow-50 p-2"}/>
-                    <LogInInterface className={"m-1 w-2/4 rounded-xl shadow-lg bg-yellow-50 p-2"}/>
+                <WebIndex className={"p-10 m-1 w-2/4 h-2/4 bg-yellow-50 rounded-xl shadow-lg  flex justify-center items-center  text-center"}
+                          title={"HaBits"}
+                          onPageChange={this.getPageTitle}/>
+                <div className="flex w-2/4"
+                     id="SLInterface">
+                    <AuthUpInterface type={"Sign Up"}
+                                     fields={["username","email","password"]}
+                                     className={"m-1 w-2/4 rounded-xl shadow-lg bg-yellow-50 p-2"}/>
+                    <AuthUpInterface type={"Log In"}
+                                     fields={["username","password"]}
+                                     className={"m-1 w-2/4 rounded-xl shadow-lg bg-yellow-50 p-2"}/>
                 </div>
             </div>
         );
     }
 };
 
-class WebIndex extends React.Component<IP, IS> {
-    constructor(props: IP){
+class WebIndex extends React.Component< any > {
+    constructor(props: any){
         super(props);
         this.state = { links : {}};
         this.setPageTitle = this.setPageTitle.bind(this);
@@ -72,42 +80,56 @@ class WebIndex extends React.Component<IP, IS> {
 
     render() {
         return (
-            <div className="p-6 w-2/4 h-2/4 bg-yellow-50 rounded-xl shadow-lg  flex justify-center items-center  text-center">
+            <div className={this.props.className}>
                 <h1 className=" text-7xl font-bold tracking-widest text-gray-700"> {this.props.title} </h1>
             </div>
         )
     }
 };
-class LogInInterface extends React.Component<any> {
+class AuthUpInterface extends React.Component<any> {
+
+    makeFieldsData() {
+        const fieldNames: any = this.props.fields;
+        const fieldsData: any = [];
+        const inputContainerClasses = "rounded-lg p-1";
+        const labelContainerClasses = "flex flex-row justify-start  items-center";
+        let iType = ""
+
+        for (let name of fieldNames) {
+            name === "username" ? iType = "texT" : iType = name;
+
+            fieldsData.push({ label: name[0].toUpperCase() + name.slice( 1 ),
+                            labelClasses : labelContainerClasses,
+                            iClasses: inputContainerClasses,
+                            iPlaceholder: "Write a " + name,
+                            iType : iType});
+        }
+
+        return fieldsData;
+    }
+    buildForm() {
+        const fieldContainerClasses = "flex flex-row m-1 justify-between items-center";
+        let fieldsData: any = this.makeFieldsData();
+        const formElements: any = [];
+        for (const data of fieldsData) {
+            let formElement: any = (
+                              <div className={ fieldContainerClasses }>
+                                  <label htmlFor="" className={data.labelClasses}>{data.label}</label>
+                                  <input type={data.iType}
+                                    className={data.iClasses}
+                                    placeholder={data.iPlaceholder}/>
+                              </div>
+                             )
+                formElements.push(formElement)
+        }
+        const formBtn: any = <button className="text-shadow-sm m-1 w-full text-center text-3xl" type="submit">{this.props.type}!</button>
+        formElements.unshift(formBtn);
+        return <form action="">{formElements}</form>;
+    }
     render() {
         return (
             <div className={this.props.className}>
-                <form id="logInForm" className="flex flex-col" action="" method="post">
-                    <label htmlFor="">E-Mail
-                        <input className="m-1 rounded-xl p-1" type="text" placeholder="Enter Your electronic mail" id="username"/>
-                    </label>
-                    <label htmlFor="">Password
-                        <input className="m-1 rounded-xl p-1 " type="password" placeholder="Enter your secret sequence of characters" name="password" id="password"/>
-                    </label>
-                    <button className="text-shadow-sm text-3xl m-1 text-3xl" form="logInForm" type="submit">Log In!</button>
-                </form>
-            </div>
-        )
-    }
-}
-class SignUpInterface extends React.Component<any> {
-    render() {
-        return ( 
-            <div className={this.props.className}>
-                <form className="flex flex-col" action="" method="post">
-                    <label htmlFor="">E-Mail
-                        <input className="m-1 rounded-xl p-1" type="email" placeholder="Your electronic mail" id="email"/>
-                    </label>
-                    <label htmlFor="">Password
-                        <input className="m-1 rounded-xl p-1" type="password" placeholder="Write a secret sequence of characters" name="password" id="password"/>
-                    </label>
-                    <button className="text-shadow-sm m-1 text-3xl" type="submit">Sign Up!</button>
-                </form>
+                {this.buildForm()}
             </div>
         )
     }
