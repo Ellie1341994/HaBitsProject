@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState, useEffect } from "react";
 import {
     ChakraProvider,
     Box,
@@ -7,8 +8,6 @@ import {
     Heading,
     Text,
     useColorModeValue,
-    Circle
-
 } from "@chakra-ui/react"
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import {Helmet} from "react-helmet";
@@ -17,7 +16,7 @@ import { motion } from "framer-motion";
 import AuthInterface from "./components/AuthInterface";
 import axios from 'axios';
 
-const AnimatedBigTitle: React.FC< any> = motion(Heading);
+const AnimatedHeading: React.FC< any> = motion(Heading);
 const AnimatedAppDescription: React.FC<any> = motion(Text);
 const AnimatedFlex: React.FC<any> = motion(Flex);
 
@@ -26,12 +25,27 @@ function AnimatedAuthInterface() {
     const darkGradientColor: any = {c1: "#788389", c2: "#A77"};
     const gradientColors: any = useColorModeValue(lightGradientColor, darkGradientColor);
     const gradient: string = "linear(to-r," + gradientColors.c1 + "," + gradientColors.c2 + ")";
-    console.log(gradient);
-
+    const shadowType: any = {s1: "dark-lg", s2: "0px 0px 3px 1px black;"};
+    const shadow: string = useColorModeValue(shadowType.s2, shadowType.s2);
+    const variants: any = {
+        intro: {
+            opacity: 1,
+            transition: {
+                duration: 0.5,
+            },
+        },
+        outro: {
+            opacity: 0,
+            transition: {
+                duration: 0.5,
+            },
+        }
+    }
+    const [isMounted, setMountState] = useState(true);
     return (<AnimatedFlex
         initial={{opacity: 0}}
-        animate={{opacity: 1}}
-        transition={{ delay: 1, duration: 0.5 }}
+        animate={isMounted ? "intro" : "outro"}
+        variants={variants}
         fontWeight="bold"
         direction="column"
         justifyContent="space-evenly"
@@ -41,11 +55,56 @@ function AnimatedAuthInterface() {
         backgroundColor="gray.700"
         bgGradient={ gradient }
         textAlign="center"
-        boxShadow="dark-lg"
+        boxShadow={shadow}
         color="white"
     >
-        <AuthInterface/>
+        <AuthInterface setMountState={setMountState}/>
     </AnimatedFlex>)
+}
+function AnimatedAppTitle() {
+    const [hasFallen, setHasFallen] = useState(false);
+    const variants = {
+        fall: {
+            type: "spring",
+            y: 0,
+            bounce: 1,
+            transition:{
+                duration: 0.5
+            }
+        },
+        levitate: {
+            y: "-10px",
+            velocity: 10,
+            transition: {
+                repeat: Infinity,
+                repeatType: "reverse",
+                delay: 0.5,
+                duration: 1,
+            },
+        }}
+        useEffect(() => {
+            setInterval(setHasFallen, 500, true);
+        },[]);
+        return (
+            <AnimatedHeading
+                initial={{y: "-100vh"}}
+                animate={hasFallen ? "levitate" : "fall"}
+                variants={variants}
+                fontFamily="serif"
+                as="h1"
+                size="2xl"
+                mt="0"
+                mb="5"
+            >
+                HaBits
+                <Text
+                    as="sub"
+                    fontSize="xs"
+                >
+                    Track & Trace
+                </Text>
+            </AnimatedHeading >
+        )
 }
 export const App = () => (
     // https://github.com/chakra-ui/chakra-ui/issues/591
@@ -67,24 +126,7 @@ export const App = () => (
             </Flex>
             <Flex h="100%" justifyContent="center" alignItems="center">
                 <Flex direction="column" align="center" justifyContent="center" w="50%" textAlign="center">
-                    <AnimatedBigTitle
-                        initial={{y: "-100vh"}}
-                        animate={{y: 0}}
-                        transition={{ duration: 0.5 }}
-                        fontFamily="serif"
-                        as="h1"
-                        size="2xl"
-                        mt="0"
-                        mb="5"
-                    >
-                        HaBits
-                        <Text
-                            as="sub"
-                            fontSize="xs"
-                        >
-                            Track & Trace
-                        </Text>
-                    </AnimatedBigTitle >
+                        <AnimatedAppTitle/>
                         <AnimatedAppDescription
                             w="75%"
                             as="em"
