@@ -4,11 +4,18 @@ import ReactDOM from "react-dom"
 import { App } from "./App"
 import reportWebVitals from "./reportWebVitals"
 import * as serviceWorker from "./serviceWorker"
+import {
+  BrowserRouter as Router,
+  Route,
+} from "react-router-dom";
 
 ReactDOM.render(
   <React.StrictMode>
+      <Router>
+              <ColorModeScript />
+              <App />
+      </Router>
     <ColorModeScript />
-    <App />
   </React.StrictMode>,
   document.getElementById("root"),
 )

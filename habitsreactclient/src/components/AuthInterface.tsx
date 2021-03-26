@@ -20,9 +20,14 @@ import {
     VisuallyHidden,
     Flex,
 } from '@chakra-ui/react';
+import {
+    AnimatedFlex
+} from "./AnimatedChakraComponents"
+import { useState, useEffect } from "react";
 import React from "react";
 import axios from 'axios';
-function ColoredBtn(props: any) {
+
+function PanelButton(props: any) {
     const bgColorType: any = {dark: "#e77", light:"#e8b97d"}
     const bgColor: any = useColorModeValue(bgColorType.light, bgColorType.dark);
     return (
@@ -64,7 +69,7 @@ function ColoredBtn(props: any) {
 
 }
 
-class AuthInterface extends React.Component<any> {
+class AuthPanel extends React.Component<any> {
 
     URL: string = "http://127.0.0.1:8000";
     registerFields: any = {name: "", username: "", password1: "", email: ""};
@@ -183,7 +188,7 @@ class AuthInterface extends React.Component<any> {
                             ~ Never tell your password to anyone
                         </FormHelperText>
                     </FormControl>
-                    <ColoredBtn text={
+                    <PanelButton text={
                         // @ts-ignore
                         this.state.formType}
                         headerText={"Error!"}
@@ -216,4 +221,59 @@ class AuthInterface extends React.Component<any> {
         )
     }
 };
+
+
+function AuthInterface() {
+    const lightGradientColor: any = {c1: "#7928CA", c2: "#FF0080"};
+    const darkGradientColor: any = {c1: "#788389", c2: "#A77"};
+    const gradientColors: any = useColorModeValue(lightGradientColor, darkGradientColor);
+    const gradient: string = "linear(to-r," + gradientColors.c1 + "," + gradientColors.c2 + ")";
+    const shadowType: any = {s1: "dark-lg", s2: "0px 0px 3px 1px black;"};
+    const shadow: string = useColorModeValue(shadowType.s2, shadowType.s2);
+    const variants: any = {
+        intro: {
+            opacity: 1,
+            transition: {
+                duration: 0.5,
+            },
+        },
+        outro: {
+            opacity: 0,
+            transition: {
+                duration: 0.5,
+            },
+        }
+    }
+    const [isMounted, setMountState] = useState(true);
+    return (
+        <Flex
+            h="100%"
+            color="gray.700"
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+        >
+            <AnimatedFlex
+                initial={{opacity: 0}}
+                animate={isMounted ? "intro" : "outro"}
+                variants={variants}
+                fontWeight="bold"
+                direction="column"
+                justifyContent="space-evenly"
+                align="center"
+                w="50%" h="75%" p="0"
+                rounded="md"
+                backgroundColor="gray.700"
+                bgGradient={ gradient }
+                textAlign="center"
+                boxShadow={shadow}
+                color="white"
+            >
+                <AuthPanel
+                    setMountState={setMountState}
+                />
+            </AnimatedFlex>
+        </Flex>
+    )
+}
 export default AuthInterface;
