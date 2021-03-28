@@ -7,6 +7,9 @@
 Ha-Bits is a simple Web-App to track habits either new or current ones and
 follow their progress.
 
+![alt text](https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/index_dm.png?raw=true)
+![alt text](https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/index_lm.png?raw=true)
+
 ### Features
 - W.I.P
 
