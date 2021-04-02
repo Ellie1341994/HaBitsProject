@@ -1,10 +1,8 @@
 import * as React from "react";
 import {
     ChakraProvider,
-    Box,
     extendTheme,
     Flex,
-    Text,
 } from "@chakra-ui/react"
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import {Helmet} from "react-helmet";
@@ -15,22 +13,20 @@ import {
 } from "react-router-dom";
 //import axios from 'axios';
 import AppTitle from "./components/miscellaneous"
-import {
-    AnimatedText,
-} from "./components/AnimatedChakraComponents"
 
 interface AppState {
-  title: string;
+    title: string;
+    authenticated: boolean
 }
 
 export class App extends React.Component <{}, AppState> {
     // https://github.com/chakra-ui/chakra-ui/issues/591
     constructor(props: any) {
         super(props);
-        this.state = {title: "HaBits ~ Track & Trace"};
-        this.writeText = this.writeText.bind(this)
+        this.state = {title: "HaBits ~ Track & Trace", authenticated: false};
+        this.userAuthenticated = this.userAuthenticated.bind(this)
     }
-    writeText() {
+    userAuthenticated() {
 
     }
     render () {
@@ -60,7 +56,12 @@ export class App extends React.Component <{}, AppState> {
                                 mr="1"pos="absolute"
                             />
                         </Flex>
-                        <Flex h="100%">
+                        <Flex
+                            direction={{base: "column", md: "row"}}
+                            justify={{base: "stretch", md: ""}}
+                            align={{base: "center", md: ""}}
+                            h={{base: "100vh", md: "100%"}}
+                        >
                             <AppTitle/>
                             <AuthInterface/>
                         </Flex>

@@ -1,12 +1,20 @@
 import { 
     Heading,
     Text,
-    Flex
+    Flex,
+    HeadingProps,
+    TextProps,
+    FlexProps,
 } from '@chakra-ui/react';
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, MotionProps} from "framer-motion"
 
-export const AnimatedHeading: React.FC< any> = motion(Heading),
-AnimatedText: React.FC<any> = motion(Text),
-AnimatedFlex: React.FC<any> = motion(Flex);
+type Merge<P, T> = Omit<P, keyof T> & T;
+type AHProps = Merge<HeadingProps, MotionProps>;
+type ATProps = Merge<TextProps, MotionProps>;
+type AFProps = Merge<FlexProps, MotionProps>;
+
+export const AnimatedHeading: React.FC<AHProps> = motion(Heading),
+AnimatedText: React.FC<ATProps> = motion(Text),
+AnimatedFlex: React.FC<AFProps> = motion(Flex);
 

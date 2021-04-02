@@ -30,21 +30,30 @@ import axios from 'axios';
 
 function PanelButton(props: any) {
     //const bgColorType: any = {dark: "#e77", light:"orange.200"}
-    const bgColorType: any = {dark: "#e77", light:"#9b7681"}
-    const bgColor: any = useColorModeValue(bgColorType.light, bgColorType.dark);
+    const bgColorType: {dark: string, light: string} = {dark: "#e77", light:"gray.700"}
+    const bgColor: string = useColorModeValue(bgColorType.light, bgColorType.dark);
+    const borderValues: string = useColorModeValue("solid 1px #888","solid 1px #CCC");
+
     return (
         <>
-            <Button
-                _hover={{ border: "solid 3px", borderColor: "gray.300", boxShadow: "lg"}}
-                type="submit"
-                mt="5" mb="5"
-                color="white"
-                isFullWidth={true}
-                backgroundColor={bgColor}
-                id="authPanelActionButton"
-            />
-            <Flex justifyContent="center">
-                <Popover >
+            <Flex 
+                justifyContent="center"
+                direction="column"
+                w="75%"
+            >
+                <Button
+                    _hover={{ border: "solid 3px", borderColor: "gray.300", boxShadow: "lg"}}
+                    type="submit"
+                    fontSize={{base: "10px", md: "16px"}}
+                    mt="2" mb="2"
+                    color="white"
+                    isFullWidth={true}
+                    backgroundColor={bgColor}
+                    id="authPanelActionButton"
+                    borderRadius="2xl"
+                    borderBottom={borderValues}
+                />
+                <Popover placement="left">
                     <PopoverTrigger >
                         <VisuallyHidden>
                             <Button 
@@ -57,11 +66,14 @@ function PanelButton(props: any) {
                             </Button>
                         </VisuallyHidden>
                     </PopoverTrigger >
-                    <PopoverContent color="#333">
+                    <PopoverContent 
+                        color="gray.700"
+                        backgroundColor="gray.50"
+                    >
                         <PopoverArrow />
                         <PopoverCloseButton />
-                        <PopoverHeader>{props.headerText}</PopoverHeader>
-                        <PopoverBody>{props.bodyText}</PopoverBody>
+                        <PopoverHeader fontSize="xs" color="#ef2345">{props.headerText}</PopoverHeader>
+                        <PopoverBody fontSize="xs">{props.bodyText}</PopoverBody>
                     </PopoverContent>
                 </Popover>
             </Flex>
@@ -115,17 +127,16 @@ class AuthPanel extends React.Component<APProps, APState> {
     }
 
     componentDidUpdate() {
-        this.animateFormChange(100);
+        this.animateFormChange(500);
     }
    
-    animateFormChange(delay: number) {
-        const initialDelay: number = delay; 
+    animateFormChange(initialDelay: number) {
         const authPanelHeading: any = document.getElementById("authPanelHeading");
         const authPanelActionButton: any = document.getElementById("authPanelActionButton");
         const changeFormButton: any = document.getElementById("changeFormButton");
         this.animateText(initialDelay, authPanelHeading,  {register: "Sign\u00A0Up", login: "Sign\u00A0In"});
         this.animateText(initialDelay, authPanelActionButton, {register: "Register", login: "Log\u00A0In"});
-        this.animateText(initialDelay, changeFormButton, {register: "Register\u00A0instead", login: "Log\u00A0In\u00A0instead"});
+        this.animateText(initialDelay, changeFormButton, {register:"Log\u00A0In\u00A0instead", login: "Register\u00A0instead"});
     }
     animateText(initialDelay: number, htmlElement: any, textChoices: {register: string, login:string}) {
         // "\u00A0" direct whitespace code
@@ -203,86 +214,134 @@ class AuthPanel extends React.Component<APProps, APState> {
     render() {
         return (
             <>
-                <form onSubmit={ this.state.formType === "Register" ? this.register : this.login}>
-                    <Heading 
-                        id="authPanelHeading"
-                        as="h2"
-                        p="5"
-                        fontFamily="serif"
-                        alignSelf="center"
-                    />
-                    <FormControl mt="0" mb="0" >
-                        <FormLabel mr="0" textAlign="center" fontWeight="bold">
-                            Username
-                        </FormLabel>
-                        <Input backgroundColor="white"
-                            color="gray.700"
-                            isRequired={true}
-                            id="username"
-                            name="username"
-                            type="text"
-                            onChange={this.handleChange}
-                        />
-                    </FormControl>
-                    <Fade 
-                        in={this.state.formType === "Register"}
-                        unmountOnExit={true}
-                        transition={{repeat: 1, type: "tween", duration: 2}}
+                <form 
+                    onSubmit={ 
+                        this.state.formType === "Register" 
+                            ? this.register 
+                            : this.login
+                    }
+                    style={{userSelect: "none", width: "100%", height: "100%"}}
+                >
+
+                    <Flex 
+                        direction="column"
+                        justify="space-between"
+                        align="center"
+                        height="100%"
                     >
-                        <FormControl mt="2" mb="2" >
-                            <FormLabel mr="0" textAlign="center" fontWeight="bold">
-                                E-Mail
+                        <Heading 
+                            width="75%"
+                            pt="4" pb="4"
+                            fontSize={{base: "18px", md: "36px"}}
+                            id="authPanelHeading"
+                            as="h2"
+                            fontFamily="serif"
+                            alignSelf="center"
+                        />
+                        <FormControl w="75%" mt="0" mb="2" >
+                            <FormLabel 
+                                fontSize={{base: "10px", md: "14px"}}
+                                mr="0" 
+                                textAlign="left" 
+                                fontWeight="bold"
+                            >
+                                Username
+                            </FormLabel>
+                            <Input backgroundColor="white"
+                                textAlign="center"
+                                color="gray.700"
+                                isRequired={true}
+                                id="username"
+                                name="username"
+                                type="text"
+                                onChange={this.handleChange}
+                                borderBottom="solid 2px #CCC"
+                            />
+                        </FormControl>
+                        <Fade 
+                            in={this.state.formType === "Register"}
+                            unmountOnExit={true}
+                            transition={{repeat: 1, type: "tween", duration: 2}}
+                            style={{width: "75%"}}
+                        >
+                            <FormControl  mt="2" mb="2" >
+                                <FormLabel 
+                                    fontSize={{base: "10px", md: "14px"}}
+                                    textAlign="left" 
+                                    mr="0" 
+                                    fontWeight="bold"
+                                >
+                                    E-Mail
+                                </FormLabel>
+                                <Input backgroundColor="white"
+                                    color="gray.700"
+                                    isRequired={true}
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    onChange={this.handleChange}
+                                    borderBottom="solid 2px #CCC"
+                                />
+                            </FormControl>
+                        </Fade>
+                        <FormControl w="75%" mt="2" mb="2" >
+                            <FormLabel 
+                                fontSize={{base: "10px", md: "14px"}}
+                                textAlign="left" 
+                                mr="0" 
+                                fontWeight="bold"
+                            >
+                                Password
                             </FormLabel>
                             <Input backgroundColor="white"
                                 color="gray.700"
                                 isRequired={true}
-                                id="email"
-                                name="email"
-                                type="email"
+                                id="password1"
+                                name="password1"
+                                type="password"
                                 onChange={this.handleChange}
+                                borderBottom="solid 2px #CCC"
                             />
+                            <FormHelperText
+                                color="gray.100"
+                                fontSize={{base: "8px", md: "10px"}}
+                                textAlign="left" 
+                            >
+                                ~ Never tell your password
+                            </FormHelperText>
                         </FormControl>
-                    </Fade>
-                    <FormControl  mt="2" mb="2" >
-                        <FormLabel mr="0" textAlign="center" fontWeight="bold">
-                            Password
-                        </FormLabel>
-                        <Input backgroundColor="white"
-                            color="gray.700"
-                            isRequired={true}
-                            id="password1"
-                            name="password1"
-                            type="password"
-                            onChange={this.handleChange}
-                        />
-                        <FormHelperText
-                            color="gray.100"
-                            fontSize="xs"
+                        <Flex 
+                            direction="column" 
+                            justify="space-between"
+                            align="center"
+                            h="20%"
+                            w="75%"
                         >
-                            ~ Never tell your password to anyone
-                        </FormHelperText>
-                    </FormControl>
-                    <PanelButton 
-                        headerText={"Error!"}
-                        bodyText={"LogIn Credentials are wrong"}
-                    />
-                    <Text
-                        id="changeFormButton"
-                        as="span"
-                        fontSize="xs"
-                        _hover={{ textDecoration: "underline",
-                            cursor: "pointer",
-                        }}
-                        onClick={() => {
-                            if (this.state.formType === "Log In") {
-                                this.setState({formType: "Register"})
-                            }
-                            else {
-                                this.setState({formType: "Log In"})
-                            }
-                        }}
+                            <PanelButton 
+                                headerText={"Error!"}
+                                bodyText={"Wrong Login credentials"}
+                            />
+                            <Text
+                                id="changeFormButton"
+                                as="div"
+                                width="100%"
+                                fontSize={{base: "8px", md: "12px"}}
+                                textAlign="left"
+                                _hover={{ textDecoration: "underline",
+                                    cursor: "pointer",
+                                }}
+                                onClick={() => {
+                                    if (this.state.formType === "Log In") {
+                                        this.setState({formType: "Register"})
+                                    }
+                                    else {
+                                        this.setState({formType: "Log In"})
+                                    }
+                                }}
 
-                    />
+                            />
+                        </Flex>
+                    </Flex>
                 </form>
             </>
         )
@@ -295,8 +354,8 @@ function AuthInterface() {
     const darkGradientColor: any = {c1: "#788389", c2: "#A77"};
     const gradientColors: any = useColorModeValue(lightGradientColor, darkGradientColor);
     const gradient: string = "linear(to-r," + gradientColors.c1 + "," + gradientColors.c2 + ")";
-    const shadowType: any = {s1: "dark-lg", s2: "0px 0px 3px 1px black;"};
-    const shadow: string = useColorModeValue(shadowType.s2, shadowType.s2);
+    const shadowType: any = {s1: "0 2px 1px 2px #000", s2: "0 2px 1px 2px #744"};
+    const shadow: string = useColorModeValue(shadowType.s2, shadowType.s1);
     const variants: any = {
         intro: {
             opacity: 1,
@@ -314,7 +373,10 @@ function AuthInterface() {
     }
     const [isMounted, setMountState] = useState(true);
     return (
-        <Box w="50%" h="100%">
+        <Box 
+            w={{base: "100%", md: "50%"}}
+            h={{base: "75%", md: "100%"}}
+        >
             <Flex
                 h="100%"
                 color="gray.700"
@@ -330,7 +392,9 @@ function AuthInterface() {
                     direction="column"
                     justifyContent="space-evenly"
                     align="center"
-                    w="50%" h="75%" p="0"
+                    w={{base: "75%", md: "50%"}}
+                    h="75%"
+                    p="0"
                     rounded="md"
                     backgroundColor="gray.700"
                     bgGradient={ gradient }

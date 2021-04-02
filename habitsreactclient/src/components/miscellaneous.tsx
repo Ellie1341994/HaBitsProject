@@ -12,12 +12,13 @@ import {
 
 function AppHeading() {
     const [hasFallen, setHasFallen] = useState(false);
-    const variants = {
+    const variants: any = {
         fall: {
-            type: "spring",
             y: 0,
             transition:{
-                duration: 0.5
+                duration: 1,
+                ease: "easeOut",
+
             }
         },
         levitate: {
@@ -30,7 +31,7 @@ function AppHeading() {
             },
         }}
         useEffect(() => {
-            setInterval(setHasFallen, 500, true);
+            setInterval(setHasFallen, 1000, true);
             // <Route exact={true} path="login"></Route>
         },[]);
         return (
@@ -40,9 +41,9 @@ function AppHeading() {
                 variants={variants}
                 fontFamily="serif"
                 as="h1"
-                size="2xl"
                 mt="0"
                 mb="5"
+                fontSize={{base: "18px", md: "36px"}}
             >
                 HaBits
                 <Text
@@ -62,19 +63,21 @@ function AppTitle() {
         <Flex
             direction="column"
             align="center"
-            justifyContent="center"
-            w="50%"
+            justify={{base: "end", md: "center"}}
+            w={{base: "100%", md: "50%"}}
+            h={{base: "25%", md: "100%"}}
             textAlign="center"
             color={textColor}
+            style={{userSelect: "none"}}
         >
             <AppHeading/>
             <AnimatedText
+                fontSize={{base: "10px", md: "14px"}}
                 w="75%"
                 as="em"
                 initial={{opacity: 0}}
                 animate={{opacity: 1}}
                 transition={{ delay: 0.5, duration: 0.5 }}
-                aling="center"
                 noOfLines={4}
             >
                 <strong>Check your Habits</strong> consistently
