@@ -7,6 +7,6 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export const AnimatedHeading: React.FC< any> = motion(Heading),
-AnimatedAppDescription: React.FC<any> = motion(Text),
+AnimatedText: React.FC<any> = motion(Text),
 AnimatedFlex: React.FC<any> = motion(Flex);
 
