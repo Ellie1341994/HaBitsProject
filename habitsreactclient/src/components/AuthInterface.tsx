@@ -129,14 +129,20 @@ class AuthPanel extends React.Component<APProps, APState> {
     componentDidUpdate() {
         this.animateFormChange(500);
     }
-   
+  
     animateFormChange(initialDelay: number) {
         const authPanelHeading: any = document.getElementById("authPanelHeading");
         const authPanelActionButton: any = document.getElementById("authPanelActionButton");
         const changeFormButton: any = document.getElementById("changeFormButton");
+        changeFormButton.setAttribute("style", "pointer-events: none;");
         this.animateText(initialDelay, authPanelHeading,  {register: "Sign\u00A0Up", login: "Sign\u00A0In"});
-        this.animateText(initialDelay, authPanelActionButton, {register: "Register", login: "Log\u00A0In"});
-        this.animateText(initialDelay, changeFormButton, {register:"Log\u00A0In\u00A0instead", login: "Register\u00A0instead"});
+        this.animateText(initialDelay, authPanelActionButton, {register: "Register", login: "Login"});
+        this.animateText(initialDelay, changeFormButton, {register:"Login\u00A0instead", login: "Register\u00A0instead"});
+        setTimeout(() => {
+            changeFormButton.removeAttribute("style");
+
+        },
+        1500);
     }
     animateText(initialDelay: number, htmlElement: any, textChoices: {register: string, login:string}) {
         // "\u00A0" direct whitespace code
@@ -165,7 +171,7 @@ class AuthPanel extends React.Component<APProps, APState> {
                 }
             }
             else {
-                if (headingElement.innerText === " ") {
+                if (headingElement.innerText === "\u00A0") {
                     headingElement.innerText = remaningHeadingText[0]; 
                 }
                 else {
@@ -206,7 +212,6 @@ class AuthPanel extends React.Component<APProps, APState> {
         .catch(e => { 
             if( e.status !== 200 ) {
                 const errorPopOver: any = document.getElementById("errorPopOver");
-                console.log(errorPopOver);
                 errorPopOver.click();
             }
         })
@@ -248,7 +253,6 @@ class AuthPanel extends React.Component<APProps, APState> {
                                 Username
                             </FormLabel>
                             <Input backgroundColor="white"
-                                textAlign="center"
                                 color="gray.700"
                                 isRequired={true}
                                 id="username"
@@ -312,7 +316,7 @@ class AuthPanel extends React.Component<APProps, APState> {
                         </FormControl>
                         <Flex 
                             direction="column" 
-                            justify="space-between"
+                            justify="space-evenly"
                             align="center"
                             h="20%"
                             w="75%"
@@ -323,7 +327,7 @@ class AuthPanel extends React.Component<APProps, APState> {
                             />
                             <Text
                                 id="changeFormButton"
-                                as="div"
+                                as="a"
                                 width="100%"
                                 fontSize={{base: "8px", md: "12px"}}
                                 textAlign="left"
@@ -348,8 +352,10 @@ class AuthPanel extends React.Component<APProps, APState> {
     }
 };
 
+type AIProps = {
+}
 
-function AuthInterface() {
+function AuthInterface(props: AIProps) {
     const lightGradientColor: any = {c1: "#7928CA", c2: "#FF0080"};
     const darkGradientColor: any = {c1: "#788389", c2: "#A77"};
     const gradientColors: any = useColorModeValue(lightGradientColor, darkGradientColor);
@@ -403,6 +409,7 @@ function AuthInterface() {
                     color="white"
                 >
                     <AuthPanel
+
                         setMountState={setMountState}
                     />
                 </AnimatedFlex>

@@ -18,16 +18,14 @@ interface AppState {
     title: string;
     authenticated: boolean
 }
+interface AppProps {
+}
 
-export class App extends React.Component <{}, AppState> {
+export class App extends React.Component<AppProps, AppState> {
     // https://github.com/chakra-ui/chakra-ui/issues/591
     constructor(props: any) {
         super(props);
         this.state = {title: "HaBits ~ Track & Trace", authenticated: false};
-        this.userAuthenticated = this.userAuthenticated.bind(this)
-    }
-    userAuthenticated() {
-
     }
     render () {
         return (
