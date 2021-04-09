@@ -7,7 +7,6 @@ import {
     FlexProps,
 } from '@chakra-ui/react';
 import React from "react";
-import { useState } from "react";
 import { AnimatePresence, motion, MotionProps} from "framer-motion"
 
 type Merge<P, T> = Omit<P, keyof T> & T;
@@ -37,14 +36,15 @@ export function DynamicInput(props: any) {
                 duration: 1,
                 ease: "easeOut",
 
-            }
+            },
         },
     };
     return(
         <AnimatePresence>
             {props.shouldDisplay &&
             <AnimatedFlex
-                width="75%"
+                width="100%"
+                justify="center"
                 initial={{opacity: "0"}}
                 animate={variants.intro}
                 exit={variants.outro}
@@ -61,7 +61,12 @@ export class TypingAnimation extends React.Component<TAProps, any> {
         this.state = {text: this.props.text, styles: {pointerEvents: "auto"}};
         this.textTypingAnimation = this.textTypingAnimation.bind(this);
     }
-    styles: { pointerEvents: "none" | "auto" } = {pointerEvents: "auto"};
+    childrenProps: any = "";
+    UNSAFE_componentWillMount() {
+        const {text, durationInMS, ...childrenProps}: any = this.props;
+        this.childrenProps = childrenProps;
+
+    }
     componentDidUpdate(_prevProps: any, prevState: any) {
         if ( this.state === prevState) {
             const textLength: number = this.state.text.length;
@@ -88,7 +93,7 @@ export class TypingAnimation extends React.Component<TAProps, any> {
     }
     render() {
         return (
-            <Text style={this.state.styles} {...this.props}>{this.state.text}</Text>
+            <Text style={this.state.styles} {...this.childrenProps}>{this.state.text}</Text>
         )
     }
 }

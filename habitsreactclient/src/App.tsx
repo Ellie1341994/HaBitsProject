@@ -3,11 +3,12 @@ import {
     ChakraProvider,
     extendTheme,
     Flex,
+    Box,
 } from "@chakra-ui/react"
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import {Helmet} from "react-helmet";
 import { mode } from '@chakra-ui/theme-tools';
-import AuthInterface from "./components/AuthInterface"
+import AuthenticationPanel from "./components/AuthInterface"
 import {
   Route,
 } from "react-router-dom";
@@ -61,7 +62,20 @@ export class App extends React.Component<AppProps, AppState> {
                             h={{base: "100vh", md: "100%"}}
                         >
                             <AppTitle/>
-                            <AuthInterface/>
+                            <Box
+                                w={{base: "100%", md: "50%"}}
+                                h={{base: "85%", md: "100%"}}
+                            >
+                                <Flex
+                                    h="100%"
+                                    color="gray.700"
+                                    direction="column"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                >
+                                    <AuthenticationPanel/>
+                                </Flex>
+                            </Box>
                         </Flex>
                     </Flex>
                 </ChakraProvider>

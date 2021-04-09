@@ -7,16 +7,13 @@ import {
   PopoverArrow,
   PopoverCloseButton,
 } from "@chakra-ui/react"
-import { Fade, } from "@chakra-ui/react"
 import {
-    Box,
     Input,
     FormControl,
     FormLabel,
     FormHelperText,
     Button,
     useColorModeValue,
-    Text,
     Heading,
     VisuallyHidden,
     Flex,
@@ -30,7 +27,7 @@ import { useState} from "react";
 import React from "react";
 import axios from 'axios';
 
-function PanelButton(props: any) {
+function AuthenticationFormButton(props: any) {
     //const bgColorType: any = {dark: "#e77", light:"orange.200"}
     const bgColorType: {dark: string, light: string} = {dark: "#e77", light:"gray.700"}
     const bgColor: string = useColorModeValue(bgColorType.light, bgColorType.dark);
@@ -98,7 +95,7 @@ interface APState {
 interface APProps {
     setMountState: any
 }
-class AuthPanel extends React.Component<APProps, APState> {
+class AuthenticationForm extends React.Component<APProps, APState> {
 
     URL: string = "http://127.0.0.1:8000";
     registerFields: any = {name: "", username: "", password1: "", email: ""};
@@ -109,11 +106,17 @@ class AuthPanel extends React.Component<APProps, APState> {
         this.register = this.register.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.login = this.login.bind(this);
+        this.handleFormTypeChange = this.handleFormTypeChange.bind(this);
     }
     handleChange(event: any) {
         const field: string = event.target.name;
         const value: string = event.target.value;
         this.registerFields[field] = value;
+    }
+    handleFormTypeChange(_event: any) {
+        this.state.formType === "Register" ?
+            this.setState({formType: "Log In", formTitle: "Log In", formActionButtonName: "Log In"})
+                : this.setState({formType: "Register", formTitle: "Sign Up", formActionButtonName: "Register"});
     }
     register(event: any) {
         event.preventDefault();
@@ -166,22 +169,7 @@ class AuthPanel extends React.Component<APProps, APState> {
                         align="center"
                         height="100%"
                     >
-                        <Flex 
-                            justify="center"
-                            align="center"
-                            h="20%"
-                            w="75%"
-                            pt="4" 
-                            pb="4"
-                            fontSize={{base: "18px", md: "36px"}}
-                        >
-                            <Heading 
-                                as="h2"
-                                fontFamily="serif"
-                            >
-                                <TypingAnimation text={this.state.formTitle} durationInMS={500}/>
-                            </Heading>
-                        </Flex>
+                        <FormTitle formTitle={this.state.formTitle}/>
                         <Flex 
                             h="60%"
                             w="100%"
@@ -189,88 +177,12 @@ class AuthPanel extends React.Component<APProps, APState> {
                             justify="space-evenly" 
                             align="center"
                         >
-                            <FormControl 
-                                w="75%" 
-                                mt="0" 
-                                mb="2" 
-                            >
-                                <FormLabel 
-                                    fontSize={{base: "10px", md: "14px"}}
-                                    mr="0" 
-                                    textAlign="left" 
-                                    fontWeight="bold"
-                                >
-                                    Username
-                                </FormLabel>
-                                <Input backgroundColor="white"
-                                    color="gray.700"
-                                    isRequired={true}
-                                    id="username"
-                                    name="username"
-                                    type="text"
-                                    onChange={this.handleChange}
-                                    borderBottom="solid 2px #CCC"
-                                />
-                            </FormControl>
-                            <FormControl w="75%" mt="2" mb="2" >
-                                <FormLabel 
-                                    fontSize={{base: "10px", md: "14px"}}
-                                    textAlign="left" 
-                                    mr="0" 
-                                    fontWeight="bold"
-                                >
-                                    Password
-                                </FormLabel>
-                                <Input backgroundColor="white"
-                                    color="gray.700"
-                                    isRequired={true}
-                                    id="password1"
-                                    name="password1"
-                                    type="password"
-                                    onChange={this.handleChange}
-                                    borderBottom="solid 2px #CCC"
-                                />
-                                <FormHelperText
-                                    color="gray.100"
-                                    fontSize={{base: "8px", md: "10px"}}
-                                    textAlign="left" 
-                                >
-                                    ~ Never tell your password
-                                </FormHelperText>
-                            </FormControl>
-                            {/*
-                                <Fade 
-                                in={this.state.formType === "Register"}
-                                unmountOnExit={true}
-                                transition={{repeat: 1, type: "tween", duration: 2}}
-                                style={{width: "75%"}}
-                            >
-                            </Fade>
-                              */} 
-                            <DynamicInput shouldDisplay={this.state.formType === "Register"}>
-                                <FormControl  
-                                    mt="2" 
-                                    mb="2" 
-                                >
-                                    <FormLabel 
-                                        fontSize={{base: "10px", md: "14px"}}
-                                        textAlign="left" 
-                                        mr="0" 
-                                        fontWeight="bold"
-                                    >
-                                        E-Mail
-                                    </FormLabel>
-                                    <Input backgroundColor="white"
-                                        color="gray.700"
-                                        isRequired={true}
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        onChange={this.handleChange}
-                                        borderBottom="solid 2px #CCC"
-                                    />
-                                </FormControl>
-                            </DynamicInput>
+                            <Fields 
+                                fields={ ["username", "password", "e-mail"] 
+                                }
+                                formType={this.state.formType} 
+                                handleUserInput={this.handleChange}
+                            />
                         </Flex>
                         <Flex 
                             direction="column" 
@@ -279,27 +191,14 @@ class AuthPanel extends React.Component<APProps, APState> {
                             w="75%"
                             justify="space-between"
                         >
-                            <PanelButton 
+                            <AuthenticationFormButton
                                 headerText={"Error!"}
                                 bodyText={"Wrong Login credentials"}
                                 name={this.state.formActionButtonName}
                             />
-                            <TypingAnimation 
-                                text={( this.state.formType === "Register" ? "Log In" : "Sign Up" ) + " instead" }
-                                durationInMS={500}
-                                id="changeFormButton"
-                                as="a"
-                                width="100%"
-                                fontSize={{base: "8px", md: "12px"}}
-                                textAlign="left"
-                                _hover={{ textDecoration: "underline",
-                                    cursor: "pointer",
-                                }}
-                                onClick={() => { 
-                                    this.state.formType === "Register" ?
-                                        this.setState({formType: "Log In", formTitle: "Log In", formActionButtonName: "Log In"})
-                                        : this.setState({formType: "Register", formTitle: "Sign Up", formActionButtonName: "Register"});
-                                }}
+                            <FormTypeSwitcher 
+                                formType={this.state.formType} 
+                                switchFormType={this.handleFormTypeChange}
                             />
                         </Flex>
                     </Flex>
@@ -308,11 +207,176 @@ class AuthPanel extends React.Component<APProps, APState> {
         )
     }
 };
-
+function Fields(props: any) {
+    // props.fields = ["email", "username", "password"]
+    const fields: any = [];
+    for (const field of props.fields) {
+        let inputControl: any = 
+            <FormControl 
+                w="75%" 
+                mt="0" 
+                mb="2" 
+                key={field}
+            >
+                <FormLabel 
+                    fontSize={{base: "10px", md: "14px"}}
+                    mr="0" 
+                    textAlign="left" 
+                    fontWeight="bold"
+                >
+                    {field.replace(/^\w/, (c: string) => c.toUpperCase())}
+                </FormLabel>
+                <Input backgroundColor="white"
+                    color="gray.700"
+                    isRequired={true}
+                    name={field}
+                    type={field === "e-mail" ? "email" : field === "username" ? field : "password"}
+                    onChange={props.handleUserInput}
+                    borderBottom="solid 2px #CCC"
+                />
+                {field === "password" &&
+                <FormHelperText
+                    color="gray.100"
+                    fontSize={{base: "8px", md: "10px"}}
+                    textAlign="left" 
+                >
+                    ~ Never tell your password
+                </FormHelperText>
+                }
+            </FormControl>
+            if ( field === "e-mail" )  {
+                inputControl = <DynamicInput 
+                    key={field} 
+                    shouldDisplay={props.formType === "Register"}
+                >
+                    {inputControl}
+                </DynamicInput>
+                console.log(inputControl);
+            }
+            fields.push(inputControl);
+    }
+    return fields;
+}
+    /* return(
+        <>
+            <FormControl 
+                w="75%" 
+                mt="0" 
+                mb="2" 
+            >
+                <FormLabel 
+                    fontSize={{base: "10px", md: "14px"}}
+                    mr="0" 
+                    textAlign="left" 
+                    fontWeight="bold"
+                >
+                    Username
+                </FormLabel>
+                <Input backgroundColor="white"
+                    color="gray.700"
+                    isRequired={true}
+                    name="username"
+                    type="text"
+                    onChange={props.handleUserInput}
+                    borderBottom="solid 2px #CCC"
+                />
+            </FormControl>
+            <FormControl 
+                w="75%" 
+                mt="2" 
+                mb="2" 
+            >
+                <FormLabel 
+                    fontSize={{base: "10px", md: "14px"}}
+                    textAlign="left" 
+                    mr="0" 
+                    fontWeight="bold"
+                >
+                    Password
+                </FormLabel>
+                <Input backgroundColor="white"
+                    color="gray.700"
+                    isRequired={true}
+                    id="password1"
+                    name="password1"
+                    type="password"
+                    onChange={props.handleUserInput}
+                    borderBottom="solid 2px #CCC"
+                />
+                <FormHelperText
+                    color="gray.100"
+                    fontSize={{base: "8px", md: "10px"}}
+                    textAlign="left" 
+                >
+                    ~ Never tell your password
+                </FormHelperText>
+            </FormControl>
+            <DynamicInput shouldDisplay={props.formType === "Register"}>
+                <FormControl  
+                    mt="2" 
+                    mb="2" 
+                >
+                    <FormLabel 
+                        fontSize={{base: "10px", md: "14px"}}
+                        textAlign="left" 
+                        mr="0" 
+                        fontWeight="bold"
+                    >
+                        E-Mail
+                    </FormLabel>
+                    <Input backgroundColor="white"
+                        color="gray.700"
+                        isRequired={true}
+                        id="email"
+                        name="email"
+                        type="email"
+                        onChange={props.handleUserInput}
+                        borderBottom="solid 2px #CCC"
+                    />
+                </FormControl>
+            </DynamicInput>
+        </>
+    )
+    */
+function FormTitle(props: any) {
+    return (
+        <Flex 
+            justify="center"
+            align="center"
+            h="20%"
+            w="75%"
+            pt="4" 
+            pb="4"
+            fontSize={{base: "18px", md: "36px"}}
+        >
+            <Heading 
+                as="h2"
+                fontFamily="serif"
+            >
+                <TypingAnimation text={props.formTitle} durationInMS={500}/>
+            </Heading>
+        </Flex>
+    )
+}
+function FormTypeSwitcher(props: any) {
+    return (
+        <TypingAnimation 
+            text={( props.formType === "Register" ? "Log In" : "Sign Up" ) + " instead" }
+            durationInMS={500}
+            as="a"
+            width="100%"
+            fontSize={{base: "8px", md: "12px"}}
+            textAlign="left"
+            _hover={{ textDecoration: "underline",
+                cursor: "pointer",
+            }}
+            onClick={props.switchFormType}
+        />
+    )
+}
 type AIProps = {
 }
-
-function AuthInterface(props: AIProps) {
+function AuthenticationPanel(_props: AIProps) {
     const lightGradientColor: any = {c1: "#7928CA", c2: "#FF0080"};
     const darkGradientColor: any = {c1: "#788389", c2: "#A77"};
     const gradientColors: any = useColorModeValue(lightGradientColor, darkGradientColor);
@@ -336,42 +400,29 @@ function AuthInterface(props: AIProps) {
     }
     const [isMounted, setMountState] = useState(true);
     return (
-        <Box 
-            w={{base: "100%", md: "50%"}}
-            h={{base: "85%", md: "100%"}}
+        <AnimatedFlex
+            initial={{opacity: 0}}
+            animate={isMounted ? "intro" : "outro"}
+            variants={variants}
+            fontWeight="bold"
+            direction="column"
+            justifyContent="space-evenly"
+            align="center"
+            w={{base: "75%", md: "50%"}}
+            h={{base: "90%", md: "75%"}}
+            p="0"
+            rounded="md"
+            backgroundColor="gray.700"
+            bgGradient={ gradient }
+            textAlign="center"
+            boxShadow={shadow}
+            color="white"
         >
-            <Flex
-                h="100%"
-                color="gray.700"
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-            >
-                <AnimatedFlex
-                    initial={{opacity: 0}}
-                    animate={isMounted ? "intro" : "outro"}
-                    variants={variants}
-                    fontWeight="bold"
-                    direction="column"
-                    justifyContent="space-evenly"
-                    align="center"
-                    w={{base: "75%", md: "50%"}}
-                    h={{base: "90%", md: "75%"}}
-                    p="0"
-                    rounded="md"
-                    backgroundColor="gray.700"
-                    bgGradient={ gradient }
-                    textAlign="center"
-                    boxShadow={shadow}
-                    color="white"
-                >
-                    <AuthPanel
+            <AuthenticationForm
 
-                        setMountState={setMountState}
-                    />
-                </AnimatedFlex>
-            </Flex>
-        </Box>
+                setMountState={setMountState}
+            />
+        </AnimatedFlex>
     )
 }
-export default AuthInterface;
+export default AuthenticationPanel;
