@@ -63,9 +63,9 @@ function AppTitle() {
         <Flex
             direction="column"
             align="center"
-            justify={{base: "end", md: "center"}}
+            justify={{base: "flex-end", md: "center"}}
             w={{base: "100%", md: "50%"}}
-            h={{base: "25%", md: "100%"}}
+            h={{base: "15%", md: "100%"}}
             textAlign="center"
             color={textColor}
             style={{userSelect: "none"}}

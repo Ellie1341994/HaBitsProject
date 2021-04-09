@@ -22,7 +22,9 @@ import {
     Flex,
 } from '@chakra-ui/react';
 import {
-    AnimatedFlex
+    AnimatedFlex,
+    TypingAnimation,
+    DynamicInput,
 } from "./AnimatedChakraComponents"
 import { useState} from "react";
 import React from "react";
@@ -39,20 +41,24 @@ function PanelButton(props: any) {
             <Flex 
                 justifyContent="center"
                 direction="column"
-                w="75%"
+                w="100%"
             >
                 <Button
                     _hover={{ border: "solid 3px", borderColor: "gray.300", boxShadow: "lg"}}
                     type="submit"
                     fontSize={{base: "10px", md: "16px"}}
-                    mt="2" mb="2"
+                    mt="2"
+                    mb="2"
+                    size="md"
                     color="white"
                     isFullWidth={true}
                     backgroundColor={bgColor}
                     id="authPanelActionButton"
                     borderRadius="2xl"
                     borderBottom={borderValues}
-                />
+                >
+                    <TypingAnimation durationInMS={500} as="span" text={props.name}/>
+                </Button>
                 <Popover placement="left">
                     <PopoverTrigger >
                         <VisuallyHidden>
@@ -84,30 +90,26 @@ function PanelButton(props: any) {
 
 interface APState {
     formType: string,
-    loggedIn: string | undefined 
+    loggedIn: string | undefined,
+    formTitle: "Sign Up" | "Log In",
+    formActionButtonName: "Register" | "Log In",
 }
 
 interface APProps {
     setMountState: any
 }
-type TAArgsTypes = [string, string, any, number];
-
 class AuthPanel extends React.Component<APProps, APState> {
 
     URL: string = "http://127.0.0.1:8000";
     registerFields: any = {name: "", username: "", password1: "", email: ""};
     Heading: string = "Sign Up";
-    constructor(props: any){
+    constructor(props: any) {
         super(props);
-        this.state = {formType: "Register", loggedIn: undefined }
+        this.state = { formType: "Register", loggedIn: undefined, formTitle: "Sign Up", formActionButtonName: "Register" }
         this.register = this.register.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.login = this.login.bind(this);
-        this.typingAnimation = this.typingAnimation.bind(this);
-        this.animateText = this.animateText.bind(this);
-        this.animateFormChange = this.animateFormChange.bind(this);
     }
-
     handleChange(event: any) {
         const field: string = event.target.name;
         const value: string = event.target.value;
@@ -121,75 +123,6 @@ class AuthPanel extends React.Component<APProps, APState> {
         .then( response => console.log(response) )
         .catch( e => console.log(e));
     }
-
-    componentDidMount() {
-        this.animateFormChange(1000);
-    }
-
-    componentDidUpdate() {
-        this.animateFormChange(500);
-    }
-  
-    animateFormChange(initialDelay: number) {
-        const authPanelHeading: any = document.getElementById("authPanelHeading");
-        const authPanelActionButton: any = document.getElementById("authPanelActionButton");
-        const changeFormButton: any = document.getElementById("changeFormButton");
-        changeFormButton.setAttribute("style", "pointer-events: none;");
-        this.animateText(initialDelay, authPanelHeading,  {register: "Sign\u00A0Up", login: "Sign\u00A0In"});
-        this.animateText(initialDelay, authPanelActionButton, {register: "Register", login: "Login"});
-        this.animateText(initialDelay, changeFormButton, {register:"Login\u00A0instead", login: "Register\u00A0instead"});
-        setTimeout(() => {
-            changeFormButton.removeAttribute("style");
-
-        },
-        1500);
-    }
-    animateText(initialDelay: number, htmlElement: any, textChoices: {register: string, login:string}) {
-        // "\u00A0" direct whitespace code
-        const text: string = this.state.formType === "Register" ? textChoices.register : textChoices.login;
-        let typingAnimationArgs: TAArgsTypes = [
-            "erase",
-            text,
-            htmlElement,
-            500 / text.length ,
-        ];
-        setTimeout(this.typingAnimation, initialDelay, ...typingAnimationArgs);
-    }
-    typingAnimation(
-        animationType: "erase" | "write",
-        remaningHeadingText: string,
-        headingElement: any,
-        delay: number) {
-            const headingElementLength: number = headingElement.innerText.length;
-            if ( animationType === "erase") {
-                if (headingElementLength > 1) {
-                    headingElement.innerText = headingElement.innerText.substring(0, headingElementLength - 1);
-                }
-                else {
-                    headingElement.innerText  = "\u00A0";
-                    animationType = "write";
-                }
-            }
-            else {
-                if (headingElement.innerText === "\u00A0") {
-                    headingElement.innerText = remaningHeadingText[0]; 
-                }
-                else {
-                    headingElement.innerText += remaningHeadingText[0]; 
-                }
-                remaningHeadingText = remaningHeadingText.substring(1);
-            }
-            if( remaningHeadingText !== "") {
-                let typingAnimationArgs: TAArgsTypes = [
-                    animationType, 
-                    remaningHeadingText,
-                    headingElement,
-                    delay,
-                ];
-                setTimeout(this.typingAnimation, delay, ...typingAnimationArgs); 
-            }
-        }
-
     login(event: any) {
         event.preventDefault();
         const loginURL: string = this.URL + "/login/";
@@ -227,105 +160,133 @@ class AuthPanel extends React.Component<APProps, APState> {
                     }
                     style={{userSelect: "none", width: "100%", height: "100%"}}
                 >
-
                     <Flex 
                         direction="column"
                         justify="space-between"
                         align="center"
                         height="100%"
                     >
-                        <Heading 
-                            width="75%"
-                            pt="4" pb="4"
+                        <Flex 
+                            justify="center"
+                            align="center"
+                            h="20%"
+                            w="75%"
+                            pt="4" 
+                            pb="4"
                             fontSize={{base: "18px", md: "36px"}}
-                            id="authPanelHeading"
-                            as="h2"
-                            fontFamily="serif"
-                            alignSelf="center"
-                        />
-                        <FormControl w="75%" mt="0" mb="2" >
-                            <FormLabel 
-                                fontSize={{base: "10px", md: "14px"}}
-                                mr="0" 
-                                textAlign="left" 
-                                fontWeight="bold"
-                            >
-                                Username
-                            </FormLabel>
-                            <Input backgroundColor="white"
-                                color="gray.700"
-                                isRequired={true}
-                                id="username"
-                                name="username"
-                                type="text"
-                                onChange={this.handleChange}
-                                borderBottom="solid 2px #CCC"
-                            />
-                        </FormControl>
-                        <Fade 
-                            in={this.state.formType === "Register"}
-                            unmountOnExit={true}
-                            transition={{repeat: 1, type: "tween", duration: 2}}
-                            style={{width: "75%"}}
                         >
-                            <FormControl  mt="2" mb="2" >
+                            <Heading 
+                                as="h2"
+                                fontFamily="serif"
+                            >
+                                <TypingAnimation text={this.state.formTitle} durationInMS={500}/>
+                            </Heading>
+                        </Flex>
+                        <Flex 
+                            h="60%"
+                            w="100%"
+                            direction="column" 
+                            justify="space-evenly" 
+                            align="center"
+                        >
+                            <FormControl 
+                                w="75%" 
+                                mt="0" 
+                                mb="2" 
+                            >
+                                <FormLabel 
+                                    fontSize={{base: "10px", md: "14px"}}
+                                    mr="0" 
+                                    textAlign="left" 
+                                    fontWeight="bold"
+                                >
+                                    Username
+                                </FormLabel>
+                                <Input backgroundColor="white"
+                                    color="gray.700"
+                                    isRequired={true}
+                                    id="username"
+                                    name="username"
+                                    type="text"
+                                    onChange={this.handleChange}
+                                    borderBottom="solid 2px #CCC"
+                                />
+                            </FormControl>
+                            <FormControl w="75%" mt="2" mb="2" >
                                 <FormLabel 
                                     fontSize={{base: "10px", md: "14px"}}
                                     textAlign="left" 
                                     mr="0" 
                                     fontWeight="bold"
                                 >
-                                    E-Mail
+                                    Password
                                 </FormLabel>
                                 <Input backgroundColor="white"
                                     color="gray.700"
                                     isRequired={true}
-                                    id="email"
-                                    name="email"
-                                    type="email"
+                                    id="password1"
+                                    name="password1"
+                                    type="password"
                                     onChange={this.handleChange}
                                     borderBottom="solid 2px #CCC"
                                 />
+                                <FormHelperText
+                                    color="gray.100"
+                                    fontSize={{base: "8px", md: "10px"}}
+                                    textAlign="left" 
+                                >
+                                    ~ Never tell your password
+                                </FormHelperText>
                             </FormControl>
-                        </Fade>
-                        <FormControl w="75%" mt="2" mb="2" >
-                            <FormLabel 
-                                fontSize={{base: "10px", md: "14px"}}
-                                textAlign="left" 
-                                mr="0" 
-                                fontWeight="bold"
+                            {/*
+                                <Fade 
+                                in={this.state.formType === "Register"}
+                                unmountOnExit={true}
+                                transition={{repeat: 1, type: "tween", duration: 2}}
+                                style={{width: "75%"}}
                             >
-                                Password
-                            </FormLabel>
-                            <Input backgroundColor="white"
-                                color="gray.700"
-                                isRequired={true}
-                                id="password1"
-                                name="password1"
-                                type="password"
-                                onChange={this.handleChange}
-                                borderBottom="solid 2px #CCC"
-                            />
-                            <FormHelperText
-                                color="gray.100"
-                                fontSize={{base: "8px", md: "10px"}}
-                                textAlign="left" 
-                            >
-                                ~ Never tell your password
-                            </FormHelperText>
-                        </FormControl>
+                            </Fade>
+                              */} 
+                            <DynamicInput shouldDisplay={this.state.formType === "Register"}>
+                                <FormControl  
+                                    mt="2" 
+                                    mb="2" 
+                                >
+                                    <FormLabel 
+                                        fontSize={{base: "10px", md: "14px"}}
+                                        textAlign="left" 
+                                        mr="0" 
+                                        fontWeight="bold"
+                                    >
+                                        E-Mail
+                                    </FormLabel>
+                                    <Input backgroundColor="white"
+                                        color="gray.700"
+                                        isRequired={true}
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        onChange={this.handleChange}
+                                        borderBottom="solid 2px #CCC"
+                                    />
+                                </FormControl>
+                            </DynamicInput>
+                        </Flex>
                         <Flex 
                             direction="column" 
-                            justify="space-evenly"
                             align="center"
                             h="20%"
                             w="75%"
+                            justify="space-between"
                         >
                             <PanelButton 
                                 headerText={"Error!"}
                                 bodyText={"Wrong Login credentials"}
+                                name={this.state.formActionButtonName}
                             />
-                            <Text
+                            <TypingAnimation 
+                                text={( this.state.formType === "Register" ? "Log In" : "Sign Up" ) + " instead" }
+                                durationInMS={500}
                                 id="changeFormButton"
                                 as="a"
                                 width="100%"
@@ -334,15 +295,11 @@ class AuthPanel extends React.Component<APProps, APState> {
                                 _hover={{ textDecoration: "underline",
                                     cursor: "pointer",
                                 }}
-                                onClick={() => {
-                                    if (this.state.formType === "Log In") {
-                                        this.setState({formType: "Register"})
-                                    }
-                                    else {
-                                        this.setState({formType: "Log In"})
-                                    }
+                                onClick={() => { 
+                                    this.state.formType === "Register" ?
+                                        this.setState({formType: "Log In", formTitle: "Log In", formActionButtonName: "Log In"})
+                                        : this.setState({formType: "Register", formTitle: "Sign Up", formActionButtonName: "Register"});
                                 }}
-
                             />
                         </Flex>
                     </Flex>
@@ -381,7 +338,7 @@ function AuthInterface(props: AIProps) {
     return (
         <Box 
             w={{base: "100%", md: "50%"}}
-            h={{base: "75%", md: "100%"}}
+            h={{base: "85%", md: "100%"}}
         >
             <Flex
                 h="100%"
@@ -399,7 +356,7 @@ function AuthInterface(props: AIProps) {
                     justifyContent="space-evenly"
                     align="center"
                     w={{base: "75%", md: "50%"}}
-                    h="75%"
+                    h={{base: "90%", md: "75%"}}
                     p="0"
                     rounded="md"
                     backgroundColor="gray.700"
