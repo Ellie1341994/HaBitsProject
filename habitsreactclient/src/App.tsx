@@ -8,7 +8,7 @@ import {
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import {Helmet} from "react-helmet";
 import { mode } from '@chakra-ui/theme-tools';
-import AuthenticationPanel from "./components/AuthInterface"
+import AuthenticationPanel from "./components/AuthenticationPanel"
 import {
   Route,
 } from "react-router-dom";
@@ -28,6 +28,13 @@ export class App extends React.Component<AppProps, AppState> {
         super(props);
         this.state = {title: "HaBits ~ Track & Trace", authenticated: false};
     }
+    componentDidMount() {
+        let token: any = localStorage.getItem("token");
+        if ( token ) {
+            console.log("token exists");
+        }
+    }
+
     render () {
         return (
             <Route exact={true} path="/">

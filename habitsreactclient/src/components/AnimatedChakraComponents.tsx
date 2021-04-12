@@ -25,15 +25,6 @@ export const AnimatedText: React.FC<ATProps> = motion(Text);
 export const AnimatedFlex: React.FC<AFProps> = motion(Flex);
 export const AnimatedBox: React.FC<ABProps> = motion(Box);
 export function TransitioningInput(props: any) {
-    const variants: any = {
-        transit: {
-            flex: "1",
-            transition: {
-                duration: 1,
-                ease: "easeOut",
-            } 
-        }
-    }
     return (
         <AnimatedFlex
             width="100%"
@@ -90,7 +81,7 @@ export class TypingAnimation extends React.Component<TAProps, any> {
         this.textTypingAnimation = this.textTypingAnimation.bind(this);
     }
     childrenProps: any = "";
-    afterUpdateText: string = "";
+    afterUpdateText: string = this.props.text;
     UNSAFE_componentWillMount() {
         const {text, durationInMS, ...childrenProps}: any = this.props;
         this.childrenProps = childrenProps;
