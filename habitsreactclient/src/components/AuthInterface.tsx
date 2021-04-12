@@ -6,6 +6,7 @@ import {
   PopoverBody,
   PopoverArrow,
   PopoverCloseButton,
+  useMediaQuery,
 } from "@chakra-ui/react"
 import {
     Input,
@@ -21,7 +22,8 @@ import {
 import {
     AnimatedFlex,
     TypingAnimation,
-    DynamicInput,
+    FadingInput,
+    TransitioningInput,
 } from "./AnimatedChakraComponents"
 import { useState} from "react";
 import React from "react";
@@ -32,31 +34,16 @@ function AuthenticationFormButton(props: any) {
     const bgColorType: {dark: string, light: string} = {dark: "#e77", light:"gray.700"}
     const bgColor: string = useColorModeValue(bgColorType.light, bgColorType.dark);
     const borderValues: string = useColorModeValue("solid 1px #888","solid 1px #CCC");
+    const [ isBelow48em ]: boolean[] = useMediaQuery("(max-width: 48em)");
 
     return (
         <>
             <Flex 
                 justifyContent="center"
-                direction="column"
-                w="100%"
+                direction={isBelow48em ? "row" : "column"}
+                w="75%"
             >
-                <Button
-                    _hover={{ border: "solid 3px", borderColor: "gray.300", boxShadow: "lg"}}
-                    type="submit"
-                    fontSize={{base: "10px", md: "16px"}}
-                    mt="2"
-                    mb="2"
-                    size="md"
-                    color="white"
-                    isFullWidth={true}
-                    backgroundColor={bgColor}
-                    id="authPanelActionButton"
-                    borderRadius="2xl"
-                    borderBottom={borderValues}
-                >
-                    <TypingAnimation durationInMS={500} as="span" text={props.name}/>
-                </Button>
-                <Popover placement="left">
+                <Popover placement={isBelow48em ? "top" : "left"}>
                     <PopoverTrigger >
                         <VisuallyHidden>
                             <Button 
@@ -70,6 +57,8 @@ function AuthenticationFormButton(props: any) {
                         </VisuallyHidden>
                     </PopoverTrigger >
                     <PopoverContent 
+                        margin="auto"
+                        width={isBelow48em ? "65%" : "100%"}
                         color="gray.700"
                         backgroundColor="gray.50"
                     >
@@ -79,6 +68,21 @@ function AuthenticationFormButton(props: any) {
                         <PopoverBody fontSize="xs">{props.bodyText}</PopoverBody>
                     </PopoverContent>
                 </Popover>
+                <Button
+                    _hover={{ border: "solid 3px", borderColor: "gray.300", boxShadow: "lg"}}
+                    type="submit"
+                    fontSize={{base: "10px", md: "16px"}}
+                    mt="2"
+                    mb="2"
+                    size="md"
+                    color="white"
+                    isFullWidth={true}
+                    backgroundColor={bgColor}
+                    borderRadius="2xl"
+                    borderBottom={borderValues}
+                >
+                    <TypingAnimation durationInMS={500} as="span" text={props.name}/>
+                </Button>
             </Flex>
         </>
     )
@@ -90,6 +94,8 @@ interface APState {
     loggedIn: string | undefined,
     formTitle: "Sign Up" | "Log In",
     formActionButtonName: "Register" | "Log In",
+    messagesHeaderText: string,
+    requestFeedbackMessages: string,
 }
 
 interface APProps {
@@ -102,7 +108,14 @@ class AuthenticationForm extends React.Component<APProps, APState> {
     Heading: string = "Sign Up";
     constructor(props: any) {
         super(props);
-        this.state = { formType: "Register", loggedIn: undefined, formTitle: "Sign Up", formActionButtonName: "Register" }
+        this.state = { 
+            messagesHeaderText: "Error(s)",
+            requestFeedbackMessages: "",
+            formType: "Register",
+            loggedIn: undefined,
+            formTitle: "Sign Up",
+            formActionButtonName: "Register"
+        }
         this.register = this.register.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.login = this.login.bind(this);
@@ -113,18 +126,25 @@ class AuthenticationForm extends React.Component<APProps, APState> {
         const value: string = event.target.value;
         this.registerFields[field] = value;
     }
-    handleFormTypeChange(_event: any) {
+    handleFormTypeChange(_event?: any) {
         this.state.formType === "Register" ?
             this.setState({formType: "Log In", formTitle: "Log In", formActionButtonName: "Log In"})
                 : this.setState({formType: "Register", formTitle: "Sign Up", formActionButtonName: "Register"});
     }
     register(event: any) {
         event.preventDefault();
+        const registerURL: string = this.URL + "/registration/";
         let data = this.registerFields;
         data["password2"] = data.password;
-        axios.post(this.URL, data)
-        .then( response => console.log(response) )
-        .catch( e => console.log(e));
+        axios.post(registerURL, data)
+        .then( response => {
+            if ( response.status === 400 ) {
+            }
+            else {
+                this.handleFormTypeChange();
+            }
+        })
+        .catch( error => console.log(error));
     }
     login(event: any) {
         event.preventDefault();
@@ -133,6 +153,7 @@ class AuthenticationForm extends React.Component<APProps, APState> {
         const postData = {username: this.registerFields.username, password: this.registerFields.password1};
         axios.post(loginURL, postData)
         .then( r =>   {
+            console.log(r)
 
             if( r.status === 200 ) {
                 this.props.setMountState(false);
@@ -145,8 +166,10 @@ class AuthenticationForm extends React.Component<APProps, APState> {
                 .catch(e => console.log(e));
             }
         })
-        .catch(e => { 
-            if( e.status !== 200 ) {
+        .catch(error => { 
+            console.log(error)
+            if( error.status !== 200 ) {
+                this.setState({requestFeedbackMessages: "* Wrong Login credentials"})
                 const errorPopOver: any = document.getElementById("errorPopOver");
                 errorPopOver.click();
             }
@@ -170,12 +193,13 @@ class AuthenticationForm extends React.Component<APProps, APState> {
                         height="100%"
                     >
                         <FormTitle formTitle={this.state.formTitle}/>
-                        <Flex 
+                        <AnimatedFlex 
                             h="60%"
                             w="100%"
                             direction="column" 
                             justify="space-evenly" 
                             align="center"
+                            layout={true}
                         >
                             <Fields 
                                 fields={ ["username", "password", "e-mail"] 
@@ -183,7 +207,7 @@ class AuthenticationForm extends React.Component<APProps, APState> {
                                 formType={this.state.formType} 
                                 handleUserInput={this.handleChange}
                             />
-                        </Flex>
+                        </AnimatedFlex>
                         <Flex 
                             direction="column" 
                             align="center"
@@ -192,11 +216,11 @@ class AuthenticationForm extends React.Component<APProps, APState> {
                             justify="space-between"
                         >
                             <AuthenticationFormButton
-                                headerText={"Error!"}
-                                bodyText={"Wrong Login credentials"}
+                                headerText={this.state.messagesHeaderText}
+                                bodyText={this.state.requestFeedbackMessages}
                                 name={this.state.formActionButtonName}
                             />
-                            <FormTypeSwitcher 
+                            <ChangeFormButton 
                                 formType={this.state.formType} 
                                 switchFormType={this.handleFormTypeChange}
                             />
@@ -216,7 +240,6 @@ function Fields(props: any) {
                 w="75%" 
                 mt="0" 
                 mb="2" 
-                key={field}
             >
                 <FormLabel 
                     fontSize={{base: "10px", md: "14px"}}
@@ -245,99 +268,24 @@ function Fields(props: any) {
                 }
             </FormControl>
             if ( field === "e-mail" )  {
-                inputControl = <DynamicInput 
+                inputControl = <FadingInput
                     key={field} 
                     shouldDisplay={props.formType === "Register"}
                 >
                     {inputControl}
-                </DynamicInput>
-                console.log(inputControl);
+                </FadingInput>
+            }
+            else {
+                inputControl = <TransitioningInput
+                    key={field} 
+                >
+                    {inputControl}
+                </TransitioningInput>
             }
             fields.push(inputControl);
     }
     return fields;
 }
-    /* return(
-        <>
-            <FormControl 
-                w="75%" 
-                mt="0" 
-                mb="2" 
-            >
-                <FormLabel 
-                    fontSize={{base: "10px", md: "14px"}}
-                    mr="0" 
-                    textAlign="left" 
-                    fontWeight="bold"
-                >
-                    Username
-                </FormLabel>
-                <Input backgroundColor="white"
-                    color="gray.700"
-                    isRequired={true}
-                    name="username"
-                    type="text"
-                    onChange={props.handleUserInput}
-                    borderBottom="solid 2px #CCC"
-                />
-            </FormControl>
-            <FormControl 
-                w="75%" 
-                mt="2" 
-                mb="2" 
-            >
-                <FormLabel 
-                    fontSize={{base: "10px", md: "14px"}}
-                    textAlign="left" 
-                    mr="0" 
-                    fontWeight="bold"
-                >
-                    Password
-                </FormLabel>
-                <Input backgroundColor="white"
-                    color="gray.700"
-                    isRequired={true}
-                    id="password1"
-                    name="password1"
-                    type="password"
-                    onChange={props.handleUserInput}
-                    borderBottom="solid 2px #CCC"
-                />
-                <FormHelperText
-                    color="gray.100"
-                    fontSize={{base: "8px", md: "10px"}}
-                    textAlign="left" 
-                >
-                    ~ Never tell your password
-                </FormHelperText>
-            </FormControl>
-            <DynamicInput shouldDisplay={props.formType === "Register"}>
-                <FormControl  
-                    mt="2" 
-                    mb="2" 
-                >
-                    <FormLabel 
-                        fontSize={{base: "10px", md: "14px"}}
-                        textAlign="left" 
-                        mr="0" 
-                        fontWeight="bold"
-                    >
-                        E-Mail
-                    </FormLabel>
-                    <Input backgroundColor="white"
-                        color="gray.700"
-                        isRequired={true}
-                        id="email"
-                        name="email"
-                        type="email"
-                        onChange={props.handleUserInput}
-                        borderBottom="solid 2px #CCC"
-                    />
-                </FormControl>
-            </DynamicInput>
-        </>
-    )
-    */
 function FormTitle(props: any) {
     return (
         <Flex 
@@ -358,7 +306,7 @@ function FormTitle(props: any) {
         </Flex>
     )
 }
-function FormTypeSwitcher(props: any) {
+function ChangeFormButton(props: any) {
     return (
         <TypingAnimation 
             text={( props.formType === "Register" ? "Log In" : "Sign Up" ) + " instead" }
