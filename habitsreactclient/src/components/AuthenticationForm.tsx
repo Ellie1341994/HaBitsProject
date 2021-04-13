@@ -22,7 +22,9 @@ interface APState {
 }
 
 interface APProps {
-    setMountState: any
+    setMountState: any,
+    formInformation: any,
+    routeHistory: any,
 }
 export default class AuthenticationForm extends React.Component<APProps, APState> {
 
@@ -33,10 +35,10 @@ export default class AuthenticationForm extends React.Component<APProps, APState
         this.state = { 
             messagesHeaderText: "Error(s)",
             requestFeedbackMessages: "",
-            formType: "Log In",
+            formType: this.props.formInformation.type,
             loggedIn: undefined,
-            formTitle: "Log In",
-            formActionButtonName: "Enter"
+            formTitle: this.props.formInformation.title, 
+            formActionButtonName: this.props.formInformation.button,
         }
         this.register = this.register.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -49,9 +51,14 @@ export default class AuthenticationForm extends React.Component<APProps, APState
         this.registerFields[field] = value;
     }
     handleFormTypeChange(_event?: any) {
-        this.state.formType === "Register" ?
-            this.setState({formType: "Log In", formTitle: "Log In", formActionButtonName: "Enter"})
-                : this.setState({formType: "Register", formTitle: "Sign Up", formActionButtonName: "Register"});
+        if (this.state.formType === "Register" ) {
+            this.props.routeHistory.push("/login");
+            this.setState({formType: "Log In", formTitle: "Log In", formActionButtonName: "Enter"});
+        }
+        else {
+            this.props.routeHistory.push("/register");
+            this.setState({formType: "Register", formTitle: "Sign Up", formActionButtonName: "Register"});
+        }
     }
     register(event: any) {
         event.preventDefault();

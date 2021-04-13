@@ -7,6 +7,9 @@ import {
 import { useState} from "react";
 import React from "react";
 import AuthenticationForm from "./AuthenticationForm"
+import {
+  Route,
+} from "react-router-dom";
 export default function AuthenticationPanel(_props: {}) {
     const lightGradientColor: any = {c1: "#7928CA", c2: "#FF0080"};
     const darkGradientColor: any = {c1: "#788389", c2: "#A77"};
@@ -29,6 +32,17 @@ export default function AuthenticationPanel(_props: {}) {
             },
         }
     }
+    function makeFormInformation(isLoginForm: boolean) {
+        const formInformation: any = {title: "Sign Up", button: "Register", type: "Register"};
+        if ( isLoginForm ) {
+            for (let key of Object.keys(formInformation)) {
+                for (let value of ["Log In", "Enter", "Log In"]) {
+                    formInformation[key] = value;
+                }
+            }
+        }
+        return formInformation;
+    }
     const [isMounted, setMountState] = useState(true);
     return (
         <AnimatedFlex
@@ -49,9 +63,13 @@ export default function AuthenticationPanel(_props: {}) {
             boxShadow={shadow}
             color="white"
         >
-            <AuthenticationForm
-
-                setMountState={setMountState}
+            <Route 
+                path={["/login","/register"]}
+                exact={true}
+                render={({ match, history }: any) => {
+                    return <AuthenticationForm routeHistory={history} formInformation={makeFormInformation(match.path.includes("login"))} setMountState={setMountState}/>;
+                    }
+                }
             />
         </AnimatedFlex>
     )

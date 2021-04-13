@@ -85,7 +85,6 @@ export class TypingAnimation extends React.Component<TAProps, any> {
     UNSAFE_componentWillMount() {
         const {text, durationInMS, ...childrenProps}: any = this.props;
         this.childrenProps = childrenProps;
-
     }
     componentDidUpdate(_prevProps: any, prevState: any) {
         if ( this.state === prevState && this.afterUpdateText !== this.props.text) {

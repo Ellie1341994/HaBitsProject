@@ -10,10 +10,11 @@ import {Helmet} from "react-helmet";
 import { mode } from '@chakra-ui/theme-tools';
 import AuthenticationPanel from "./components/AuthenticationPanel"
 import {
-  Route,
+    Route,
+    Redirect,
 } from "react-router-dom";
 //import axios from 'axios';
-import AppTitle from "./components/miscellaneous"
+import AppTitle from "./components/AppTitle"
 
 interface AppState {
     title: string;
@@ -31,13 +32,14 @@ export class App extends React.Component<AppProps, AppState> {
     componentDidMount() {
         let token: any = localStorage.getItem("token");
         if ( token ) {
-            console.log("token exists");
+            this.setState({authenticated: true});
         }
     }
 
     render () {
         return (
-            <Route exact={true} path="/">
+            <Route path="/">
+                {this.state.authenticated ? <Flex>asd</Flex>: <Redirect to="/login"/>}
                 <ChakraProvider theme={extendTheme({
                     styles: {
                         global: (props: any) => ({
