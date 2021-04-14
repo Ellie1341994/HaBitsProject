@@ -10,7 +10,7 @@ import AuthenticationForm from "./AuthenticationForm"
 import {
   Route,
 } from "react-router-dom";
-export default function AuthenticationPanel(_props: {}) {
+export default function AuthenticationPanel(props: any) {
     const lightGradientColor: any = {c1: "#7928CA", c2: "#FF0080"};
     const darkGradientColor: any = {c1: "#788389", c2: "#A77"};
     const gradientColors: any = useColorModeValue(lightGradientColor, darkGradientColor);
@@ -43,11 +43,11 @@ export default function AuthenticationPanel(_props: {}) {
         }
         return formInformation;
     }
-    const [isMounted, setMountState] = useState(true);
+    const [displayAuthPanel, setDisplayAuthPanel] = useState(true);
     return (
         <AnimatedFlex
             initial={{opacity: 0}}
-            animate={isMounted ? "intro" : "outro"}
+            animate={displayAuthPanel ? "intro" : "outro"}
             variants={variants}
             fontWeight="bold"
             direction="column"
@@ -67,9 +67,15 @@ export default function AuthenticationPanel(_props: {}) {
                 path={["/login","/register"]}
                 exact={true}
                 render={({ match, history }: any) => {
-                    return <AuthenticationForm routeHistory={history} formInformation={makeFormInformation(match.path.includes("login"))} setMountState={setMountState}/>;
-                    }
-                }
+                    return (
+                        <AuthenticationForm 
+                            routeHistory={history} 
+                            formInformation={makeFormInformation(match.path.includes("login"))} 
+                            setDisplayAuthPanel={setDisplayAuthPanel}
+                            displayUserPanel={props.displayUserPanel}
+                        />
+                    );
+                }}
             />
         </AnimatedFlex>
     )

@@ -22,9 +22,10 @@ interface APState {
 }
 
 interface APProps {
-    setMountState: any,
+    setDisplayAuthPanel: any,
     formInformation: any,
     routeHistory: any,
+    displayUserPanel: any,
 }
 export default class AuthenticationForm extends React.Component<APProps, APState> {
 
@@ -71,7 +72,7 @@ export default class AuthenticationForm extends React.Component<APProps, APState
             console.log(response);
             if ( response.status !== 400 ) {
                 this.setState({messagesHeaderText: "Information",
-                              requestFeedbackMessages: "Registration successful, you can now login into your account"});
+                              requestFeedbackMessages: "Registration successful\nYou may login into your account now"});
                 this.handleFormTypeChange();
                 const errorPopOver: any = document.getElementById("errorPopOver");
                 errorPopOver.click();
@@ -98,7 +99,7 @@ export default class AuthenticationForm extends React.Component<APProps, APState
         axios.post(loginURL, postData)
         .then( response =>   {
             console.log(response)
-            if( response.status === 200 ) {
+            if ( response.status === 200 ) {
                 const token: string = response.data.key;
                 this.setState({messagesHeaderText: "Information", requestFeedbackMessages: "Successfully logged in"})
                 localStorage.setItem("token", token);
@@ -109,13 +110,18 @@ export default class AuthenticationForm extends React.Component<APProps, APState
                 .then(response => console.log(response.data))
                 .catch(e => console.log(e));
                 errorPopOver.click();
-                setTimeout(() => { this.props.setMountState(false) }, 2000);
+                setTimeout(() => { 
+                       this.props.setDisplayAuthPanel(false);
+                       setTimeout(() => {this.props.displayUserPanel() }, 1000);
+                    }
+                    ,2000);
             }
         })
         .catch( reason => {
             if( reason.response.status === 400 ) {
                 const r: any = reason.response;
                 const errorsPerField: any = r.data;
+                console.log(errorsPerField);
                 let errorMessages: string = "";
                 for (let errors of Object.values(errorsPerField)){
                     errorMessages += ( errors as []).join("\n") + "\n";

@@ -28,18 +28,16 @@ export class App extends React.Component<AppProps, AppState> {
     constructor(props: any) {
         super(props);
         this.state = {title: "HaBits ~ Track & Trace", authenticated: false};
+        this.displayUserPanel = this.displayUserPanel.bind(this);
     }
     componentDidMount() {
-        let token: any = localStorage.getItem("token");
-        if ( token ) {
-            this.setState({authenticated: true});
-        }
     }
-
+    displayUserPanel() {
+        this.setState({authenticated: true})
+    }
     render () {
         return (
             <Route path="/">
-                {this.state.authenticated ? <Flex>asd</Flex>: <Redirect to="/login"/>}
                 <ChakraProvider theme={extendTheme({
                     styles: {
                         global: (props: any) => ({
@@ -51,29 +49,38 @@ export class App extends React.Component<AppProps, AppState> {
                 })}>
                     <Helmet title={this.state.title}/>
                     <Flex
+                        justifyContent="right"
                         w="100%"
+                    >
+                        <ColorModeSwitcher
+                            mt="1"
+                            mr="1"
+                            pos="absolute"
+                        />
+                    </Flex>
+                    <Flex
+                        direction={{base: "column", md: "row"}}
+                        justify={{base: "stretch", md: ""}}
+                        align={{base: "center", md: ""}}
                         h="100vh"
-                        direction="column"
                     >
                         <Flex
-                            justifyContent="right"
-                            w="100%"
+                            direction="column"
+                            align="center"
+                            justify={{base: "flex-end", md: "center"}}
+                            w={{base: "100%", md: "50%"}}
+                            h={{base: "25%", md: "100%"}}
+                            textAlign="center"
+                            style={{userSelect: "none"}}
                         >
-                            <ColorModeSwitcher
-                                mt="1"
-                                mr="1"pos="absolute"
-                            />
+                            {this.state.authenticated ? <AppTitle titleOnly={true}/> : <AppTitle/>}
                         </Flex>
-                        <Flex
-                            direction={{base: "column", md: "row"}}
-                            justify={{base: "stretch", md: ""}}
-                            align={{base: "center", md: ""}}
-                            h={{base: "100vh", md: "100%"}}
-                        >
-                            <AppTitle/>
+                        {! this.state.authenticated &&
+                        <>
+                            <Redirect to="/login"/>
                             <Box
                                 w={{base: "100%", md: "50%"}}
-                                h={{base: "85%", md: "100%"}}
+                                h={{base: "75%", md: "100%"}}
                             >
                                 <Flex
                                     h="100%"
@@ -82,10 +89,11 @@ export class App extends React.Component<AppProps, AppState> {
                                     justifyContent="center"
                                     alignItems="center"
                                 >
-                                    <AuthenticationPanel/>
+                                    <AuthenticationPanel displayUserPanel={this.displayUserPanel}/>
                                 </Flex>
                             </Box>
-                        </Flex>
+                        </>
+                        }
                     </Flex>
                 </ChakraProvider>
             </Route>

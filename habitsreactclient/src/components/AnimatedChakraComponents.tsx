@@ -9,7 +9,7 @@ import {
     BoxProps,
 } from '@chakra-ui/react';
 import React from "react";
-import { AnimatePresence, motion, MotionProps} from "framer-motion"
+import { motion, MotionProps} from "framer-motion"
 
 type Merge<P, T> = Omit<P, keyof T> & T;
 type AHProps = Merge<HeadingProps, MotionProps>;
@@ -19,6 +19,7 @@ type ABProps = Merge<BoxProps, MotionProps>;
 interface TAProps extends TextProps {
     text: string,
     durationInMS?: number,
+    animateAlways?: boolean,
 }
 export const AnimatedHeading: React.FC<AHProps> = motion(Heading);
 export const AnimatedText: React.FC<ATProps> = motion(Text);
@@ -35,7 +36,6 @@ export function TransitioningInput(props: any) {
         >
             { props.children }
         </AnimatedFlex>
-
     )
 }
 export function FadingInput(props: any) {
@@ -58,7 +58,7 @@ export function FadingInput(props: any) {
         },
     };
     return(
-        <AnimatePresence>
+        <>
             {props.shouldDisplay &&
             <AnimatedFlex
                 width="100%"
@@ -71,7 +71,7 @@ export function FadingInput(props: any) {
                 {props.children}
             </AnimatedFlex>
             }
-        </AnimatePresence>
+        </>
     )
 }
 export class TypingAnimation extends React.Component<TAProps, any> {
@@ -79,43 +79,43 @@ export class TypingAnimation extends React.Component<TAProps, any> {
         super(props);
         this.state = {text: this.props.text, styles: {pointerEvents: "auto"}};
         this.textTypingAnimation = this.textTypingAnimation.bind(this);
-    }
-    childrenProps: any = "";
-    afterUpdateText: string = this.props.text;
-    UNSAFE_componentWillMount() {
         const {text, durationInMS, ...childrenProps}: any = this.props;
         this.childrenProps = childrenProps;
     }
-    componentDidUpdate(_prevProps: any, prevState: any) {
-        if ( this.state === prevState && this.afterUpdateText !== this.props.text) {
+    childrenProps: TextProps = "" as TextProps;
+    afterUpdateText: string = "";
+    componentDidUpdate(_prevProps: any, _prevState: any) {
+        let shouldAnimate: boolean = this.afterUpdateText !== this.props.text;
+        if ( this.props.animateAlways ) {
+            shouldAnimate = _prevState === this.state;
+        }
+        if ( shouldAnimate ) {
             const textLength: number = this.state.text.length;
             const animationDuration: undefined | number = this.props.durationInMS;
             const typingSpeed: number = animationDuration ? animationDuration  / textLength : 1000 / textLength;
             setTimeout(this.textTypingAnimation, 0, textLength, typingSpeed, 1);
             this.afterUpdateText = this.props.text;
-
         }
     }
-    textTypingAnimation(range: number, typingSpeed: number, erase?: boolean) {
-        erase = range > 0 && erase ? true : false;
-        range = erase ? range - 1 : range + 1;
-        let typing: boolean = range <= this.props.text.length;
+    textTypingAnimation(textLength: number, typingSpeed: number, erase?: boolean, eraseOnly?: boolean) {
+        erase = textLength > 0 && erase ? true : false;
+        textLength = erase ? textLength - 1 : textLength + 1;
+        const maxTextLength: number = this.props.text.length;
+        let typing: boolean = textLength <= maxTextLength && ! eraseOnly;
         let updatedText: string =
             erase ?
-                this.state.text.substring(0, range)
+                this.state.text.substring(0, textLength)
             :
-                this.props.text.substring(0, range);
+                this.props.text.substring(0, textLength);
         let updatedState: any = {styles: { pointerEvents: "auto" }};
         if ( erase || typing ) {
-            setTimeout(this.textTypingAnimation, typingSpeed, range, typingSpeed, erase);
+            setTimeout(this.textTypingAnimation, typingSpeed, textLength, typingSpeed, erase);
             updatedState = {text: updatedText, styles: { pointerEvents: "none" }};
         }
         this.setState(updatedState);
     }
     render() {
-        return (
-            <Text style={this.state.styles} {...this.childrenProps}>{this.state.text}</Text>
-        )
+        return <Text style={this.state.styles} {...this.childrenProps}> {this.state.text} </Text>;
     }
 }
 

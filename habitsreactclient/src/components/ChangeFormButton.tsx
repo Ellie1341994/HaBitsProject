@@ -11,7 +11,8 @@ export default function ChangeFormButton(props: any) {
             width="100%"
             fontSize={{base: "8px", md: "12px"}}
             textAlign="left"
-            _hover={{ textDecoration: "underline",
+            _hover={{
+                textDecoration: "underline",
                 cursor: "pointer",
             }}
             onClick={props.switchFormType}
