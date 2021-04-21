@@ -5,8 +5,18 @@ import { Text, useColorModeValue } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 
 function AppHeading({ subText, supText }: any) {
-  const [animationType, setAnimationType] = useState("fall");
+  const [animationType, setAnimationType] = useState("intro");
+  const [titleTexts, setTitleTexts] = useState({
+    subText: subText,
+    supText: supText,
+  });
   const variants: any = {
+    intro: {
+      y: "-50vh",
+      transition: {
+        duration: 0,
+      },
+    },
     fall: {
       y: "0",
       transition: {
@@ -31,16 +41,33 @@ function AppHeading({ subText, supText }: any) {
     },
   };
   useEffect(() => {
-    setTimeout(setAnimationType, 1000, "levitate");
-  }, [animationType]);
-  useEffect(() => {
+    /*
+     * if timeOut wait time must be 1s if user is logging out out so the title correctly fades with the previous text
+     * by the same token, the title text must change before the title starts the falling animation */
+    setTimeout(setTitleTexts, subText === "Of" ? 1000 : 0, {
+      subText: subText,
+      supText: supText,
+    });
     if (subText === "Of") {
-      setTimeout(setAnimationType, 0, "outro");
+      setAnimationType("outro");
+    } else {
+      setAnimationType("intro");
     }
-  }, [subText]);
+  }, [supText, subText]);
+  useEffect(() => {
+    if (animationType === "intro") {
+      setAnimationType("fall");
+    }
+    if (animationType === "fall") {
+      setTimeout(setAnimationType, 1000, "levitate");
+    }
+    if (animationType === "outro") {
+      setTimeout(setAnimationType, 1000, "intro");
+    }
+  }, [animationType]);
   return (
     <AnimatedHeading
-      initial={{ y: "-50vh" }}
+      initial={false}
       animate={animationType}
       variants={variants}
       fontFamily="serif"
@@ -51,9 +78,9 @@ function AppHeading({ subText, supText }: any) {
     >
       HaBits
       <Text as="sub" fontSize="xs">
-        {subText}
+        {titleTexts.subText}
         <Text fontSize="md" as="sup">
-          {supText?.replace(/^\w/, (fc: string) => fc.toUpperCase())}
+          {titleTexts.supText?.replace(/^\w/, (fc: string) => fc.toUpperCase())}
         </Text>
       </Text>
     </AnimatedHeading>

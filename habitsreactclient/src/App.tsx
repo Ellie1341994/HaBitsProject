@@ -38,7 +38,6 @@ export class App extends React.Component<AppProps, AppState> {
         ? (localStorage.getItem("userName") as string)
         : "",
     };
-    this.setState({});
   }
   URL: string = "http://127.0.0.1:8000";
   componentDidUpdate(_prevProps: any, _prevState: any) {}
