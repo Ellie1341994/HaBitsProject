@@ -5,10 +5,9 @@ export default function ChangeFormButton(props: any) {
     <TypingAnimation
       text={(props.formType === "Register" ? "Log In" : "Sign Up") + " instead"}
       durationInMS={500}
-      as="a"
-      width="100%"
+      mb="5"
+      border="1px solid transparent"
       fontSize={{ base: "8px", md: "12px" }}
-      textAlign="left"
       _hover={{
         textDecoration: "underline",
         cursor: "pointer",

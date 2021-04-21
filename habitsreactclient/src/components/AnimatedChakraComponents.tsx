@@ -78,7 +78,10 @@ export function FadingInput(props: any) {
 export class TypingAnimation extends React.Component<TAProps, any> {
   constructor(props: any) {
     super(props);
-    this.state = { text: this.props.text, styles: { pointerEvents: "auto" } };
+    this.state = {
+      text: this.props.text,
+      styles: { pointerEvents: "auto", width: "100%" },
+    };
     this.textTypingAnimation = this.textTypingAnimation.bind(this);
     this.runAnimation = this.runAnimation.bind(this);
     const {

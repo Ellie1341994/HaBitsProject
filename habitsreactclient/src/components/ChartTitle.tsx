@@ -9,8 +9,8 @@ export class ChartTitle extends React.Component<any, any> {
         fontWeight="bold"
         fontFamily="serif"
         animateOnMount={true}
-        text={"ASD"}
-        fontSize="lg"
+        fontSize={{ base: "12px", md: "14px" }}
+        text={"Habit ASD Chart"}
       />
     );
   }

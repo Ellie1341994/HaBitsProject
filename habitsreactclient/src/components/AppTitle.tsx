@@ -75,14 +75,14 @@ function AppHeading({ subText, supText }: any) {
       mt="0"
       mb="5"
       fontSize={{ base: "18px", md: "36px" }}
+      isTruncated={true}
+      maxW="100%"
     >
       HaBits
       <Text as="sub" fontSize="xs">
         {titleTexts.subText}
-        <Text fontSize="md" as="sup">
-          {titleTexts.supText?.replace(/^\w/, (fc: string) => fc.toUpperCase())}
-        </Text>
       </Text>
+      {titleTexts.supText?.replace(/^\w/, (fc: string) => fc.toUpperCase())}
     </AnimatedHeading>
   );
 }

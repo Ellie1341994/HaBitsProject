@@ -22,7 +22,7 @@ export default function AuthenticationPanel(props: any) {
     intro: {
       opacity: 1,
       transition: {
-        delay: 1,
+        delay: 0.75,
         duration: 0.5,
       },
     },
@@ -58,7 +58,7 @@ export default function AuthenticationPanel(props: any) {
       direction="column"
       justifyContent="space-evenly"
       align="center"
-      w={{ base: "75%", md: "50%" }}
+      w={{ base: "75%", md: "65%" }}
       h={{ base: "90%", md: "75%" }}
       p="0"
       rounded="md"

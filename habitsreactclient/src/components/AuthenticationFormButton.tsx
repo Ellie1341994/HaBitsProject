@@ -48,7 +48,7 @@ export default function AuthenticationFormButton(props: any) {
                 textAlign="center"
                 id="errorPopOver"
               >
-                {props.text}
+                {" "}
               </Button>
             </VisuallyHidden>
           </PopoverTrigger>

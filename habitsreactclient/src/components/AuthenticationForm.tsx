@@ -131,10 +131,8 @@ export default class AuthenticationForm extends React.Component<
             .catch((e) => console.log(e));
           errorPopOver.click();
           setTimeout(() => {
-            setTimeout(() => {
-              this.props.setUserCredentials(1000);
-            }, 1000);
-          }, 1500);
+            this.props.setUserCredentials(1000);
+          }, 1000);
         }
       })
       .catch((reason) => {
@@ -187,6 +185,7 @@ export default class AuthenticationForm extends React.Component<
             <Flex
               direction="column"
               align="center"
+              textAlign="center"
               h="20%"
               w="75%"
               justify="space-between"

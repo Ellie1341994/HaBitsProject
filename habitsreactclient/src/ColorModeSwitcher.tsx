@@ -1,43 +1,38 @@
-import * as React from "react"
+import * as React from "react";
 import {
   useColorMode,
   useColorModeValue,
   IconButton,
   IconButtonProps,
-} from "@chakra-ui/react"
-import { FaMoon, FaSun } from "react-icons/fa"
+} from "@chakra-ui/react";
+import { FaMoon, FaSun } from "react-icons/fa";
 
-type ColorModeSwitcherProps = Omit<IconButtonProps, "aria-label">
+type ColorModeSwitcherProps = Omit<IconButtonProps, "aria-label">;
 
 export const ColorModeSwitcher: React.FC<ColorModeSwitcherProps> = (props) => {
-  const { toggleColorMode } = useColorMode()
-  const text = useColorModeValue("dark", "light")
-  const SwitchIcon = useColorModeValue(FaMoon, FaSun)
-  // function that avoids user abuse to the switcher 
-  function waitAnimationEnd(e: any) {
-      toggleColorMode()
-      const newlyRenderedButton: any = document.getElementById("changeColorModeButton");
-      newlyRenderedButton.setAttribute("disabled","true");
-      setTimeout( function() {
-          newlyRenderedButton.removeAttribute("disabled");
-      },
-      1000);
-  }
+  const { toggleColorMode } = useColorMode();
+  const text = useColorModeValue("dark", "light");
+  const SwitchIcon = useColorModeValue(FaMoon, FaSun);
+  const [disable, setDisable] = React.useState(true);
+  // function that avoids user abuse to the switcher
+  React.useEffect(() => {
+    setDisable(true);
+    setTimeout(setDisable, 1000, false);
+  }, [text]);
 
   return (
-      <IconButton
-          position="absolute"
-          top="1"
-          right="1"
-          id="changeColorModeButton"
-          size="sm"
-          fontSize="lg"
-          variant="ghost"
-          color="current"
-          onClick={waitAnimationEnd}
-          icon={<SwitchIcon />}
-          aria-label={`Switch to ${text} mode`}
-          {...props}
-      />
-  )
-}
+    <IconButton
+      id="changeColorModeButton"
+      isDisabled={disable}
+      size="sm"
+      fontSize="lg"
+      variant="ghost"
+      color="current"
+      _hover={{ bgColor: "none", cursor: "pointer" }}
+      onClick={toggleColorMode}
+      icon={<SwitchIcon />}
+      aria-label={`Switch to ${text} mode`}
+      {...props}
+    />
+  );
+};

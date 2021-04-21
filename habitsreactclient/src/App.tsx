@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ChakraProvider, extendTheme, Flex, Box } from "@chakra-ui/react";
+import { Link, ChakraProvider, extendTheme, Flex, Box } from "@chakra-ui/react";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import { Helmet } from "react-helmet";
 import { mode } from "@chakra-ui/theme-tools";
@@ -27,6 +27,7 @@ export class App extends React.Component<AppProps, AppState> {
     super(props);
     this.setUserCredentials = this.setUserCredentials.bind(this);
     this.logout = this.logout.bind(this);
+    this.displayInstructions = this.displayInstructions.bind(this);
     const isUserAuthenticated: boolean = localStorage.getItem("token") !== null;
     this.state = {
       appOrientation: isUserAuthenticated ? "column" : "row",
@@ -78,6 +79,9 @@ export class App extends React.Component<AppProps, AppState> {
       appOrientation: "row",
     });
   }
+  displayInstructions(event: any) {
+    event.preventDefault();
+  }
   render() {
     return (
       <Route path="/">
@@ -93,9 +97,42 @@ export class App extends React.Component<AppProps, AppState> {
           })}
         >
           <Helmet title={this.state.headerTitle} />
-          <Flex justifyContent="right" w="100%">
-            <ColorModeSwitcher mt="1" mr="1" pos="absolute" />
-          </Flex>
+          <AnimatedFlex
+            fontFamily="serif"
+            justify={this.state.authenticated ? "space-between" : "flex-end"}
+            align="center"
+            pos="absolute"
+            right="1"
+            fontSize={{ base: "10px", md: "18px" }}
+            w={{ base: "50%", md: "20%" }}
+            layout={true}
+          >
+            <AnimatePresence>
+              {this.state.authenticated && (
+                <>
+                  <AnimatedFlex
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    justify="space-evenly"
+                    w="85%"
+                    as="span"
+                  >
+                    <Link href="logout" onClick={this.logout}>
+                      Logout
+                    </Link>
+                    <Link
+                      href="instructions"
+                      onClick={this.displayInstructions}
+                    >
+                      Instructions
+                    </Link>
+                  </AnimatedFlex>
+                </>
+              )}
+            </AnimatePresence>
+            <ColorModeSwitcher />
+          </AnimatedFlex>
           <Flex
             direction={{ base: "column", md: this.state.appOrientation }}
             justify={{ base: "stretch", md: "" }}
@@ -109,8 +146,8 @@ export class App extends React.Component<AppProps, AppState> {
                 base: "flex-end",
                 md: this.state.authenticated ? "flex-end" : "center",
               }}
-              w="50%"
-              h="25%"
+              w="75%"
+              h="20%"
               textAlign="center"
               style={{ userSelect: "none" }}
             >
@@ -146,8 +183,9 @@ export class App extends React.Component<AppProps, AppState> {
               </AnimatePresence>
               {this.state.authenticated && (
                 <AnimatedFlex
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ opacity: 0, display: "none" }}
+                  animate={{ opacity: 1, display: "flex" }}
+                  exit={{ opacity: 1, transition: { delay: 1, duration: 1 } }}
                   transition={{ delay: 1, duration: 1 }}
                   h="100%"
                   w="100%"
@@ -162,11 +200,6 @@ export class App extends React.Component<AppProps, AppState> {
                     align="center"
                   >
                     <UserServices />
-                  </Flex>
-                  <Flex>
-                    <a href="logout" onClick={this.logout}>
-                      Logout
-                    </a>
                   </Flex>
                 </AnimatedFlex>
               )}
