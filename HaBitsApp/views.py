@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from django.urls import reverse
-from HaBitsApp import permissions as custom_permissions  
+from HaBitsApp import permissions as custom_permissions
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 import re
@@ -43,6 +43,9 @@ class UserViewSet(viewsets.ModelViewSet):
              and 'email' in self.request.data
              and str(self.request.user.id) in self.request.path
              or self.action == 'c_password'):
+            self.permission_classes = [permissions.IsAuthenticated]
+        elif "/user/" in self.request.path:
+            self.queryset = self.queryset.filter(id=self.request.user.id)
             self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.IsAdminUser]
