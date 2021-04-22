@@ -118,10 +118,17 @@ export class App extends React.Component<AppProps, AppState> {
                     w="85%"
                     as="span"
                   >
-                    <Link href="logout" onClick={this.logout}>
+                    <Link
+                      _active={{ bgColor: "none", border: "none" }}
+                      _focus={{ border: "none" }}
+                      href="logout"
+                      onClick={this.logout}
+                    >
                       Logout
                     </Link>
                     <Link
+                      _active={{ bgColor: "none", border: "none" }}
+                      _focus={{ border: "none" }}
                       href="instructions"
                       onClick={this.displayInstructions}
                     >
