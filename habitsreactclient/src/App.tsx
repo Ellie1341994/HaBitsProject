@@ -111,6 +111,8 @@ export class App extends React.Component<AppProps, AppState> {
               {this.state.authenticated && (
                 <>
                   <AnimatedFlex
+                    fontFamily="sans-serif"
+                    fontWeight="normal"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

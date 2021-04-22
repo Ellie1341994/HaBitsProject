@@ -1,8 +1,7 @@
 import * as React from "react";
 import { Box, Flex, Link } from "@chakra-ui/react";
-
-import { BsPlus } from "react-icons/bs";
-export class NewHabitButton extends React.Component<any, any> {
+import { AiOutlineFile } from "react-icons/ai";
+export class OldHabitsButton extends React.Component<any, any> {
   render() {
     return (
       <Link
@@ -12,8 +11,8 @@ export class NewHabitButton extends React.Component<any, any> {
         variant="unstyled"
       >
         <Flex direction="row" align="center" justifyContent="space-evenly">
-          <BsPlus />
-          New Habit
+          <AiOutlineFile />
+          Old Habits
         </Flex>
       </Link>
     );
