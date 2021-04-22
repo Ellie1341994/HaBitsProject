@@ -16,14 +16,6 @@ type AHProps = Merge<HeadingProps, MotionProps>;
 type ATProps = Merge<TextProps, MotionProps>;
 type AFProps = Merge<FlexProps, MotionProps>;
 type ABProps = Merge<BoxProps, MotionProps>;
-interface TAProps extends TextProps {
-  text: string;
-  durationInMS?: number;
-  animateAlways?: boolean;
-  animateOnMount?: boolean;
-  writeOnly?: boolean;
-  eraseOnly?: boolean;
-}
 export const AnimatedHeading: React.FC<AHProps> = motion(Heading);
 export const AnimatedText: React.FC<ATProps> = motion(Text);
 export const AnimatedFlex: React.FC<AFProps> = motion(Flex);
@@ -75,6 +67,26 @@ export function FadingInput(props: any) {
     </>
   );
 }
+interface TAProps extends TextProps {
+  text: string;
+  durationInMS?: number;
+  animateAlways?: boolean;
+  onMountOnly?: boolean;
+  writeOnly?: boolean;
+  eraseOnly?: boolean;
+  delayInMS?: number;
+}
+/**
+ * @param text requred | string | text content to be animated
+ * @param durationInMS optional | integer number as miliseconds | Typing or erasing speed
+ * @param delayInMS optional | integer number as miliseconds | time before animation triggers
+ * note: in case both animations run, the take it will take this animation to finish will be double
+ * @param animateAlways optional | boolean | Will animate after a component mounts or updates, otherwise only on updates
+ * @param writeOnly optional | boolean
+ * @param eraseOnly optional | boolean
+ * note: writeOnly and eraseOnly are mutually exclusive
+ * @param onMountOnly optional | boolean
+ */
 export class TypingAnimation extends React.Component<TAProps, any> {
   constructor(props: any) {
     super(props);
@@ -85,11 +97,12 @@ export class TypingAnimation extends React.Component<TAProps, any> {
     this.textTypingAnimation = this.textTypingAnimation.bind(this);
     this.runAnimation = this.runAnimation.bind(this);
     const {
+      delayInMS,
       writeOnly,
       eraseOnly,
       text,
       durationInMS,
-      animateOnMount,
+      onMountOnly,
       animateAlways,
       ...childrenProps
     }: any = this.props;
@@ -97,19 +110,22 @@ export class TypingAnimation extends React.Component<TAProps, any> {
   }
   childrenProps: TextProps = "" as TextProps;
   componentDidMount() {
-    if (this.props.animateAlways || this.props.animateOnMount) {
-      this.runAnimation();
+    if (this.props.animateAlways || this.props.onMountOnly) {
+      this.runAnimation(this.props.delayInMS);
     }
   }
   componentDidUpdate(_prevProps: any, _prevState: any) {
-    let shouldAnimate: boolean = this.props.animateAlways
-      ? _prevState === this.state
-      : _prevProps.text !== this.props.text;
-    if (shouldAnimate) {
-      this.runAnimation();
+    if (!this.props.onMountOnly) {
+      let shouldAnimate: boolean = this.props.animateAlways
+        ? _prevState === this.state
+        : _prevProps.text !== this.props.text;
+      if (shouldAnimate) {
+        this.runAnimation(this.props.delayInMS);
+      }
     }
   }
-  runAnimation() {
+  runAnimation(delay?: number) {
+    delay = delay ? delay : 0;
     let textLength: number = this.state.text.length;
     const animationDuration: undefined | number = this.props.durationInMS;
     const typingSpeed: number = animationDuration
@@ -119,7 +135,7 @@ export class TypingAnimation extends React.Component<TAProps, any> {
       textLength = 0;
       this.setState({ text: "" });
     }
-    setTimeout(this.textTypingAnimation, 0, textLength, typingSpeed, true);
+    setTimeout(this.textTypingAnimation, delay, textLength, typingSpeed, true);
   }
   textTypingAnimation(
     textLength: number,
