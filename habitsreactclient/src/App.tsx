@@ -165,7 +165,10 @@ export class App extends React.Component<AppProps, AppState> {
               />
             </AnimatedFlex>
             <Box
-              w={{ base: "100%", md: "50%" }}
+              w={{
+                base: "100%",
+                md: this.state.authenticated ? "100%" : "50%",
+              }}
               h={{ base: "75%", md: "100%" }}
             >
               <AnimatePresence>
@@ -199,15 +202,7 @@ export class App extends React.Component<AppProps, AppState> {
                   align="center"
                   justify="center"
                 >
-                  <Flex
-                    width="75%"
-                    h="50%"
-                    direction="column"
-                    justify="center"
-                    align="center"
-                  >
-                    <UserServices />
-                  </Flex>
+                  <UserServices />
                 </AnimatedFlex>
               )}
             </Box>
