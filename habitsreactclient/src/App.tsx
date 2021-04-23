@@ -20,6 +20,7 @@ interface AppState {
   titleSubText: string;
   titleSupText: string;
   appTitle: string;
+  secondAppSectionWidth: string;
 }
 interface AppProps {}
 
@@ -31,6 +32,7 @@ export class App extends React.Component<AppProps, AppState> {
     this.logout = this.logout.bind(this);
     const isUserAuthenticated: boolean = localStorage.getItem("token") !== null;
     this.state = {
+      secondAppSectionWidth: isUserAuthenticated ? "100%" : "50%",
       bigScreensAppOrientation: isUserAuthenticated ? "column" : "row",
       headerTitle: "HaBits ~ Track & Trace",
       appTitle: "HaBits",
@@ -65,6 +67,7 @@ export class App extends React.Component<AppProps, AppState> {
         setTimeout(() => {
           this.setState({
             bigScreensAppOrientation: "column",
+            secondAppSectionWidth: "100%",
           });
         }, layOutChangeSpeed);
       })
@@ -72,14 +75,15 @@ export class App extends React.Component<AppProps, AppState> {
   }
   logout(e: any) {
     e.preventDefault();
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("id");
+    for (let information of ["token", "userName", "id"]) {
+      localStorage.removeItem(information);
+    }
     this.setState({
       titleSupText: "",
       titleSubText: "Track & Trace",
       authenticated: false,
       bigScreensAppOrientation: "row",
+      secondAppSectionWidth: "50%",
     });
   }
   render() {
@@ -120,7 +124,7 @@ export class App extends React.Component<AppProps, AppState> {
             <Box
               w={{
                 base: "100%",
-                md: this.state.authenticated ? "100%" : "50%",
+                md: this.state.secondAppSectionWidth,
               }}
               h={{ base: "75%", md: "100%" }}
             >
