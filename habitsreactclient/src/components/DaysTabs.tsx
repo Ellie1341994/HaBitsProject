@@ -15,6 +15,7 @@ export default function DaysTabs() {
   for (let day of week) {
     let dayElement: any = (
       <Flex
+        key={day}
         position="relative"
         justify="center"
         align="center"
@@ -25,7 +26,6 @@ export default function DaysTabs() {
         <TypingAnimation
           w="80%"
           isTruncated={true}
-          key={day}
           delayInMS={1500}
           fontWeight="bold"
           writeOnly={true}

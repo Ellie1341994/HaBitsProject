@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ChakraProvider, extendTheme, Flex, Box } from "@chakra-ui/react";
-import { Helmet } from "react-helmet";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { mode } from "@chakra-ui/theme-tools";
 import AuthenticationPanel from "./components/AuthenticationPanel";
 import { AnimatePresence } from "framer-motion";
@@ -88,69 +88,71 @@ export class App extends React.Component<AppProps, AppState> {
   }
   render() {
     return (
-      <Route path="/">
-        <ChakraProvider
-          theme={extendTheme({
-            styles: {
-              global: (props: any) => ({
-                body: {
-                  bg: mode("#fcf6ef", "gray.800")(props),
-                },
-              }),
-            },
-          })}
-        >
-          <Helmet title={this.state.headerTitle} />
-          <AppMenu
-            displayAsUserMenu={this.state.authenticated}
-            logOutUser={this.logout}
-          />
-          <Flex
-            direction={{
-              base: "column",
-              md: this.state.bigScreensAppOrientation,
-            }}
-            justify={{ base: "stretch", md: "" }}
-            align={{ base: "center", md: "" }}
-            h="100vh"
+      <HelmetProvider>
+        <Route path="/">
+          <ChakraProvider
+            theme={extendTheme({
+              styles: {
+                global: (props: any) => ({
+                  body: {
+                    bg: mode("#fcf6ef", "gray.800")(props),
+                  },
+                }),
+              },
+            })}
           >
-            <AppTitleContainer displayAsUserTitle={this.state.authenticated}>
-              <AppTitle
-                subText={this.state.titleSubText}
-                supText={this.state.titleSupText}
-                titleOnly={this.state.authenticated}
-              />
-            </AppTitleContainer>
-            <Box
-              w={{
-                base: "100%",
-                md: this.state.secondAppSectionWidth,
+            <Helmet title={this.state.headerTitle} />
+            <AppMenu
+              displayAsUserMenu={this.state.authenticated}
+              logOutUser={this.logout}
+            />
+            <Flex
+              direction={{
+                base: "column",
+                md: this.state.bigScreensAppOrientation,
               }}
-              h={{ base: "75%", md: "100%" }}
+              justify={{ base: "stretch", md: "" }}
+              align={{ base: "center", md: "" }}
+              h="100vh"
             >
-              <AnimatePresence>
-                {!this.state.authenticated && (
+              <AppTitleContainer displayAsUserTitle={this.state.authenticated}>
+                <AppTitle
+                  subText={this.state.titleSubText}
+                  supText={this.state.titleSupText}
+                  titleOnly={this.state.authenticated}
+                />
+              </AppTitleContainer>
+              <Box
+                w={{
+                  base: "100%",
+                  md: this.state.secondAppSectionWidth,
+                }}
+                h={{ base: "75%", md: "100%" }}
+              >
+                <AnimatePresence>
+                  {!this.state.authenticated && (
+                    <>
+                      <AuthenticationPanelContainer>
+                        <AuthenticationPanel
+                          setUserCredentials={this.setUserCredentials}
+                        />
+                      </AuthenticationPanelContainer>
+                      <Redirect to="/login" />
+                    </>
+                  )}
+                </AnimatePresence>
+                {this.state.authenticated && (
                   <>
-                    <AuthenticationPanelContainer>
-                      <AuthenticationPanel
-                        setUserCredentials={this.setUserCredentials}
-                      />
-                    </AuthenticationPanelContainer>
-                    <Redirect to="/login" />
+                    <UserServicesContainer>
+                      <UserServices />
+                    </UserServicesContainer>
                   </>
                 )}
-              </AnimatePresence>
-              {this.state.authenticated && (
-                <>
-                  <UserServicesContainer>
-                    <UserServices />
-                  </UserServicesContainer>
-                </>
-              )}
-            </Box>
-          </Flex>
-        </ChakraProvider>
-      </Route>
+              </Box>
+            </Flex>
+          </ChakraProvider>
+        </Route>
+      </HelmetProvider>
     );
   }
 }
