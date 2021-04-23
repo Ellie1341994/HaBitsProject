@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Link, ChakraProvider, extendTheme, Flex, Box } from "@chakra-ui/react";
-import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import { Helmet } from "react-helmet";
 import { mode } from "@chakra-ui/theme-tools";
 import AuthenticationPanel from "./components/AuthenticationPanel";
@@ -10,6 +9,7 @@ import { UserServices } from "./components/userServices";
 import { Route, Redirect } from "react-router-dom";
 import axios from "axios";
 import AppTitle from "./components/AppTitle";
+import { AppMenu } from "./components/AppMenu";
 interface AppState {
   headerTitle: string;
   authenticated: boolean;
@@ -27,7 +27,6 @@ export class App extends React.Component<AppProps, AppState> {
     super(props);
     this.setUserCredentials = this.setUserCredentials.bind(this);
     this.logout = this.logout.bind(this);
-    this.displayInstructions = this.displayInstructions.bind(this);
     const isUserAuthenticated: boolean = localStorage.getItem("token") !== null;
     this.state = {
       appOrientation: isUserAuthenticated ? "column" : "row",
@@ -79,9 +78,6 @@ export class App extends React.Component<AppProps, AppState> {
       appOrientation: "row",
     });
   }
-  displayInstructions(event: any) {
-    event.preventDefault();
-  }
   render() {
     return (
       <Route path="/">
@@ -97,51 +93,10 @@ export class App extends React.Component<AppProps, AppState> {
           })}
         >
           <Helmet title={this.state.headerTitle} />
-          <AnimatedFlex
-            fontFamily="serif"
-            justify={this.state.authenticated ? "space-between" : "flex-end"}
-            align="center"
-            pos="absolute"
-            right="1"
-            fontSize={{ base: "10px", md: "18px" }}
-            w={{ base: "50%", md: "20%" }}
-            layout={true}
-          >
-            <AnimatePresence>
-              {this.state.authenticated && (
-                <>
-                  <AnimatedFlex
-                    fontFamily="sans-serif"
-                    fontWeight="normal"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    justify="space-evenly"
-                    w="85%"
-                    as="span"
-                  >
-                    <Link
-                      _active={{ bgColor: "none", border: "none" }}
-                      _focus={{ border: "none" }}
-                      href="logout"
-                      onClick={this.logout}
-                    >
-                      Logout
-                    </Link>
-                    <Link
-                      _active={{ bgColor: "none", border: "none" }}
-                      _focus={{ border: "none" }}
-                      href="instructions"
-                      onClick={this.displayInstructions}
-                    >
-                      Instructions
-                    </Link>
-                  </AnimatedFlex>
-                </>
-              )}
-            </AnimatePresence>
-            <ColorModeSwitcher />
-          </AnimatedFlex>
+          <AppMenu
+            isUserAuthenticated={this.state.authenticated}
+            logOutUser={this.logout}
+          />
           <Flex
             direction={{ base: "column", md: this.state.appOrientation }}
             justify={{ base: "stretch", md: "" }}
