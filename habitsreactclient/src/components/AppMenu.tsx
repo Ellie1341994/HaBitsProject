@@ -16,7 +16,7 @@ export class AppMenu extends React.Component<any, any> {
     return (
       <AnimatedFlex
         fontFamily="serif"
-        justify={this.props.isUserAuthenticated ? "space-between" : "flex-end"}
+        justify={this.props.displayAsUserMenu ? "space-between" : "flex-end"}
         align="center"
         pos="absolute"
         right="1"
@@ -25,7 +25,7 @@ export class AppMenu extends React.Component<any, any> {
         layout={true}
       >
         <AnimatePresence>
-          {this.props.isUserAuthenticated && (
+          {this.props.displayAsUserMenu && (
             <>
               <AnimatedFlex
                 fontFamily="sans-serif"

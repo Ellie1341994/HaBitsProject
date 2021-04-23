@@ -1,20 +1,22 @@
 import * as React from "react";
-import { Link, ChakraProvider, extendTheme, Flex, Box } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme, Flex, Box } from "@chakra-ui/react";
 import { Helmet } from "react-helmet";
 import { mode } from "@chakra-ui/theme-tools";
 import AuthenticationPanel from "./components/AuthenticationPanel";
-import { AnimatedFlex } from "./components/AnimatedChakraComponents";
 import { AnimatePresence } from "framer-motion";
 import { UserServices } from "./components/userServices";
 import { Route, Redirect } from "react-router-dom";
 import axios from "axios";
 import AppTitle from "./components/AppTitle";
+import AppTitleContainer from "./components/AppTitleContainer";
+import AuthenticationPanelContainer from "./components/AuthenticationPanelContainer";
+import UserServicesContainer from "./components/UserServicesContainer";
 import { AppMenu } from "./components/AppMenu";
 interface AppState {
   headerTitle: string;
   authenticated: boolean;
   userName?: string;
-  appOrientation: any;
+  bigScreensAppOrientation: any;
   titleSubText: string;
   titleSupText: string;
   appTitle: string;
@@ -29,7 +31,7 @@ export class App extends React.Component<AppProps, AppState> {
     this.logout = this.logout.bind(this);
     const isUserAuthenticated: boolean = localStorage.getItem("token") !== null;
     this.state = {
-      appOrientation: isUserAuthenticated ? "column" : "row",
+      bigScreensAppOrientation: isUserAuthenticated ? "column" : "row",
       headerTitle: "HaBits ~ Track & Trace",
       appTitle: "HaBits",
       titleSubText: isUserAuthenticated ? "Of" : "Track & Trace",
@@ -55,12 +57,14 @@ export class App extends React.Component<AppProps, AppState> {
           authenticated: true,
           titleSupText: userInfo.username,
           titleSubText: "Of",
-          appOrientation: "row",
+          bigScreensAppOrientation: "row",
         };
         this.setState(updatedState);
+        // App Orientation for non-mobile/tablets screens changes only after
+        // login or logout animations are finished.
         setTimeout(() => {
           this.setState({
-            appOrientation: "column",
+            bigScreensAppOrientation: "column",
           });
         }, layOutChangeSpeed);
       })
@@ -75,7 +79,7 @@ export class App extends React.Component<AppProps, AppState> {
       titleSupText: "",
       titleSubText: "Track & Trace",
       authenticated: false,
-      appOrientation: "row",
+      bigScreensAppOrientation: "row",
     });
   }
   render() {
@@ -94,33 +98,25 @@ export class App extends React.Component<AppProps, AppState> {
         >
           <Helmet title={this.state.headerTitle} />
           <AppMenu
-            isUserAuthenticated={this.state.authenticated}
+            displayAsUserMenu={this.state.authenticated}
             logOutUser={this.logout}
           />
           <Flex
-            direction={{ base: "column", md: this.state.appOrientation }}
+            direction={{
+              base: "column",
+              md: this.state.bigScreensAppOrientation,
+            }}
             justify={{ base: "stretch", md: "" }}
             align={{ base: "center", md: "" }}
             h="100vh"
           >
-            <AnimatedFlex
-              direction="column"
-              align="center"
-              justify={{
-                base: "flex-end",
-                md: this.state.authenticated ? "flex-end" : "center",
-              }}
-              w="75%"
-              h="20%"
-              textAlign="center"
-              style={{ userSelect: "none" }}
-            >
+            <AppTitleContainer displayAsUserTitle={this.state.authenticated}>
               <AppTitle
                 subText={this.state.titleSubText}
                 supText={this.state.titleSupText}
                 titleOnly={this.state.authenticated}
               />
-            </AnimatedFlex>
+            </AppTitleContainer>
             <Box
               w={{
                 base: "100%",
@@ -131,36 +127,21 @@ export class App extends React.Component<AppProps, AppState> {
               <AnimatePresence>
                 {!this.state.authenticated && (
                   <>
-                    <AnimatedFlex
-                      h="100%"
-                      color="gray.700"
-                      direction="column"
-                      justifyContent="center"
-                      alignItems="center"
-                      initial={{ opacity: 1 }}
-                      exit={{ opacity: 0, transition: { duration: 1 } }}
-                    >
+                    <AuthenticationPanelContainer>
                       <AuthenticationPanel
                         setUserCredentials={this.setUserCredentials}
                       />
-                    </AnimatedFlex>
+                    </AuthenticationPanelContainer>
                     <Redirect to="/login" />
                   </>
                 )}
               </AnimatePresence>
               {this.state.authenticated && (
-                <AnimatedFlex
-                  initial={{ opacity: 0, display: "none" }}
-                  animate={{ opacity: 1, display: "flex" }}
-                  exit={{ opacity: 1, transition: { delay: 1, duration: 1 } }}
-                  transition={{ delay: 1, duration: 1 }}
-                  h="100%"
-                  w="100%"
-                  align="center"
-                  justify="center"
-                >
-                  <UserServices />
-                </AnimatedFlex>
+                <>
+                  <UserServicesContainer>
+                    <UserServices />
+                  </UserServicesContainer>
+                </>
               )}
             </Box>
           </Flex>
