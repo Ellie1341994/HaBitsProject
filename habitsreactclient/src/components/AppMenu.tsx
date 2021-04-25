@@ -20,7 +20,7 @@ export class AppMenu extends React.Component<any, any> {
         align="center"
         pos="absolute"
         right="1"
-        fontSize={{ base: "10px", md: "18px" }}
+        fontSize={{ base: "10px", md: "14px" }}
         w={{ base: "50%", md: "20%" }}
         layout={true}
       >
