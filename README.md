@@ -1,31 +1,31 @@
-# Ha!Bits - W.I.P
+# HaBits - W.I.P
 **Our daily behaviour shapes our daily future.**
-
 ## General
-
 ### Introduction
-Ha-Bits is a simple Web-App to track habits either new or current ones and
-follow their progress.
-
-![alt text](https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/index_dm.png?raw=true)
-![alt text](https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/index_lm.png?raw=true)
-
+HaBits is a Web Application that can help you build habits and track data related to them
 ### Features
+- Efficient routine overview
+- Easy HaBits tracking
+- Tracked data visualization
+- Responsive behaviour
+- Beautiful Design
+### Application Previews
+- [Demonstrations On YouTube](https://www.youtube.com/playlist?list=PL5-tfLwc7d7HnUji9f3UjgYvCu4KNwOsT)
+### Description
 - W.I.P
-
-### Preview
-- W.I.P
-
-## Description
-- W.I.P
-
-## Usage
-- W.I.P
-
+## Instructions on
+### Usage for User
+In order to be able to take advantage of the Application features
+an account is needed.
+To create an account you need a username, a password and a third-party e-mail provider. You
+can do so, clicking on the link named "Sign Up instead" which will display the Sign Up form panel at the Application index page.
+Once an account is created it can be accessed to start building or tracking habits and using the graphic chart to visualize a habits tracked data
+The Calendar is used to create new habits, check old ones and record
+### Web Application Installation for Developers
+W.I.P
 ## Other
-This section contains related project information and details
-
-### Built with
+This project was started as the capstone assignment of [CS50 Web Programming with Python and JavaScrpt course](https://www.edx.org/course/cs50s-web-programming-with-python-and-javascript)
+### Technologies used to build this Web Application
 - [DJango](https://www.djangoproject.com/start/overview/)
 - [DJango Rest](https://www.django-rest-framework.org/)
 - [H.T.M.L](https://html.spec.whatwg.org/)
@@ -33,21 +33,6 @@ This section contains related project information and details
 - [Typescript](https://www.typescriptlang.org/docs/handbook/jsx.html)
 - [React](https://reactjs.org/)
 - [Create React App](https://create-react-app.dev/docs/adding-typescript/)
-- [Dimple](http://dimplejs.org/)
 - [Axios](https://www.npmjs.com/package/axios)
-- [Selenium](https://pypi.org/project/selenium/)
 - [React-Helmet](https://www.npmjs.com/package/react-helmet)
-
-### Python Dependencies
-asgiref==3.3.1
-Django==3.1.6
-django-filter==2.4.0
-djangorestframework==3.12.2
-Markdown==3.3.3
-nodeenv==1.5.0
-pytz==2021.1
-six==1.15.0
-sqlparse==0.4.1
-
-### Node Dependencies
-create-react-app@4.0.2
+- [Nivo Charts](https://nivo.rocks/)
