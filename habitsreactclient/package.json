@@ -6,8 +6,6 @@
     "@chakra-ui/react": "^1.5.2",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.1.5",
-    "@nivo/bar": "^0.67.0",
-    "@nivo/bump": "^0.67.0",
     "@nivo/line": "^0.67.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^10.4.9",

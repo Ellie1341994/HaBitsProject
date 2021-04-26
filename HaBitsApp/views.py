@@ -2,8 +2,8 @@
 """
 from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
-from .serializers import UserSerializer, TraceSerializer, HabitSerializer
-from .models import Habit, Trace, User
+from .serializers import UserSerializer, TrackSerializer, HabitSerializer
+from .models import Habit, Track, User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.decorators import action
@@ -69,32 +69,22 @@ class HabitViewSet(viewsets.ModelViewSet):
             """
             dataIs = False
             for field in data:
-                if field in ['name', 'date_created', 'user']:
+                if field in ['name', 'dateCreated', 'user']:
                     return False
                 if field in ['date_edited',
                              'description',
                              'effectiveness'
-                             'time_frame',
-                             'day',
-                             'start_hour',
-                             'start_minutes',
-                             'end_hour',
-                             'end_minutes']:
+                             'frequency',
+                             'startTime',
+                             'endTime'
+                             ]:
                     dataIs = True
 
             return dataIs
 
-        def checkHabitTime(habit_data: dict) -> bool:
-            """
-            Determines whether a habit's start hour is lower than its end hour
-            """
-            s = 'start_hour'
-            e = 'end_hour'
-            return s in habit_data and e in habit_data and habit_data[s] < habit_data[e]
         if ( self.action == 'create'
             and 'user' in self.request.data
-            and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]
-            and checkHabitTime(self.request.data) ):
+            and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]):
             self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'list' and self.request.user.id is not None:
             self.queryset = self.queryset.filter(user=self.request.user.id)
@@ -111,13 +101,13 @@ class HabitViewSet(viewsets.ModelViewSet):
 
         return super().get_permissions()
 
-class TraceViewSet(viewsets.ModelViewSet):
+class TrackViewSet(viewsets.ModelViewSet):
     """
     Subclass model that inherits viewsets.ModelViewSet from rest_framework module
     Brief: ModelViewSet adds default C.R.U.D actions to the model.
     """
-    queryset = Trace.objects.all()
-    serializer_class = TraceSerializer
+    queryset = Track.objects.all()
+    serializer_class = TrackSerializer
     ordering_fields = '__all__'
     def get_permissions(self):
         """
@@ -125,7 +115,7 @@ class TraceViewSet(viewsets.ModelViewSet):
         """
 
         if self.action == 'list' and self.request.user.id is not None:
-            self.queryset = Trace.objects.filter(habit__user=self.request.user)
+            self.queryset = Track.objects.filter(habit__user=self.request.user)
             self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'create' and 'habit' in self.request.data:
             self.permission_classes = [permissions.IsAuthenticated]
