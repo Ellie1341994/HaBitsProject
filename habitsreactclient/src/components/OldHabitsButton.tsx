@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, Flex, Link } from "@chakra-ui/react";
+import { Flex, Link } from "@chakra-ui/react";
 import { AiOutlineFile } from "react-icons/ai";
 export class OldHabitsButton extends React.Component<any, any> {
   render() {

@@ -1,6 +1,6 @@
 import * as React from "react";
-import { Box, Flex, Link } from "@chakra-ui/react";
-import { TypingAnimation } from "./AnimatedChakraComponents";
+import { Flex } from "@chakra-ui/react";
+//import { TypingAnimation } from "./AnimatedChakraComponents";
 export default function Habits() {
   return (
     <Flex

@@ -8,12 +8,7 @@ import {
   PopoverCloseButton,
   useMediaQuery,
 } from "@chakra-ui/react";
-import {
-  Button,
-  useColorModeValue,
-  VisuallyHidden,
-  Flex,
-} from "@chakra-ui/react";
+import { Button, useColorModeValue, Flex } from "@chakra-ui/react";
 import { TypingAnimation } from "./AnimatedChakraComponents";
 import React from "react";
 export default function AuthenticationFormButton(props: any) {
@@ -31,7 +26,7 @@ export default function AuthenticationFormButton(props: any) {
     "solid 1px #CCC"
   );
   const [isBelow48em]: boolean[] = useMediaQuery("(max-width: 48em)");
-
+  const [shouldOpen, setShouldOpen] = React.useState(false);
   return (
     <>
       <Flex
@@ -39,18 +34,30 @@ export default function AuthenticationFormButton(props: any) {
         direction={isBelow48em ? "row" : "column"}
         w="75%"
       >
-        <Popover placement={isBelow48em ? "top" : "left"}>
+        <Popover isOpen={shouldOpen} placement={isBelow48em ? "top" : "left"}>
           <PopoverTrigger>
-            <VisuallyHidden>
-              <Button
-                color="white"
-                isFullWidth={true}
-                textAlign="center"
-                id="errorPopOver"
-              >
-                {" "}
-              </Button>
-            </VisuallyHidden>
+            <Button
+              _hover={{
+                border: "solid 3px",
+                borderColor: "gray.300",
+                boxShadow: "lg",
+              }}
+              type="submit"
+              fontSize={{ base: "10px", md: "16px" }}
+              mt="2"
+              mb="2"
+              size="md"
+              color="white"
+              isFullWidth={true}
+              backgroundColor={bgColor}
+              borderRadius="2xl"
+              borderBottom={borderValues}
+              onClick={(_event: any) => {
+                props.popOverHandler(setShouldOpen);
+              }}
+            >
+              <TypingAnimation durationInMS={500} as="span" text={props.name} />
+            </Button>
           </PopoverTrigger>
           <PopoverContent
             margin="auto"
@@ -70,25 +77,6 @@ export default function AuthenticationFormButton(props: any) {
             <PopoverBody fontSize="xs">{props.bodyText}</PopoverBody>
           </PopoverContent>
         </Popover>
-        <Button
-          _hover={{
-            border: "solid 3px",
-            borderColor: "gray.300",
-            boxShadow: "lg",
-          }}
-          type="submit"
-          fontSize={{ base: "10px", md: "16px" }}
-          mt="2"
-          mb="2"
-          size="md"
-          color="white"
-          isFullWidth={true}
-          backgroundColor={bgColor}
-          borderRadius="2xl"
-          borderBottom={borderValues}
-        >
-          <TypingAnimation durationInMS={500} as="span" text={props.name} />
-        </Button>
       </Flex>
     </>
   );

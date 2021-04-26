@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, Flex, Link } from "@chakra-ui/react";
+import { Flex, Link } from "@chakra-ui/react";
 
 import { BsPlus } from "react-icons/bs";
 export class NewHabitButton extends React.Component<any, any> {

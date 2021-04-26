@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Box, Flex, Link } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { TypingAnimation } from "./AnimatedChakraComponents";
 export default function DaysTabs() {
   const week: string[] = [

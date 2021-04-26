@@ -14,6 +14,7 @@ interface APState {
   formActionButtonName: "Register" | "Enter";
   messagesHeaderText: string;
   requestFeedbackMessages: string;
+  popInfo: any;
 }
 
 interface APProps {
@@ -37,11 +38,13 @@ export default class AuthenticationForm extends React.Component<
       loggedIn: undefined,
       formTitle: this.props.formInformation.title,
       formActionButtonName: this.props.formInformation.button,
+      popInfo: undefined,
     };
     this.register = this.register.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.login = this.login.bind(this);
     this.handleFormTypeChange = this.handleFormTypeChange.bind(this);
+    this.setPopOverHandler = this.setPopOverHandler.bind(this);
   }
   handleChange(event: any) {
     const field: string = event.target.name;
@@ -82,8 +85,6 @@ export default class AuthenticationForm extends React.Component<
               "Registration successful\nYou may login into your account now",
           });
           this.handleFormTypeChange();
-          const errorPopOver: any = document.getElementById("errorPopOver");
-          errorPopOver.click();
         }
       })
       .catch((reason) => {
@@ -97,9 +98,8 @@ export default class AuthenticationForm extends React.Component<
           messagesHeaderText: "Error(s)",
           requestFeedbackMessages: errorMessages,
         });
-        const errorPopOver: any = document.getElementById("errorPopOver");
-        errorPopOver.click();
       });
+    setTimeout(this.state.popInfo, 250, true);
   }
   login(event: any) {
     event.preventDefault();
@@ -109,7 +109,6 @@ export default class AuthenticationForm extends React.Component<
       username: this.registerFields.username,
       password: this.registerFields.password1,
     };
-    const errorPopOver: any = document.getElementById("errorPopOver");
     axios
       .post(loginURL, postData)
       .then((response) => {
@@ -129,7 +128,6 @@ export default class AuthenticationForm extends React.Component<
             })
             .then((response) => console.log(response.data))
             .catch((e) => console.log(e));
-          errorPopOver.click();
           setTimeout(() => {
             this.props.setUserCredentials(1000);
           }, 1000);
@@ -148,9 +146,12 @@ export default class AuthenticationForm extends React.Component<
             messagesHeaderText: "Error(s)",
             requestFeedbackMessages: errorMessages,
           });
-          errorPopOver.click();
         }
       });
+    setTimeout(this.state.popInfo, 250, true);
+  }
+  setPopOverHandler(handlerCallback: any) {
+    this.setState({ popInfo: handlerCallback });
   }
   render() {
     return (
@@ -194,6 +195,7 @@ export default class AuthenticationForm extends React.Component<
                 headerText={this.state.messagesHeaderText}
                 bodyText={this.state.requestFeedbackMessages}
                 name={this.state.formActionButtonName}
+                popOverHandler={this.setPopOverHandler}
               />
               <ChangeFormButton
                 formType={this.state.formType}

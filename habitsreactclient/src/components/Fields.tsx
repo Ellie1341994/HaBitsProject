@@ -16,7 +16,9 @@ import {
 import React from "react";
 function PasswordInput(props: any): any {
   const [show, setShow] = React.useState(false);
-  const changeVisibility = () => {
+  const changeVisibility = (event: any) => {
+    setShow(!show);
+    event.preventDefault();
     setShow(!show);
   };
 

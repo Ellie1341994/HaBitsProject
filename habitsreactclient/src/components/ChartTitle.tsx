@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Heading, VStack } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import { TypingAnimation } from "./AnimatedChakraComponents";
 export class ChartTitle extends React.Component<any, any> {
   render() {
