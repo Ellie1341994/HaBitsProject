@@ -20,7 +20,6 @@ admin.site.login = login_required(admin.site.login)
 class UserViewSet(viewsets.ModelViewSet):
     """
     viewset.ModelViewSet subclass with custom views and permissions such as:
-    set_password
     get_permissions
     """
     queryset = User.objects.all()
@@ -29,24 +28,11 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         """
         UserViewSet method that sets each action permission:
-        Permission: AllowAny Action: create
-        Permission: IsAuthenticated Actions: c_password
-        Custom permission: IsAuthenticated own email information only Action: partial_update(PATCH method)
-        Permission: IsAdminUser Action: Any other
         """
         if self.action == 'create':
             self.permission_classes = [permissions.AllowAny]
-        # Only allows the current logged in user to modify its email
-        elif ( self.action == 'partial_update'
-             and self.request.method == 'PATCH'
-             and len(self.request.data) == 1
-             and 'email' in self.request.data
-             and str(self.request.user.id) in self.request.path
-             or self.action == 'c_password'):
-            self.permission_classes = [permissions.IsAuthenticated]
-        elif "/user/" in self.request.path:
-            self.queryset = self.queryset.filter(id=self.request.user.id)
-            self.permission_classes = [permissions.IsAuthenticated]
+        elif '/user/' in self.request.path:
+            self.permission_classes = [permissions.AllowAny]
         else:
             self.permission_classes = [permissions.IsAdminUser]
 
@@ -67,20 +53,15 @@ class HabitViewSet(viewsets.ModelViewSet):
             Determines if the post request data fields
             for the partial_update action are allowed to be modified or not
             """
-            dataIs = False
             for field in data:
-                if field in ['name', 'dateCreated', 'user']:
-                    return False
-                if field in ['date_edited',
-                             'description',
-                             'effectiveness'
+                if ( field in ['name', 'dateEdited', 'effectiveness', 'dateCreated', 'user']
+                    or field not in [ 'description',
                              'frequency',
                              'startTime',
-                             'endTime'
-                             ]:
-                    dataIs = True
+                             'endTime' ]):
+                    return False
 
-            return dataIs
+            return True
 
         if ( self.action == 'create'
             and 'user' in self.request.data
