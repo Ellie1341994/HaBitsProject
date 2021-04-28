@@ -17,8 +17,7 @@ interface AppState {
   authenticated: boolean;
   userName?: string;
   bigScreensAppOrientation: any;
-  titleSubText: string;
-  titleSupText: string;
+  userTitle: string;
   appTitle: string;
   secondAppSectionWidth: string;
 }
@@ -31,16 +30,23 @@ export class App extends React.Component<AppProps, AppState> {
     this.setUserCredentials = this.setUserCredentials.bind(this);
     this.logout = this.logout.bind(this);
     const isUserAuthenticated: boolean = localStorage.getItem("token") !== null;
+    let userTitle: string = "";
+    if (isUserAuthenticated) {
+      let storedUserNameValue: string = localStorage.getItem(
+        "userName"
+      ) as string;
+      userTitle =
+        storedUserNameValue[storedUserNameValue.length - 1] === "s"
+          ? storedUserNameValue + "' "
+          : storedUserNameValue + "'s ";
+    }
     this.state = {
       secondAppSectionWidth: isUserAuthenticated ? "100%" : "50%",
       bigScreensAppOrientation: isUserAuthenticated ? "column" : "row",
       headerTitle: "HaBits ~ Track & Trace",
       appTitle: "HaBits",
-      titleSubText: isUserAuthenticated ? "Of" : "Track & Trace",
       authenticated: isUserAuthenticated,
-      titleSupText: isUserAuthenticated
-        ? (localStorage.getItem("userName") as string)
-        : "",
+      userTitle: userTitle,
     };
   }
   URL: string = "http://127.0.0.1:8000";
@@ -55,10 +61,14 @@ export class App extends React.Component<AppProps, AppState> {
         const userInfo: any = response.data.results[0];
         localStorage.setItem("userName", userInfo.username);
         localStorage.setItem("userId", userInfo.id);
+        let userTitle: string =
+          userInfo.username[userInfo.username.length - 1] === "s"
+            ? userInfo.username + "' "
+            : userInfo.username + "'s ";
         let updatedState: any = {
           authenticated: true,
-          titleSupText: userInfo.username,
-          titleSubText: "Of",
+          userTitle: userTitle,
+          titleSubText: "",
           bigScreensAppOrientation: "row",
         };
         this.setState(updatedState);
@@ -79,8 +89,7 @@ export class App extends React.Component<AppProps, AppState> {
       localStorage.removeItem(information);
     }
     this.setState({
-      titleSupText: "",
-      titleSubText: "Track & Trace",
+      userTitle: "",
       authenticated: false,
       bigScreensAppOrientation: "row",
       secondAppSectionWidth: "50%",
@@ -117,8 +126,7 @@ export class App extends React.Component<AppProps, AppState> {
             >
               <AppTitleContainer displayAsUserTitle={this.state.authenticated}>
                 <AppTitle
-                  subText={this.state.titleSubText}
-                  supText={this.state.titleSupText}
+                  userTitle={this.state.userTitle}
                   titleOnly={this.state.authenticated}
                 />
               </AppTitleContainer>

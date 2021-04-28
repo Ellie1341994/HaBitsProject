@@ -4,21 +4,21 @@ import { useState, useEffect } from "react";
 import { Text, useColorModeValue } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 
-function AppHeading({ subText, supText }: any) {
-  const [animationType, setAnimationType] = useState("intro");
-  const [titleTexts, setTitleTexts] = useState({
-    subText: subText,
-    supText: supText,
-  });
+function AppHeading({ subText, userTitle }: any) {
+  const [animationType, setAnimationType] = useState(
+    userTitle !== "" ? "standby" : "intro"
+  );
   const variants: any = {
     intro: {
       y: "-50vh",
+      opacity: 1,
       transition: {
         duration: 0,
       },
     },
     fall: {
       y: "0",
+      visibility: "visible",
       transition: {
         duration: 1,
         ease: "easeOut",
@@ -26,49 +26,38 @@ function AppHeading({ subText, supText }: any) {
     },
     levitate: {
       y: "-5vh",
+      visibility: "visible",
       transition: {
         repeat: Infinity,
         repeatType: "reverse",
         duration: 1,
       },
     },
-    outro: {
-      y: 0,
-      opacity: 0,
+    standby: {
+      y: "-50vh",
+      opacity: 1,
+      visibility: "hidden",
       transition: {
-        duration: 1,
+        duration: 0,
       },
     },
   };
   useEffect(() => {
-    /*
-     * if timeOut wait time must be 1s if user is logging out out so the title correctly fades with the previous text
-     * by the same token, the title text must change before the title starts the falling animation */
-    setTimeout(setTitleTexts, subText === "Of" ? 1000 : 0, {
-      subText: subText,
-      supText: supText,
-    });
-    if (subText === "Of") {
-      setAnimationType("outro");
-    } else {
-      setAnimationType("intro");
-    }
-  }, [supText, subText]);
-  useEffect(() => {
     if (animationType === "intro") {
       setAnimationType("fall");
     }
+    if (animationType === "standby") {
+      setTimeout(setAnimationType, 1000, "fall");
+    }
     if (animationType === "fall") {
       setTimeout(setAnimationType, 1000, "levitate");
-    }
-    if (animationType === "outro") {
-      setTimeout(setAnimationType, 1000, "intro");
     }
   }, [animationType]);
   return (
     <AnimatedHeading
       initial={false}
       animate={animationType}
+      exit={{ opacity: 0 }}
       variants={variants}
       fontFamily="serif"
       as="h1"
@@ -78,17 +67,17 @@ function AppHeading({ subText, supText }: any) {
       isTruncated={true}
       maxW="100%"
     >
+      {userTitle?.replace(/^\w/, (fc: string) => fc.toUpperCase())}
       HaBits
       <Text as="sub" fontSize="xs">
-        {titleTexts.subText}
+        {subText}
       </Text>
-      {titleTexts.supText?.replace(/^\w/, (fc: string) => fc.toUpperCase())}
     </AnimatedHeading>
   );
 }
 interface ATProps {
   titleOnly?: boolean;
-  supText?: string;
+  userTitle?: string;
   subText?: string;
 }
 /**
@@ -120,7 +109,14 @@ function AppTitle(props?: ATProps | undefined | null) {
   };
   return (
     <>
-      <AppHeading subText={props?.subText} supText={props?.supText} />
+      <AnimatePresence>
+        {!props?.titleOnly && (
+          <AppHeading subText={"Track & Trace"} userTitle={props?.userTitle} />
+        )}
+      </AnimatePresence>
+      {props?.titleOnly && (
+        <AppHeading subText={""} userTitle={props?.userTitle} />
+      )}
       <AnimatePresence>
         {!props?.titleOnly && (
           <AnimatedText
