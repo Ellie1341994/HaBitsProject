@@ -11,13 +11,29 @@ from datetime import date
 class User(AbstractUser):
     """
     Custom User Model
+
+    Attributes:
+    username: string
+    password: string
+    email: string
     """
     class Meta:
         ordering = ["username"]
 
 class Habit(models.Model):
     """
-    Model that registers a user's Habit information
+    Model that represents a user frequent activity
+
+    Attributes:
+    frequency:  string -> Frequences.DAILY == 'D' | Frequences.WEEKLY == 'W' | Frequences.MONTHLY == 'M'
+    startTime: datetime
+    endTime: datetime
+    dateCreated: datetime
+    dateEdited: datetime
+    endTime: datetime
+    description: string
+    user: User model entry id as ForeignKey
+    name: string <= 25 characters
     """
     class Frequences(models.TextChoices):
         """
@@ -35,7 +51,6 @@ class Habit(models.Model):
     startTime = models.DateTimeField()
     endTime = models.DateTimeField()
     dateEdited = models.DateTimeField(auto_now=True)
-    effectiveness = models.IntegerField(default=0 , validators=[MinValueValidator(0), MaxValueValidator(10)])
     description = models.CharField(max_length=500,default='')
         # Inmutable
     name = models.CharField(max_length=25)
@@ -52,6 +67,14 @@ class Habit(models.Model):
 class Track(models.Model):
     """
     Model that follows the user consistency of their Habits across time
+
+    Attributes:
+    dateCreated: datetime
+    dateEdited: datetime
+    state: string -> Status.DONE == 'D' | Status.PENDING == 'P' | Status.FAILED = 'F'
+    effectiveness: positive integer <= 3
+    note: string
+    habit: HaBits Model entry id as ForeignKey
     """
     class Status(models.TextChoices):
         """
@@ -65,6 +88,7 @@ class Track(models.Model):
     dateCreated = models.DateTimeField(auto_now=True)
     state = models.CharField(max_length=1, choices=Status.choices, default=Status.PENDING)
     note = models.CharField(max_length=300,default='')
+    effectiveness = models.IntegerField(default=0 , validators=[MinValueValidator(1), MaxValueValidator(3)])
 
     # Relational fields
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE, related_name="tracks")
