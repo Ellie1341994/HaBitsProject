@@ -67,7 +67,7 @@ class HabitViewSet(viewsets.ModelViewSet):
             and 'user' in self.request.data
             and ("user/" + str(self.request.user.id) + "/") in self.request.data["user"]):
             self.permission_classes = [permissions.IsAuthenticated]
-        elif self.action == 'list' and self.request.user.id is not None:
+        elif self.action == 'list' or self.action == 'retrieve' and self.request.user.id is not None:
             self.queryset = self.queryset.filter(user=self.request.user.id)
             self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'destroy':
@@ -98,9 +98,22 @@ class TrackViewSet(viewsets.ModelViewSet):
         if self.action == 'list' and self.request.user.id is not None:
             self.queryset = Track.objects.filter(habit__user=self.request.user)
             self.permission_classes = [permissions.IsAuthenticated]
+        elif self.action == "getHabitTracks":
+            self.permission_classes = [permissions.IsAuthenticated]
         elif self.action == 'create' and 'habit' in self.request.data:
             self.permission_classes = [permissions.IsAuthenticated]
         else:
             self.permission_classes = [permissions.IsAdminUser]
 
         return super().get_permissions()
+
+    @action(detail=True, methods=['get'])
+    def getHabitTracks(self, request, pk=None):
+        tracks = self.queryset.filter(habit_id=pk)
+        page = self.paginate_queryset(tracks)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(tracks)
+        return Response(serializer.data)
