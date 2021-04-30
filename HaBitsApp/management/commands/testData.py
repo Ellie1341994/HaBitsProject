@@ -2,6 +2,8 @@ from django.core.management.base import BaseCommand, CommandError
 from HaBitsApp.models import User, Track, Habit
 from django.contrib.auth.hashers import make_password
 from datetime import datetime, timedelta
+from random import random
+from math import floor
 class Command(BaseCommand):
     help = 'Creates several user habits and a whole year of tracks for some of them'
 
@@ -14,7 +16,6 @@ class Command(BaseCommand):
 
 
     def handle(self, *args, **options):
-        print(options)
         if options["delete"]:
             Track.objects.all().delete()
             Habit.objects.all().delete()
@@ -24,7 +25,7 @@ class Command(BaseCommand):
             # Create user entry
             user = None
             try:
-                user = User.objects.create(username="test", password=make_password("test"), email="test@test.com")
+                user = User.objects.create(username="test", password=make_password("testtest"), email="test@test.com")
                 user.save()
             except Exception as error:
                 print(error)
@@ -55,19 +56,15 @@ class Command(BaseCommand):
                 while dayNumber < maxDays:
                     dayNumber += 1
                     try:
-                        weirdCondition = ( dayNumber < 10 and 50 < dayNumber <= 100
-                                          and 110 < dayNumber < 120
-                                          and 130 < dayNumber < 150
-                                          and 175 > dayNumber )
-                        trackState = 'D' if weirdCondition else 'F'
-                        userHumor = (dayNumber % 3) + 1
+                        randomValue = floor(random() * 3)
+                        trackState = 'D' if randomValue <= 2 else 'F'
+                        userHumor = randomValue
                         t = Track.objects.create(dateCreated=habit.startTime + timedelta(days=dayNumber),
                                                  effectiveness=userHumor,
                                                  note="Test note number %i" % dayNumber,
                                                  habit=habit,
                                                  state=trackState)
                         t.save()
-                        print(t)
                     except Exception as error:
                         print(error)
                 dayNumber = 0
