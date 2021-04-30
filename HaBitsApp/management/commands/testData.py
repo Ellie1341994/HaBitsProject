@@ -30,7 +30,7 @@ class Command(BaseCommand):
             except Exception as error:
                 print(error)
 
-            habitsData = [("Running", 1), ("Waling", 1), ("Brush my teeth", 2), ("Sleeping", 3)]
+            habitsData = [("Running", 1), ("Walking", 1), ("Brush my teeth", 2), ("Sleeping", 3)]
             habitName = 0
             dayOffset=1
             # Create habits entries
@@ -57,7 +57,7 @@ class Command(BaseCommand):
                     dayNumber += 1
                     try:
                         randomValue = floor(random() * 3 )
-                        trackState = 'D' if randomValue <= 2 else 'F'
+                        trackState = 'D' if randomValue < 2 else 'F'
                         userHumor = randomValue + 1
                         t = Track.objects.create(dateCreated=habit.startTime + timedelta(days=dayNumber),
                                                  effectiveness=userHumor,
