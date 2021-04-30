@@ -5,8 +5,6 @@ like json
 from rest_framework import serializers
 from HaBitsApp.models import Habit, Track, User
 
-
-
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     """
     """
@@ -26,7 +24,18 @@ class HabitSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Habit
-        fields = '__all__'
+        fields = [ "url",
+                  "id",
+                  "dateCreated",
+                  "dateEdited",
+                  "description",
+                  "endTime",
+                  "frequency",
+                  "name",
+                  "startTime",
+                  "tracks",
+                  "user",
+                  ]
 
 class TrackSerializer(serializers.HyperlinkedModelSerializer):
     """
