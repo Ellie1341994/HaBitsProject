@@ -85,7 +85,7 @@ class Track(models.Model):
         FAILED = 'F', _('Failed')
 
     # Non-relational fields
-    dateCreated = models.DateTimeField(auto_now=True)
+    dateCreated = models.DateTimeField(auto_now=False, default=timezone.now)
     state = models.CharField(max_length=1, choices=Status.choices, default=Status.PENDING)
     note = models.CharField(max_length=300,default='')
     effectiveness = models.IntegerField(default=0 , validators=[MinValueValidator(1), MaxValueValidator(3)])
