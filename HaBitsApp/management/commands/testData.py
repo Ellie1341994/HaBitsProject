@@ -35,11 +35,12 @@ class Command(BaseCommand):
             dayOffset=1
             # Create habits entries
             habitObjs = []
+            initialDate = datetime(2021, 1, 1)
             for data in habitsData:
                 try:
                     h = Habit.objects.create(name=data[habitName],
-                                         startTime=datetime.now() + timedelta(days=data[dayOffset]),
-                                         endTime=datetime.now() + timedelta(days=data[dayOffset], hours=1, minutes=30),
+                                         startTime=initialDate + timedelta(days=data[dayOffset]),
+                                         endTime=initialDate + timedelta(days=data[dayOffset], hours=1, minutes=30),
                                          user=user
                                          )
                     h.save()
