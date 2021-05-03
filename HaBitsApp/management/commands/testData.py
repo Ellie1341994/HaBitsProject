@@ -54,19 +54,19 @@ class Command(BaseCommand):
                 if habit.name == "Sleeping":
                     break
                 while dayNumber < maxDays:
-                    dayNumber += 1
                     try:
                         randomValue = floor(random() * 3 )
                         trackState = 'D' if randomValue < 2 else 'F'
-                        userHumor = randomValue + 1
-                        t = Track.objects.create(dateCreated=habit.startTime + timedelta(days=dayNumber),
-                                                 effectiveness=userHumor,
+                        testDate = habit.startTime + timedelta(days=dayNumber)
+                        t = Track.objects.create(dateCreated=testDate,
+                                                 effectiveness=randomValue + 1,
                                                  note="Test note number %i" % dayNumber,
                                                  habit=habit,
                                                  state=trackState)
                         t.save()
                     except Exception as error:
                         print(error)
+                    dayNumber += 1
                 dayNumber = 0
 
             self.stdout.write(self.style.SUCCESS('Data successfully created'))
