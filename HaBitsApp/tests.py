@@ -1,7 +1,7 @@
 """
 """
 from .models import Habit, User, Track
-from .views import HabitViewSet
+from .views import HabitViewSet, TrackViewSet
 from rest_framework import status
 from rest_framework.test import APITestCase, URLPatternsTestCase, force_authenticate, APIClient
 from django.urls import include, path, reverse
@@ -12,6 +12,8 @@ from rest_framework.parsers import JSONParser
 from django.contrib.auth.hashers import make_password
 from testfixtures import log_capture
 from datetime import datetime
+from random import random
+from math import floor
 
 #class UserModelTest(APITestCase):
 #    """
@@ -134,6 +136,7 @@ from datetime import datetime
 #        self.assertEqual(user_updated_response.status_code, status.HTTP_200_OK)
 #        self.assertEqual(response_data["email"], 'a@b.com')
 #
+
 class HabitModelTest(APITestCase):
     """
     Class that extends APITestCase to test Habit class model
@@ -221,43 +224,6 @@ class HabitModelTest(APITestCase):
         get_anonym_list_response = self.client.get(user_habit_list_url, format='json')
         self.assertEqual(get_anonym_list_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_delete_habit(self):
-        """
-        HabitModelTest method that tests the customized destroy action behaviour inherited from DestroyModelMixin
-        """
-        # LogOut admin
-        self.client.logout()
-
-        # Common user logs in
-        self.assertTrue(self.client.login(username='Ellie', password='123'))
-
-        # General data for testing
-        user = User.objects.get(username='Ellie')
-        adminUser = User.objects.get(username='admin')
-
-        anAdminHabit = Habit.objects.create(name="smoking",
-                                            user=adminUser,
-                                    startTime=datetime(year=2021, month=4, day=1, hour=4),
-                                    endTime=datetime(year=2021, month=4, day=1, hour=5),
-                                            )
-        aUserHabit = Habit.objects.filter(user=user).first()
-
-        # Requests
-        # User attempt to delete its habit succeeds
-        delete_habit_url = reverse('habit-detail', kwargs={'pk' : aUserHabit.id})
-        delete_resource_response = self.client.delete(delete_habit_url, format='json')
-        self.assertEqual(delete_resource_response.status_code , status.HTTP_204_NO_CONTENT)
-        # User attempt to delete a habit that is not his own correctly informs that such request is forbidden
-
-        admin_habit_url = reverse('habit-detail', kwargs={'pk' : anAdminHabit.id})
-        delete_admin_habit_response = self.client.delete(admin_habit_url, format='json')
-        self.assertEqual(delete_admin_habit_response.status_code , status.HTTP_403_FORBIDDEN)
-
-        # Anonymous user attempt to delete a habit correctly identifyies him as non-authenticated
-        self.client.logout()
-        delete_habit_anonym_response = self.client.delete(admin_habit_url, format='json')
-        self.assertEqual(delete_habit_anonym_response.status_code, status.HTTP_401_UNAUTHORIZED)
-
     def test_create_habit(self):
         """
         HabitModelTest method that tests the customized create action behaviour inherited from CreateModelMixin
@@ -325,22 +291,26 @@ class HabitModelTest(APITestCase):
         """
         HabitModelTest method that tests RetrieveModelMixin
         """
+        self.client.logout()
+        # LogIn common user should succeed
+        self.assertTrue(self.client.login(username='Ellie', password='123'))
         # Data
          # Constants
-        THIS_ID_DOESNOT_EXIST = Habit.objects.count() + 9
+        ObjCount = Habit.objects.count()
+        THIS_ID_DOESNOT_EXIST = ObjCount + 9
          # DB Data
-        habit = Habit.objects.all().first()
+        habit = Habit.objects.filter(user__username='Ellie').first()
+        print(habit)
 
         # Requests
-        habit_url = reverse('habit-detail', kwargs={'pk' : habit.id})
-        habit_get_response = self.client.get(habit_url, format='json')
-
         nonexistent_habit_url = reverse('habit-detail', kwargs={'pk' : THIS_ID_DOESNOT_EXIST})
         nonexistent_habit_get_response = self.client.get(nonexistent_habit_url, format='json')
-
-        # Assertions
-        self.assertEqual(habit_get_response.status_code, status.HTTP_200_OK)
         self.assertEqual(nonexistent_habit_get_response.status_code, status.HTTP_404_NOT_FOUND)
+
+        habit_url = reverse('habit-detail', kwargs={'pk' : habit.id})
+        habit_get_response = self.client.get(habit_url, format='json')
+        self.assertEqual(habit_get_response.status_code, status.HTTP_200_OK)
+
 
     def test_partial_update_habit(self):
         """
@@ -363,6 +333,44 @@ class HabitModelTest(APITestCase):
         self.client.logout()
         update_habit_request = self.client.patch(update_habit_url, data, format='json')
         self.assertEqual(update_habit_request.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_delete_habit(self):
+        """
+        HabitModelTest method that tests the customized destroy action behaviour inherited from DestroyModelMixin
+        """
+        # LogOut admin
+        self.client.logout()
+
+        # Common user logs in
+        self.assertTrue(self.client.login(username='Ellie', password='123'))
+
+        # General data for testing
+        user = User.objects.get(username='Ellie')
+        adminUser = User.objects.get(username='admin')
+
+        anAdminHabit = Habit.objects.create(name="smoking",
+                                            user=adminUser,
+                                    startTime=datetime(year=2021, month=4, day=1, hour=4),
+                                    endTime=datetime(year=2021, month=4, day=1, hour=5),
+                                            )
+        aUserHabit = Habit.objects.filter(user=user).first()
+
+        # Requests
+        # User attempt to delete its habit succeeds
+        delete_habit_url = reverse('habit-detail', kwargs={'pk' : aUserHabit.id})
+        delete_resource_response = self.client.delete(delete_habit_url, format='json')
+        self.assertEqual(delete_resource_response.status_code , status.HTTP_204_NO_CONTENT)
+        # User attempt to delete a habit that is not his own correctly informs that such request is forbidden
+
+        admin_habit_url = reverse('habit-detail', kwargs={'pk' : anAdminHabit.id})
+        delete_admin_habit_response = self.client.delete(admin_habit_url, format='json')
+        self.assertEqual(delete_admin_habit_response.status_code , status.HTTP_403_FORBIDDEN)
+
+        # Anonymous user attempt to delete a habit correctly identifyies him as non-authenticated
+        self.client.logout()
+        delete_habit_anonym_response = self.client.delete(admin_habit_url, format='json')
+        self.assertEqual(delete_habit_anonym_response.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class TrackModelTest(APITestCase):
     """
@@ -394,7 +402,7 @@ class TrackModelTest(APITestCase):
         # To test pagination on viewsets
         i = 0
         while i < TRACE_CREATION_LIMIT:
-           t = Track.objects.create(habit=ellie_habit)
+           t = Track.objects.create(habit=ellie_habit, state='D' if i % 2 == 0 else 'F')
            #if i < 10:
                #print(t.date_created)
            t.save()
@@ -447,6 +455,25 @@ class TrackModelTest(APITestCase):
         self.client.logout()
         track_list_request = self.client.get(track_list_url, format='json')
         self.assertEqual(track_list_request.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_getHabitTrack(self):
+        """
+        Test that tracks from a specific habit given by the response are all of which their
+        state is 'D'
+        """
+        # General Data
+        user_ellie = User.objects.get(username='Ellie')
+        ellie_habit = Habit.objects.filter(user=user_ellie).first()
+        #Log user in should succeed
+        self.assertTrue(self.client.login(username='Ellie', password='123'))
+
+        getHabitTracks_url = reverse('track-getHabitTracks', kwargs={'pk' : ellie_habit.id})
+        request = self.client.get(getHabitTracks_url, format='json')
+        data = request.json()
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        tracks = data["results"]
+        for track in tracks:
+            self.assertTrue(track["state"] == "D")
 
     def test_retrieve_track(self):
         """
