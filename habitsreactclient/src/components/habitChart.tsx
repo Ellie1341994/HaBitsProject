@@ -3,6 +3,46 @@ import { Flex } from "@chakra-ui/react";
 import { ResponsiveLine } from "@nivo/line";
 import { ChartTitle } from "./ChartTitle";
 import axios from "axios";
+import { ResponsiveCalendar } from "@nivo/calendar";
+// make sure parent container have a defined height when using
+// responsive component, otherwise height will be 0 and
+// no chart will be rendered.
+// website examples showcase many properties,
+// you'll often use just a few of them.
+const MyResponsiveCalendar = ({ data, from, to }: any) => (
+  <ResponsiveCalendar
+    data={data}
+    from={from}
+    to={to}
+    isInteractive={true}
+    emptyColor="#eeeeee"
+    colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
+    margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
+    tooltip={(data) => (
+      <div style={{ backgroundColor: "#AAA", color: "white" }}>
+        {data.day}
+        {data.value}
+      </div>
+    )}
+    yearSpacing={45}
+    monthSpacing={15}
+    monthBorderColor="#ffffff"
+    dayBorderWidth={2}
+    dayBorderColor="#ffffff"
+    legends={[
+      {
+        anchor: "bottom-right",
+        direction: "row",
+        translateY: 36,
+        itemCount: 4,
+        itemWidth: 42,
+        itemHeight: 36,
+        itemsSpacing: 14,
+        itemDirection: "right-to-left",
+      },
+    ]}
+  />
+);
 //  https://github.com/plouc/nivo/issues/149#issuecomment-593617357
 export class HabitChart extends React.Component<any, any> {
   constructor(props: any) {
@@ -13,6 +53,8 @@ export class HabitChart extends React.Component<any, any> {
       habits: undefined,
       selectedHabit: undefined,
       habitData: undefined,
+      startDate: undefined,
+      endDate: undefined,
     };
   }
   baseURL = "http://127.0.0.1:8000";
@@ -37,10 +79,15 @@ export class HabitChart extends React.Component<any, any> {
       }
     }
     const habitData: any = await this.getHabitData(habit.id);
+    const firstDate: string = habitData[habitData.length - 1].day;
+    const lastDate: string = habitData[0].day;
+    console.log(firstDate, lastDate);
     this.setState({
       habits: habits,
       selectedHabit: habit,
       habitData: habitData,
+      startDate: firstDate,
+      endDate: lastDate,
     });
   }
   async getUserHabitList() {
@@ -52,8 +99,7 @@ export class HabitChart extends React.Component<any, any> {
     return habits;
   }
   async getHabitData(habitId: number) {
-    let consistencyEntries: any = [];
-    let humourEntries: any = [];
+    let tracksData: any = [];
     const response = await axios.get(
       this.baseURL + "/trace/" + habitId + "/getHabitTracks",
       {
@@ -63,30 +109,17 @@ export class HabitChart extends React.Component<any, any> {
     const tracks = response.data.results;
     console.log(tracks);
     for (let track of tracks) {
-      let humourEntry: any = {
-        x: track.dateCreated,
-        y: track.effectiveness,
+      let trackDate: string = track.dateCreated.substr(
+        0,
+        track.dateCreated.indexOf("T")
+      );
+      let dataEntry: any = {
+        day: trackDate,
+        value: track.effectiveness,
       };
-      let consistencyEntry: any = {
-        x: track.dateCreated,
-        y: track.state === "F" ? 0 : 1,
-      };
-      consistencyEntries.push(consistencyEntry);
-      humourEntries.push(humourEntry);
+      tracksData.push(dataEntry);
     }
-    let habitData: any = [
-      {
-        id: "Consistency",
-        color: "hsl(30, 70%, 50%)",
-        data: consistencyEntries,
-      },
-      {
-        id: "Humor",
-        color: "hsl(207, 70%, 50%)",
-        data: humourEntries,
-      },
-    ];
-    return habitData;
+    return tracksData;
   }
   render() {
     return (
@@ -99,18 +132,50 @@ export class HabitChart extends React.Component<any, any> {
           }
         />
         <Flex h="100%" w="90%">
+          <ResponsiveCalendar
+            data={this.state.habitData}
+            from={this.state.startDate}
+            to={this.state.endDate}
+            isInteractive={true}
+            emptyColor="#eeeeee"
+            colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
+            margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
+            yearSpacing={45}
+            monthSpacing={15}
+            monthBorderColor="#ffffff"
+            dayBorderWidth={2}
+            dayBorderColor="#ffffff"
+            legends={[
+              {
+                anchor: "bottom-right",
+                direction: "row",
+                translateY: 36,
+                itemCount: 4,
+                itemWidth: 42,
+                itemHeight: 36,
+                itemsSpacing: 14,
+                itemDirection: "right-to-left",
+              },
+            ]}
+          />
+        </Flex>
+      </Flex>
+    );
+  }
+}
+/*
           <ResponsiveLine
             data={this.state.habitData}
             margin={{ top: 25, right: 110, bottom: 25, left: 0 }}
             xScale={{ type: "point" }}
-            xFormat=" >-"
             yScale={{
-              type: "linear",
               min: "auto",
               max: "auto",
               stacked: true,
               reverse: false,
+              type: "point" as any,
             }}
+            xFormat=" >-"
             yFormat=" >-.2f"
             curve="natural"
             axisTop={null}
@@ -166,11 +231,4 @@ export class HabitChart extends React.Component<any, any> {
             ]}
             animate={true}
           />
-        </Flex>
-      </Flex>
-    );
-  }
-}
-/*
-            colors={{ scheme: "red_grey" }}
-              */
+*/
