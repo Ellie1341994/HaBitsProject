@@ -1,60 +1,98 @@
 import * as React from "react";
-import { Flex } from "@chakra-ui/react";
-import { ResponsiveLine } from "@nivo/line";
+import {
+  Text,
+  Flex,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+} from "@chakra-ui/react";
 import { ChartTitle } from "./ChartTitle";
 import axios from "axios";
 import { ResponsiveCalendar } from "@nivo/calendar";
+import { FaFrownOpen, FaGrinBeam, FaGrinTongue } from "react-icons/fa";
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
 // no chart will be rendered.
 // website examples showcase many properties,
 // you'll often use just a few of them.
-const MyResponsiveCalendar = ({ data, from, to }: any) => (
-  <ResponsiveCalendar
-    data={data}
-    from={from}
-    to={to}
-    isInteractive={true}
-    emptyColor="#eeeeee"
-    colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
-    margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
-    tooltip={(data) => (
-      <div style={{ backgroundColor: "#AAA", color: "white" }}>
-        {data.day}
-        {data.value}
-      </div>
-    )}
-    yearSpacing={45}
-    monthSpacing={15}
-    monthBorderColor="#ffffff"
-    dayBorderWidth={2}
-    dayBorderColor="#ffffff"
-    legends={[
-      {
-        anchor: "bottom-right",
-        direction: "row",
-        translateY: 36,
-        itemCount: 4,
-        itemWidth: 42,
-        itemHeight: 36,
-        itemsSpacing: 14,
-        itemDirection: "right-to-left",
-      },
-    ]}
-  />
-);
 //  https://github.com/plouc/nivo/issues/149#issuecomment-593617357
+function TrackInformationModal(_props: any) {
+  let trackDate: string = _props.trackInformation?.dateCreated.substr(
+    0,
+    _props.trackInformation.dateCreated.indexOf("T")
+  );
+  function setIconOpacity(trackEffectiveness: string, iconType: string) {
+    const effectivenessNumber: number = parseInt(trackEffectiveness);
+    if (
+      (iconType === "bad" && effectivenessNumber === 1) ||
+      (iconType === "medium" && effectivenessNumber === 2) ||
+      (iconType === "good" && effectivenessNumber === 3)
+    ) {
+      return 1;
+    }
+
+    return 0.5;
+  }
+  return (
+    <Modal isOpen={_props.open} onClose={_props.setOpen}>
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader>Day Record Information</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody whiteSpace="pre-line">
+          <Flex p="4" justify="space-evenly">
+            <FaFrownOpen
+              size="32"
+              opacity={setIconOpacity(
+                _props.trackInformation?.effectiveness,
+                "bad"
+              )}
+            />
+            <FaGrinTongue
+              size="32"
+              opacity={setIconOpacity(
+                _props.trackInformation?.effectiveness,
+                "medium"
+              )}
+            />
+            <FaGrinBeam
+              size="32"
+              opacity={setIconOpacity(
+                _props.trackInformation?.effectiveness,
+                "good"
+              )}
+            />
+            <br />
+          </Flex>
+          {_props.trackInformation?.note}
+          <br />
+          <Text textAlign="right" w="100%" as="p">
+            On {trackDate}
+          </Text>
+        </ModalBody>
+        <ModalFooter></ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}
 export class HabitChart extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.getHabitData = this.getHabitData.bind(this);
     this.getUserHabitList = this.getUserHabitList.bind(this);
+    this.popTrackInformation = this.popTrackInformation.bind(this);
     this.state = {
       habits: undefined,
       selectedHabit: undefined,
       habitData: undefined,
       startDate: undefined,
       endDate: undefined,
+      trackInformationPopped: false,
+      trackInformation: undefined,
     };
   }
   baseURL = "http://127.0.0.1:8000";
@@ -65,7 +103,7 @@ export class HabitChart extends React.Component<any, any> {
     );
     let habit: any = undefined;
     if (habits !== []) {
-      const maxRandomNumber = habits.length;
+      const maxRandomNumber = habits.length - 1;
       var randomNumber = Math.floor(Math.random() * maxRandomNumber);
       habit = habits[randomNumber];
       if (preselectedHabitId) {
@@ -81,7 +119,6 @@ export class HabitChart extends React.Component<any, any> {
     const habitData: any = await this.getHabitData(habit.id);
     const firstDate: string = habitData[habitData.length - 1].day;
     const lastDate: string = habitData[0].day;
-    console.log(firstDate, lastDate);
     this.setState({
       habits: habits,
       selectedHabit: habit,
@@ -95,7 +132,6 @@ export class HabitChart extends React.Component<any, any> {
       headers: { Authorization: "Token " + localStorage.getItem("token") },
     });
     let habits: any = response.data.results;
-    console.log(habits);
     return habits;
   }
   async getHabitData(habitId: number) {
@@ -107,7 +143,6 @@ export class HabitChart extends React.Component<any, any> {
       }
     );
     const tracks = response.data.results;
-    console.log(tracks);
     for (let track of tracks) {
       let trackDate: string = track.dateCreated.substr(
         0,
@@ -116,34 +151,65 @@ export class HabitChart extends React.Component<any, any> {
       let dataEntry: any = {
         day: trackDate,
         value: track.effectiveness,
+        url: track.url,
       };
       tracksData.push(dataEntry);
     }
     return tracksData;
   }
+  async popTrackInformation(trackUrl?: string) {
+    let updatedState: any = {
+      trackInformationPopped: !this.state.trackInformationPopped,
+    };
+    if (trackUrl) {
+      const response: any = await axios.get(trackUrl, {
+        headers: { Authorization: "Token " + localStorage.getItem("token") },
+      });
+      updatedState["trackInformation"] = response.data;
+      console.log(response);
+    }
+    this.setState(updatedState);
+  }
   render() {
     return (
-      <Flex justify="space-evenly" align="center" h="25%" w="90%">
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        justify="space-evenly"
+        align="center"
+        h="25%"
+        w="90%"
+      >
+        <TrackInformationModal
+          trackInformation={this.state.trackInformation}
+          open={this.state.trackInformationPopped}
+          setOpen={this.popTrackInformation}
+        />
         <ChartTitle
           text={
             this.state.selectedHabit
               ? this.state.selectedHabit.name
-              : "You haven't created a habit"
+              : "Start creating a HaBit!"
           }
         />
-        <Flex h="100%" w="90%">
+        <Flex h="100%" w={{ base: "100%", md: "90%" }}>
           <ResponsiveCalendar
             data={this.state.habitData}
             from={this.state.startDate}
             to={this.state.endDate}
-            isInteractive={true}
+            minValue={1}
+            maxValue={3}
             emptyColor="#eeeeee"
-            colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
-            margin={{ top: 2, right: 2, bottom: 2, left: 2 }}
-            yearSpacing={45}
-            monthSpacing={15}
+            colors={["#fc9953", "#fcee53", "#b5fc53"]}
+            margin={{ top: 20, right: 2, bottom: 2, left: 2 }}
+            onClick={(event: any) => {
+              if (event.data) {
+                this.popTrackInformation(event.data.url);
+              }
+            }}
+            yearSpacing={0}
+            monthSpacing={10}
             monthBorderColor="#ffffff"
-            dayBorderWidth={2}
+            dayBorderWidth={1}
             dayBorderColor="#ffffff"
             legends={[
               {
@@ -163,72 +229,3 @@ export class HabitChart extends React.Component<any, any> {
     );
   }
 }
-/*
-          <ResponsiveLine
-            data={this.state.habitData}
-            margin={{ top: 25, right: 110, bottom: 25, left: 0 }}
-            xScale={{ type: "point" }}
-            yScale={{
-              min: "auto",
-              max: "auto",
-              stacked: true,
-              reverse: false,
-              type: "point" as any,
-            }}
-            xFormat=" >-"
-            yFormat=" >-.2f"
-            curve="natural"
-            axisTop={null}
-            axisRight={null}
-            axisBottom={null}
-            tooltip={(data) => {
-              //console.log(input.point)
-              return (
-                <Flex fontFamily="serif" fontWeight="semibold">
-                  Date: {data.point.data.y}
-                </Flex>
-              );
-            }}
-            enableCrosshair={false}
-            axisLeft={null}
-            enableGridX={false}
-            enableGridY={false}
-            colors={{ scheme: "nivo" }}
-            enablePoints={true}
-            pointSize={10}
-            pointColor={{ theme: "background" }}
-            pointBorderWidth={2}
-            pointBorderColor={{ from: "serieColor" }}
-            pointLabel="y"
-            pointLabelYOffset={-12}
-            isInteractive={true}
-            useMesh={true}
-            legends={[
-              {
-                anchor: "right",
-                direction: "column",
-                justify: false,
-                translateX: 100,
-                translateY: 0,
-                itemsSpacing: 0,
-                itemDirection: "left-to-right",
-                itemWidth: 80,
-                itemHeight: 20,
-                itemOpacity: 0.75,
-                symbolSize: 12,
-                symbolShape: "circle",
-                symbolBorderColor: "rgba(0, 0, 0, .5)",
-                effects: [
-                  {
-                    on: "hover",
-                    style: {
-                      itemBackground: "rgba(0, 0, 0, .03)",
-                      itemOpacity: 1,
-                    },
-                  },
-                ],
-              },
-            ]}
-            animate={true}
-          />
-*/
