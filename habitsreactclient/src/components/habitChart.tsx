@@ -83,6 +83,7 @@ export class HabitChart extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.getHabitData = this.getHabitData.bind(this);
+    this.setHabitsData = this.setHabitsData.bind(this);
     this.getUserHabitList = this.getUserHabitList.bind(this);
     this.popTrackInformation = this.popTrackInformation.bind(this);
     this.state = {
@@ -97,35 +98,30 @@ export class HabitChart extends React.Component<any, any> {
   }
   baseURL = "http://127.0.0.1:8000";
   async componentDidMount() {
-    const habits: any = await this.getUserHabitList();
-    const preselectedHabitId: string | null = localStorage.getItem(
-      "selectedUserHabit"
-    );
-    let habit: any = undefined;
-    if (habits !== []) {
+    this.setHabitsData();
+  }
+  async componentDidUpdate(_prevState: any, _prevProps: any) {
+    console.log("hola");
+  }
+  async setHabitsData(selectedHabit?: any) {
+    let habits: any = undefined;
+    let habit: any = selectedHabit;
+    let updatedState: any = {};
+    if (!selectedHabit) {
+      habits = await this.getUserHabitList();
       const maxRandomNumber = habits.length - 1;
       var randomNumber = Math.floor(Math.random() * maxRandomNumber);
       habit = habits[randomNumber];
-      if (preselectedHabitId) {
-        const id: number = parseInt(preselectedHabitId);
-        for (let object of habits) {
-          if (object.id === id) {
-            habit = object;
-            break;
-          }
-        }
-      }
+      updatedState["habits"] = habits;
     }
     const habitData: any = await this.getHabitData(habit.id);
-    const firstDate: string = habitData[habitData.length - 1].day;
-    const lastDate: string = habitData[0].day;
-    this.setState({
-      habits: habits,
-      selectedHabit: habit,
-      habitData: habitData,
-      startDate: firstDate,
-      endDate: lastDate,
-    });
+    const firstDate: string = habitData[habitData.length - 1]?.day;
+    const lastDate: string = habitData[0]?.day;
+    updatedState["habitData"] = habitData;
+    updatedState["startDate"] = firstDate;
+    updatedState["endDate"] = lastDate;
+    updatedState["selectedHabit"] = habit;
+    this.setState(updatedState);
   }
   async getUserHabitList() {
     const response: any = await axios.get("http://127.0.0.1:8000/habit", {
@@ -185,6 +181,8 @@ export class HabitChart extends React.Component<any, any> {
           setOpen={this.popTrackInformation}
         />
         <ChartTitle
+          changeHabit={this.setHabitsData}
+          habitsList={this.state.habits}
           text={
             this.state.selectedHabit
               ? this.state.selectedHabit.name
@@ -193,7 +191,7 @@ export class HabitChart extends React.Component<any, any> {
         />
         <Flex h="100%" w={{ base: "100%", md: "90%" }}>
           <ResponsiveCalendar
-            data={this.state.habitData}
+            data={this.state.habitData ? this.state.habitData : []}
             from={this.state.startDate}
             to={this.state.endDate}
             minValue={1}
