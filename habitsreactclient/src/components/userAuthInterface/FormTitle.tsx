@@ -1,5 +1,5 @@
 import { Heading, Flex } from "@chakra-ui/react";
-import { TypingAnimation } from "./AnimatedChakraComponents";
+import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
 export default function FormTitle(props: any) {
   return (

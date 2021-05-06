@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Flex } from "@chakra-ui/react";
-import { HabitTitle } from "./ChartTitle";
+import { HabitCalendarTitle } from "./HabitCalendarTitle";
 import axios from "axios";
 import HabitCalendar from "./habitCalendar";
 import CalendarModal from "./calendarModal";
@@ -109,7 +109,7 @@ export class HabitCalendarInterface extends React.Component<any, any> {
           open={this.state.trackInformationPopped}
           setOpen={this.popTrackInformation}
         />
-        <HabitTitle
+        <HabitCalendarTitle
           default={this.state.selectedHabit ? this.state.selectedHabit.id : ""}
           changeHabit={this.setHabitsData}
           habitsList={this.state.habits}

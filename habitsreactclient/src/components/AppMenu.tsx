@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ColorModeSwitcher } from "../ColorModeSwitcher";
-import { AnimatedFlex } from "./AnimatedChakraComponents";
+import { AnimatedFlex } from "./miscellaneous/AnimatedChakraComponents";
 import { AnimatePresence } from "framer-motion";
 import { Link } from "@chakra-ui/react";
 export class AppMenu extends React.Component<any, any> {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AnimatedFlex } from "./AnimatedChakraComponents";
+import { AnimatedFlex } from "./miscellaneous/AnimatedChakraComponents";
 
 export default function UserServicesContainer(props: any) {
   return (

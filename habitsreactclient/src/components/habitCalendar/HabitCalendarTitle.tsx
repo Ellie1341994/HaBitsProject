@@ -1,22 +1,18 @@
 import * as React from "react";
-import { Text, Select } from "@chakra-ui/react";
+import { Select } from "@chakra-ui/react";
 //import { TypingAnimation } from "./AnimatedChakraComponents";
-export class ChartTitle extends React.Component<any, any> {
+export class HabitCalendarTitle extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {};
   }
-  titleChangeOptions() {
+  makeOptions() {
     const options: any = [];
     const habits: any = this.props.habitsList;
     if (habits) {
       for (let habit of habits) {
         const option: any = (
-          <option
-            key={habit.name}
-            selected={habit.name === this.props.text}
-            value={habit.id}
-          >
+          <option key={habit.name} value={habit.id}>
             {habit.name}
           </option>
         );
@@ -40,13 +36,15 @@ export class ChartTitle extends React.Component<any, any> {
     return (
       <>
         <Select
-          w="10%"
+          w={{ base: "100%", md: "10%" }}
+          fontSize={{ base: "xs", md: "md" }}
+          defaultValue={this.props.default}
           isTruncated={true}
           textAlign="center"
           variant="unstyled"
           onChange={(e: any) => this.handleChangeHabit(e.target.value)}
         >
-          {this.titleChangeOptions()}
+          {this.makeOptions()}
         </Select>
       </>
     );

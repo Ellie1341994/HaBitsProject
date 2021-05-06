@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import { AnimatedFlex } from "./AnimatedChakraComponents";
+import { AnimatedFlex } from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
 import axios from "axios";
 import Fields from "./Fields";

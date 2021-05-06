@@ -1,4 +1,7 @@
-import { AnimatedHeading, AnimatedText } from "./AnimatedChakraComponents";
+import {
+  AnimatedHeading,
+  AnimatedText,
+} from "./miscellaneous/AnimatedChakraComponents";
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { Text, useColorModeValue } from "@chakra-ui/react";

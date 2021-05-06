@@ -9,7 +9,7 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 import { Button, useColorModeValue, Flex } from "@chakra-ui/react";
-import { TypingAnimation } from "./AnimatedChakraComponents";
+import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
 export default function AuthenticationFormButton(props: any) {
   //const bgColorType: any = {dark: "#e77", light:"orange.200"}

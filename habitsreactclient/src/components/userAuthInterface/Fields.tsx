@@ -12,7 +12,7 @@ import {
   FadingInput,
   TransitioningInput,
   TypingAnimation,
-} from "./AnimatedChakraComponents";
+} from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
 function PasswordInput(props: any): any {
   const [show, setShow] = React.useState(false);

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Flex, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
-import { TypingAnimation } from "./AnimatedChakraComponents";
+import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
 import { ResponsiveCalendar } from "@nivo/calendar";
 export default function HabitCalendar(props: any): any {
   const color: any = useColorModeValue(

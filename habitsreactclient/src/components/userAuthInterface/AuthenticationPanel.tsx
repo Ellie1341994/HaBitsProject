@@ -1,5 +1,5 @@
 import { useColorModeValue } from "@chakra-ui/react";
-import { AnimatedFlex } from "./AnimatedChakraComponents";
+import { AnimatedFlex } from "../miscellaneous/AnimatedChakraComponents";
 import { useState } from "react";
 import React from "react";
 import AuthenticationForm from "./AuthenticationForm";

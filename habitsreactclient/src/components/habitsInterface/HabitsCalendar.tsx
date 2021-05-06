@@ -1,8 +1,6 @@
 import * as React from "react";
 import { Flex } from "@chakra-ui/react";
 import CalendarMenu from "./CalendarMenu";
-import DaysTabs from "./DaysTabs";
-import Habits from "./Habits";
 
 export class HabitsCalendar extends React.Component<any, any> {
   constructor(props: any) {
@@ -23,8 +21,6 @@ export class HabitsCalendar extends React.Component<any, any> {
           justify="center"
           direction="column"
         >
-          <DaysTabs />
-          <Habits />
           <CalendarMenu />
         </Flex>
       </Flex>

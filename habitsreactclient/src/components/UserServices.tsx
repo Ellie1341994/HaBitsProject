@@ -1,5 +1,5 @@
-import { HabitChart } from "./habitChart";
-import { HabitsCalendar } from "./HabitsCalendar";
+import { HabitCalendarInterface } from "./habitCalendar/habitCalendarInterface";
+import { HabitsInterface } from "./habitsInterface/HabitsInterface";
 import * as React from "react";
 import { Flex } from "@chakra-ui/react";
 export class UserServices extends React.Component<any, any> {
@@ -12,8 +12,8 @@ export class UserServices extends React.Component<any, any> {
         direction="column"
         align="center"
       >
-        <HabitChart />
-        <HabitsCalendar />
+        <HabitCalendarInterface />
+        <HabitsInterface />
       </Flex>
     );
   }

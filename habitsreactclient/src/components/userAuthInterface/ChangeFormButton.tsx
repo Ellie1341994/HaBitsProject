@@ -1,4 +1,4 @@
-import { TypingAnimation } from "./AnimatedChakraComponents";
+import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
 export default function ChangeFormButton(props: any) {
   return (
