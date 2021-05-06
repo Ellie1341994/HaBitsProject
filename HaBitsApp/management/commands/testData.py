@@ -57,10 +57,10 @@ class Command(BaseCommand):
                 while dayNumber < maxDays:
                     try:
                         randomValue = floor(random() * 3 )
-                        trackState = 'D' if randomValue < 2 else 'F'
+                        trackState = 'D' if dayNumber % 2 == 0 or dayNumber % 3 == 0 else 'F'
                         testDate = habit.startTime + timedelta(days=dayNumber)
                         t = Track.objects.create(dateCreated=testDate,
-                                                 effectiveness=randomValue + 1,
+                                                 effectiveness=( randomValue + 1 ),
                                                  note="Test note number %i" % dayNumber,
                                                  habit=habit,
                                                  state=trackState)
