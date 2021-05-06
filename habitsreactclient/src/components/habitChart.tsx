@@ -9,9 +9,11 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { ChartTitle } from "./ChartTitle";
 import axios from "axios";
+import { TypingAnimation } from "./AnimatedChakraComponents";
 import { ResponsiveCalendar } from "@nivo/calendar";
 import { FaFrownOpen, FaGrinBeam, FaGrinTongue } from "react-icons/fa";
 // make sure parent container have a defined height when using
@@ -79,6 +81,59 @@ function TrackInformationModal(_props: any) {
     </Modal>
   );
 }
+function HabitCalendar(props: any): any {
+  const textColor: string = useColorModeValue("gray.700", "white");
+  const darkColors: any = ["#788389", "#927d80", "#A77"];
+  const lightColors: any = ["#7928CA", "#bc14a5", "#FF0080"];
+  const entryColor: string[] = useColorModeValue(lightColors, darkColors);
+  if (props.data?.length > 0) {
+    return (
+      <ResponsiveCalendar
+        theme={{ textColor: textColor }}
+        data={props.data ? props.data : []}
+        from={props.startDate}
+        to={props.endDate}
+        minValue={1}
+        maxValue={3}
+        emptyColor="#eeeeee"
+        colors={entryColor}
+        margin={{ top: 20, right: 0, bottom: 2, left: 0 }}
+        onClick={(event: any) => {
+          if (event.data) {
+            props.popTrackInformation(event.data.url);
+          }
+        }}
+        yearSpacing={0}
+        monthSpacing={10}
+        monthBorderColor="#fff0"
+        dayBorderWidth={1}
+        dayBorderColor="#ffffff"
+        legends={[
+          {
+            anchor: "bottom-right",
+            direction: "row",
+            translateY: 36,
+            itemCount: 4,
+            itemWidth: 42,
+            itemHeight: 36,
+            itemsSpacing: 14,
+            itemDirection: "right-to-left",
+          },
+        ]}
+      />
+    );
+  } else {
+    return (
+      <TypingAnimation
+        animateAlways={true}
+        writeOnly={true}
+        text={
+          "Selected HaBit is too new to diplay its information on the Calendar!"
+        }
+      />
+    );
+  }
+}
 export class HabitChart extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
@@ -99,9 +154,6 @@ export class HabitChart extends React.Component<any, any> {
   baseURL = "http://127.0.0.1:8000";
   async componentDidMount() {
     this.setHabitsData();
-  }
-  async componentDidUpdate(_prevState: any, _prevProps: any) {
-    console.log("hola");
   }
   async setHabitsData(selectedHabit?: any) {
     let habits: any = undefined;
@@ -167,6 +219,7 @@ export class HabitChart extends React.Component<any, any> {
     this.setState(updatedState);
   }
   render() {
+    console.log("hd ->", this.state.habitData);
     return (
       <Flex
         direction={{ base: "column", md: "row" }}
@@ -189,38 +242,17 @@ export class HabitChart extends React.Component<any, any> {
               : "Start creating a HaBit!"
           }
         />
-        <Flex h="100%" w={{ base: "100%", md: "90%" }}>
-          <ResponsiveCalendar
-            data={this.state.habitData ? this.state.habitData : []}
-            from={this.state.startDate}
-            to={this.state.endDate}
-            minValue={1}
-            maxValue={3}
-            emptyColor="#eeeeee"
-            colors={["#fc9953", "#fcee53", "#b5fc53"]}
-            margin={{ top: 20, right: 2, bottom: 2, left: 2 }}
-            onClick={(event: any) => {
-              if (event.data) {
-                this.popTrackInformation(event.data.url);
-              }
-            }}
-            yearSpacing={0}
-            monthSpacing={10}
-            monthBorderColor="#ffffff"
-            dayBorderWidth={1}
-            dayBorderColor="#ffffff"
-            legends={[
-              {
-                anchor: "bottom-right",
-                direction: "row",
-                translateY: 36,
-                itemCount: 4,
-                itemWidth: 42,
-                itemHeight: 36,
-                itemsSpacing: 14,
-                itemDirection: "right-to-left",
-              },
-            ]}
+        <Flex
+          justify="center"
+          align="center"
+          h="100%"
+          w={{ base: "100%", md: "90%" }}
+        >
+          <HabitCalendar
+            popTrackInformation={this.popTrackInformation}
+            startDate={this.state.startDate}
+            endDate={this.state.endDate}
+            data={this.state.habitData}
           />
         </Flex>
       </Flex>
