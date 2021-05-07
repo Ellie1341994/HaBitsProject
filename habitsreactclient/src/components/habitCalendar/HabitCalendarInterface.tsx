@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Flex } from "@chakra-ui/react";
-import { HabitCalendarTitle } from "./HabitCalendarTitle";
 import axios from "axios";
-import HabitCalendar from "./habitCalendar";
-import CalendarModal from "./calendarModal";
+import { CalendarModal } from "./CalendarModal";
+import { HabitCalendarTitle } from "./HabitCalendarTitle";
+import { HabitCalendar } from "./HabitCalendar";
 // make sure parent container have a defined height when using
 // responsive component, otherwise height will be 0 and
 // no chart will be rendered.
@@ -35,7 +35,7 @@ export class HabitCalendarInterface extends React.Component<any, any> {
     let habits: any = undefined;
     let habit: any = selectedHabit;
     let updatedState: any = {};
-    if (!selectedHabit) {
+    if (habit === undefined) {
       habits = await this.getUserHabitList();
       const maxRandomNumber = habits.length - 1;
       var randomNumber = Math.floor(Math.random() * maxRandomNumber);
@@ -90,12 +90,10 @@ export class HabitCalendarInterface extends React.Component<any, any> {
         headers: { Authorization: "Token " + localStorage.getItem("token") },
       });
       updatedState["trackInformation"] = response.data;
-      console.log(response);
     }
     this.setState(updatedState);
   }
   render() {
-    console.log("hd ->", this.state.habitData);
     return (
       <Flex
         direction={{ base: "column", md: "row" }}
@@ -110,13 +108,12 @@ export class HabitCalendarInterface extends React.Component<any, any> {
           setOpen={this.popTrackInformation}
         />
         <HabitCalendarTitle
-          default={this.state.selectedHabit ? this.state.selectedHabit.id : ""}
           changeHabit={this.setHabitsData}
           habitsList={this.state.habits}
           text={
             this.state.selectedHabit
               ? this.state.selectedHabit.name
-              : "Start creating a HaBit!"
+              : "You need HaBits!"
           }
         />
         <HabitCalendar

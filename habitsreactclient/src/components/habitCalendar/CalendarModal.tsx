@@ -11,7 +11,7 @@ import {
   ModalCloseButton,
 } from "@chakra-ui/react";
 import { FaFrownOpen, FaGrinBeam, FaGrinTongue } from "react-icons/fa";
-export default function CalendarModal(_props: any) {
+export function CalendarModal(_props: any) {
   let trackDate: string = _props.trackInformation?.dateCreated.substr(
     0,
     _props.trackInformation.dateCreated.indexOf("T")

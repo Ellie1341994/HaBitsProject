@@ -2,7 +2,7 @@ import * as React from "react";
 import { Flex, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
 import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
 import { ResponsiveCalendar } from "@nivo/calendar";
-export default function HabitCalendar(props: any): any {
+export function HabitCalendar(props: any): any {
   const color: any = useColorModeValue(
     { textColor: "gray.700" },
     { textColor: "white" }
@@ -59,7 +59,7 @@ export default function HabitCalendar(props: any): any {
         />
       </Flex>
     );
-  } else if (props.data === []) {
+  } else {
     return (
       <TypingAnimation
         w="100%"
@@ -70,7 +70,5 @@ export default function HabitCalendar(props: any): any {
         }
       />
     );
-  } else {
-    return <></>;
   }
 }

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Select } from "@chakra-ui/react";
-//import { TypingAnimation } from "./AnimatedChakraComponents";
 export class HabitCalendarTitle extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
@@ -38,7 +37,16 @@ export class HabitCalendarTitle extends React.Component<any, any> {
         <Select
           w={{ base: "100%", md: "10%" }}
           fontSize={{ base: "xs", md: "md" }}
-          defaultValue={this.props.default}
+          value={
+            this.props.habitsList?.find(
+              (habit: any) => habit.name === this.props.text
+            ).id
+          }
+          defaultValue={
+            this.props.habitsList?.find(
+              (habit: any) => habit.name === this.props.text
+            ).id
+          }
           isTruncated={true}
           textAlign="center"
           variant="unstyled"

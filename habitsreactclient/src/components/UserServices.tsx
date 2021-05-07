@@ -1,4 +1,4 @@
-import { HabitCalendarInterface } from "./habitCalendar/habitCalendarInterface";
+import { HabitCalendarInterface } from "./habitCalendar/HabitCalendarInterface";
 import { HabitsInterface } from "./habitsInterface/HabitsInterface";
 import * as React from "react";
 import { Flex } from "@chakra-ui/react";

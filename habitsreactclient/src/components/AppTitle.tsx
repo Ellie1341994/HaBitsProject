@@ -3,12 +3,11 @@ import {
   AnimatedText,
 } from "./miscellaneous/AnimatedChakraComponents";
 import * as React from "react";
-import { useState, useEffect } from "react";
 import { Text, useColorModeValue } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 
 function AppHeading({ subText, userTitle }: any) {
-  const [animationType, setAnimationType] = useState(
+  const [animationType, setAnimationType] = React.useState(
     userTitle !== "" ? "standby" : "intro"
   );
   const variants: any = {
@@ -45,7 +44,7 @@ function AppHeading({ subText, userTitle }: any) {
       },
     },
   };
-  useEffect(() => {
+  React.useEffect(() => {
     if (animationType === "intro") {
       setAnimationType("fall");
     }
