@@ -99,7 +99,7 @@ export class HabitCalendarInterface extends React.Component<any, any> {
         direction={{ base: "column", md: "row" }}
         justify="space-between"
         align="center"
-        h="25%"
+        h={{ base: "40%", md: "30%" }}
         w="90%"
       >
         <CalendarModal

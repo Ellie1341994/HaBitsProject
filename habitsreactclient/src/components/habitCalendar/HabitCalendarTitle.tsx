@@ -35,7 +35,9 @@ export class HabitCalendarTitle extends React.Component<any, any> {
     return (
       <>
         <Select
-          w={{ base: "100%", md: "10%" }}
+          w={{ base: "80%", md: "10%" }}
+          m="0"
+          p="0"
           fontSize={{ base: "xs", md: "md" }}
           value={
             this.props.habitsList?.find(

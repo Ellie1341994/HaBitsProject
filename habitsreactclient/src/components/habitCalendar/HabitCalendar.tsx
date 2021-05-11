@@ -1,65 +1,79 @@
 import * as React from "react";
 import { Flex, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
-import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
-import { ResponsiveCalendar } from "@nivo/calendar";
+import {
+  AnimatedFlex,
+  TypingAnimation,
+} from "../miscellaneous/AnimatedChakraComponents";
+import { Calendar } from "@nivo/calendar";
+//import { ResponsiveCalendar } from "@nivo/calendar";
 export function HabitCalendar(props: any): any {
   const color: any = useColorModeValue(
-    { textColor: "gray.700" },
-    { textColor: "white" }
+    { textColor: "#333", monthBorderColor: "#3337" },
+    { textColor: "white", monthBorderColor: "#fff7" }
   );
   const darkColors: any = ["#788389", "#927d80", "#A77"];
   const lightColors: any = ["#7928CA", "#bc14a5", "#FF0080"];
   const entryColor: string[] = useColorModeValue(lightColors, darkColors);
-  const [isSmallerThan600] = useMediaQuery("(max-width: 600px)");
+  const [isWLessThan600] = useMediaQuery("(max-width: 600px)");
+  //console.log(props.data);
   if (props.data?.length > 0) {
     return (
       <Flex
-        justify="center"
-        align="center"
         h="100%"
+        justify="flex-start"
+        overflowX={{ base: "scroll", md: "auto" }}
         w={{ base: "100%", md: "90%" }}
       >
-        <ResponsiveCalendar
-          theme={color}
-          data={props.data ? props.data : []}
-          from={props.startDate}
-          to={props.endDate}
-          minValue={1}
-          maxValue={3}
-          emptyColor="#eeeeee"
-          colors={entryColor}
-          margin={{
-            top: isSmallerThan600 ? 0 : 20,
-            right: 0,
-            bottom: 2,
-            left: 0,
-          }}
-          onClick={(event: any) => {
-            if (event.data) {
-              props.popTrackInformation(event.data.url);
+        <Flex h="100%" w={isWLessThan600 ? "200%" : "100%"}>
+          <Calendar
+            width={
+              isWLessThan600 ? window.innerWidth * 2 : window.innerWidth * 0.8
             }
-          }}
-          yearSpacing={0}
-          monthSpacing={10}
-          monthBorderColor="#fff0"
-          dayBorderWidth={1}
-          dayBorderColor="#ffffff"
-          legends={[
-            {
-              anchor: "bottom-right",
-              direction: "row",
-              translateY: 36,
-              itemCount: 4,
-              itemWidth: 42,
-              itemHeight: 36,
-              itemsSpacing: 14,
-              itemDirection: "right-to-left",
-            },
-          ]}
-        />
+            height={150}
+            theme={{ textColor: color.textColor }}
+            data={props.data ? props.data : []}
+            from={props.startDate}
+            to={props.endDate}
+            minValue={1}
+            maxValue={3}
+            emptyColor="#eee0"
+            colors={entryColor}
+            margin={{
+              top: 5,
+              right: 0,
+              bottom: 2,
+              left: 0,
+            }}
+            onClick={(event: any) => {
+              if (event.data) {
+                props.popTrackInformation(event.data.url);
+              }
+            }}
+            tooltip={(_d: any) => <></>}
+            yearSpacing={0}
+            monthSpacing={20}
+            monthBorderWidth={0}
+            monthBorderColor={color.monthBorderColor}
+            dayBorderWidth={0}
+            daySpacing={2}
+            dayBorderColor="#fff0"
+            legends={[
+              {
+                anchor: "bottom-right",
+                direction: "row",
+                translateY: 36,
+                itemCount: 4,
+                itemWidth: 42,
+                itemHeight: 36,
+                itemsSpacing: 14,
+                itemDirection: "right-to-left",
+              },
+            ]}
+          />
+        </Flex>
       </Flex>
     );
-  } else {
+  } else if (props.data) {
     return (
       <TypingAnimation
         w="100%"
@@ -70,5 +84,5 @@ export function HabitCalendar(props: any): any {
         }
       />
     );
-  }
+  } else return <></>;
 }
