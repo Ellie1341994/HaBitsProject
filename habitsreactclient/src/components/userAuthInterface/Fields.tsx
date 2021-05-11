@@ -14,10 +14,14 @@ import {
   TypingAnimation,
 } from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
-function PasswordInput(props: any): any {
+interface PIProps {
+  handleUserInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+function PasswordInput(props: PIProps) {
   const [show, setShow] = React.useState(false);
-  const changeVisibility = (event: any) => {
-    setShow(!show);
+  const changeVisibility = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ): void => {
     event.preventDefault();
     setShow(!show);
   };
@@ -58,7 +62,11 @@ function PasswordInput(props: any): any {
     </>
   );
 }
-function CustomInput(props: any) {
+interface CIProps {
+  type: string;
+  handleUserInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+function CustomInput(props: CIProps) {
   if (props.type === "password") {
     return <PasswordInput handleUserInput={props.handleUserInput} />;
   } else {
@@ -75,11 +83,15 @@ function CustomInput(props: any) {
     );
   }
 }
-export default function Fields(props: any) {
-  // props.fields = ["email", "username", "password"]
-  const fields: any = [];
+interface FProps {
+  formType: string;
+  fields: Array<string>;
+  handleUserInput: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+export default function Fields(props: FProps): any {
+  const fields: Array<any> = [];
   for (const field of props.fields) {
-    let inputControl: any = (
+    let inputControl = (
       <FormControl w="75%" mt="0" mb="2">
         <FormLabel
           fontSize={{ base: "10px", md: "14px" }}

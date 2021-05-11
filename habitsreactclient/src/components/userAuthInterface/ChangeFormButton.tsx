@@ -1,6 +1,12 @@
 import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
-export default function ChangeFormButton(props: any) {
+interface CFBProps {
+  formType: string;
+  switchFormType: (
+    event: React.MouseEvent<HTMLParagraphElement, MouseEvent>
+  ) => void;
+}
+export default function ChangeFormButton(props: CFBProps) {
   return (
     <TypingAnimation
       text={(props.formType === "Register" ? "Log In" : "Sign Up") + " instead"}

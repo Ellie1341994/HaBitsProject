@@ -1,7 +1,10 @@
 import { Heading, Flex } from "@chakra-ui/react";
 import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
-export default function FormTitle(props: any) {
+interface FTProps {
+  formTitle: string;
+}
+export default function FormTitle(props: FTProps) {
   return (
     <Flex
       justify="center"

@@ -11,7 +11,13 @@ import {
 import { Button, useColorModeValue, Flex } from "@chakra-ui/react";
 import { TypingAnimation } from "../miscellaneous/AnimatedChakraComponents";
 import React from "react";
-export default function AuthenticationFormButton(props: any) {
+interface AFBProps {
+  headerText: string;
+  bodyText: string;
+  name: string;
+  popOverHandler: Function;
+}
+export default function AuthenticationFormButton(props: AFBProps) {
   //const bgColorType: any = {dark: "#e77", light:"orange.200"}
   const bgColorType: { dark: string; light: string } = {
     dark: "#e77",
@@ -52,7 +58,7 @@ export default function AuthenticationFormButton(props: any) {
               backgroundColor={bgColor}
               borderRadius="2xl"
               borderBottom={borderValues}
-              onClick={(_event: any) => {
+              onClick={(_event: React.SyntheticEvent) => {
                 props.popOverHandler(setShouldOpen);
               }}
             >

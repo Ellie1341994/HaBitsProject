@@ -1,7 +1,10 @@
 import * as React from "react";
 import { AnimatedFlex } from "../miscellaneous/AnimatedChakraComponents";
 
-export default function AppTitleContainer(props: any) {
+interface ATCProps {
+  children: any;
+}
+export default function AppTitleContainer(props: ATCProps) {
   return (
     <AnimatedFlex
       h="100%"

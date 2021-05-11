@@ -10,18 +10,18 @@ import AuthenticationFormButton from "./AuthenticationFormButton";
 interface APState {
   formType: string;
   loggedIn: string | undefined;
-  formTitle: "Sign Up" | "Log In";
-  formActionButtonName: "Register" | "Enter";
+  formTitle: string;
+  formActionButtonName: string;
   messagesHeaderText: string;
   requestFeedbackMessages: string;
-  popInfo: any;
+  popInfo: undefined | boolean;
 }
 
 interface APProps {
-  setDisplayAuthPanel: any;
-  formInformation: any;
+  setDisplayAuthPanel: Function;
+  formInformation: { title: string; button: string; type: string };
   routeHistory: any;
-  setUserCredentials: any;
+  setUserCredentials: Function;
 }
 export default class AuthenticationForm extends React.Component<
   APProps,
@@ -51,7 +51,7 @@ export default class AuthenticationForm extends React.Component<
     const value: string = event.target.value;
     this.registerFields[field] = value;
   }
-  handleFormTypeChange(_event?: any) {
+  handleFormTypeChange(_event?: React.SyntheticEvent) {
     if (this.state.formType === "Register") {
       this.props.routeHistory.push("/login");
       this.setState({

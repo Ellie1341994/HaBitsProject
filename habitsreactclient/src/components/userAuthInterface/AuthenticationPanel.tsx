@@ -4,7 +4,10 @@ import { useState } from "react";
 import React from "react";
 import AuthenticationForm from "./AuthenticationForm";
 import { Route } from "react-router-dom";
-export default function AuthenticationPanel(props: any) {
+interface APProps {
+  setUserCredentials: Function;
+}
+export default function AuthenticationPanel(props: APProps) {
   const lightGradientColor: any = { c1: "#7928CA", c2: "#FF0080" };
   const darkGradientColor: any = { c1: "#788389", c2: "#A77" };
   const gradientColors: any = useColorModeValue(
