@@ -96,7 +96,7 @@ export class HabitCalendarInterface extends React.Component<any, any> {
   render() {
     return (
       <Flex
-        direction={{ base: "column", md: "row" }}
+        direction={{ base: "column-reverse", md: "row" }}
         justify="space-between"
         align="center"
         h={{ base: "40%", md: "30%" }}

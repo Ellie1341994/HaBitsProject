@@ -52,6 +52,8 @@ export class HabitCalendarTitle extends React.Component<any, any> {
           isTruncated={true}
           textAlign="center"
           variant="unstyled"
+          fontFamily="serif"
+          fontWeight="bold"
           onChange={(e: any) => this.handleChangeHabit(e.target.value)}
         >
           {this.makeOptions()}
