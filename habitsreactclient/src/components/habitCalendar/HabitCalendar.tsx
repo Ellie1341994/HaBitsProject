@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Flex, useColorModeValue, useMediaQuery } from "@chakra-ui/react";
 import {
-  AnimatedFlex,
   TypingAnimation,
 } from "../miscellaneous/AnimatedChakraComponents";
 import { Calendar } from "@nivo/calendar";

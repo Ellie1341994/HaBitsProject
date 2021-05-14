@@ -14,7 +14,7 @@ interface APState {
   formActionButtonName: string;
   messagesHeaderText: string;
   requestFeedbackMessages: string;
-  popInfo: undefined | boolean;
+  popInfo: undefined | Function | TimerHandler;
 }
 
 interface APProps {
@@ -99,7 +99,7 @@ export default class AuthenticationForm extends React.Component<
           requestFeedbackMessages: errorMessages,
         });
       });
-    setTimeout(this.state.popInfo, 250, true);
+    setTimeout(this.state.popInfo as TimerHandler, 250, true);
   }
   login(event: any) {
     event.preventDefault();
@@ -148,7 +148,7 @@ export default class AuthenticationForm extends React.Component<
           });
         }
       });
-    setTimeout(this.state.popInfo, 250, true);
+    setTimeout(this.state.popInfo as TimerHandler, 250, true);
   }
   setPopOverHandler(handlerCallback: any) {
     this.setState({ popInfo: handlerCallback });
