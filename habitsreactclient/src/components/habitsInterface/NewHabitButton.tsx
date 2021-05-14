@@ -1,21 +1,19 @@
 import * as React from "react";
-import { Flex, Link } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 
-import { BsPlus } from "react-icons/bs";
-export class NewHabitButton extends React.Component<any, any> {
-  render() {
-    return (
-      <Link
-        mb="1"
-        mr="1"
-        fontSize={{ base: "10px", md: "14px" }}
-        variant="unstyled"
-      >
-        <Flex direction="row" align="center" justifyContent="space-evenly">
-          <BsPlus />
-          New Habit
-        </Flex>
-      </Link>
-    );
-  }
+export function NewHabitButton(props: any) {
+  return (
+    <Button
+      m="1"
+      color="gray"
+      fontSize={{ base: "10px", md: "14px" }}
+      variant="unstyled"
+      _focus={undefined}
+      onClick={() => {
+        props.setOpen(true);
+      }}
+    >
+      New Habit
+    </Button>
+  );
 }
