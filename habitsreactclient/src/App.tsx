@@ -62,8 +62,10 @@ export class App extends React.Component<AppProps, AppState> {
       })
       .then((response) => {
         const userInfo: any = response.data.results[0];
+        console.log(userInfo);
         localStorage.setItem("userName", userInfo.username);
         localStorage.setItem("userId", userInfo.id);
+        localStorage.setItem("userURL", userInfo.url);
         let userTitle: string =
           userInfo.username[userInfo.username.length - 1] === "s"
             ? userInfo.username + "' "
