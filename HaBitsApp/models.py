@@ -25,7 +25,6 @@ class Habit(models.Model):
     Model that represents a user frequent activity
 
     Attributes:
-    frequency:  string -> Frequences.DAILY == 'D' | Frequences.WEEKLY == 'W' | Frequences.MONTHLY == 'M'
     startTime: datetime
     endTime: datetime
     dateCreated: datetime
@@ -35,25 +34,15 @@ class Habit(models.Model):
     user: User model entry id as ForeignKey
     name: string <= 25 characters
     """
-    class Frequences(models.TextChoices):
-        """
-        Habit class's enumeration
-        Defines time frames that describe how often a Habit is realized
-        """
-        DAILY = 'D', _('Daily')
-        WEEKLY = 'W', _('Weekly')
-        MONTHLY = 'M', _('Monthly')
-
     # Non-relational fields
         # Mutable
-    frequency = models.CharField(max_length=1, choices=Frequences.choices, default=Frequences.DAILY)
     # 24 hours clock
     startTime = models.DateTimeField()
     endTime = models.DateTimeField()
     dateEdited = models.DateTimeField(auto_now=True)
-    description = models.CharField(max_length=500,default='')
+    description = models.CharField(max_length=500, default='')
         # Inmutable
-    name = models.CharField(max_length=25)
+    name = models.CharField(max_length=25, unique=True)
     dateCreated = models.DateTimeField(auto_now_add=True)
     # Relational fields
     # Inmutable
