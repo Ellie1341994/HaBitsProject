@@ -30,7 +30,6 @@ class HabitSerializer(serializers.HyperlinkedModelSerializer):
                   "dateEdited",
                   "description",
                   "endTime",
-                  "frequency",
                   "name",
                   "startTime",
                   "tracks",

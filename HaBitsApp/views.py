@@ -54,7 +54,6 @@ class HabitViewSet(viewsets.ModelViewSet):
             for field in data:
                 if ( field in ['name', 'dateEdited', 'effectiveness', 'dateCreated', 'user']
                     or field not in [ 'description',
-                             'frequency',
                              'startTime',
                              'endTime' ]):
                     return False
