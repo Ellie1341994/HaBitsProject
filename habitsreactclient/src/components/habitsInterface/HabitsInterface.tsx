@@ -38,7 +38,7 @@ export class HabitsInterface extends React.Component<any, any> {
           direction="column"
         >
           <Habits data={this.state.habits} />
-          <HabitsMenu />
+          <HabitsMenu reloadCalendar={this.props.reloadCalendar} />
         </Flex>
       </Flex>
     );

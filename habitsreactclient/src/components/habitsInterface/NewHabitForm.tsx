@@ -47,7 +47,6 @@ function makeSelectionOf(list: any, label: string, namePrefix: string) {
   );
 }
 export function NewHabitForm(_props: any) {
-  const [message, setMessage] = React.useState("");
   const lightColors: any = {
     bgColor: "#fff",
     text: "#333",
@@ -74,6 +73,11 @@ export function NewHabitForm(_props: any) {
   ];
   const hours: number[] = new Array(24).fill("").map((_e, i) => i);
   const minutes: number[] = new Array(60).fill("").map((_e, i) => i);
+  const [userSubmitInformation, setUserSubmitInformation] = React.useState({
+    message: "",
+    color: "#65902f",
+    success: false,
+  });
   async function handleNewHabitSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const URL: string = "http://127.0.0.1:8000/habit/";
@@ -83,7 +87,11 @@ export function NewHabitForm(_props: any) {
       (form.EndHour.value === form.StartHour.value &&
         form.StartMinutes.value >= form.EndMinutes.value)
     ) {
-      setMessage("Error! Start or End time values are incorrect");
+      setUserSubmitInformation({
+        message: "Error! Start or End time values are incorrect",
+        color: "#933",
+        success: false,
+      });
       return undefined;
     }
     const present: Date = new Date();
@@ -114,12 +122,16 @@ export function NewHabitForm(_props: any) {
       name: form.habitName.value,
       user: localStorage.getItem("userURL"),
     };
-    console.log(startTime, endTime);
-    console.log(form.elements);
-    console.log(form.habitName);
     let response: any = await axios.post(URL, data, { headers: headers });
     console.log(response);
-    setMessage(form.habitName.value + " successfully created!");
+    if (response.status === 201) {
+      setUserSubmitInformation({
+        message: form.habitName.value + " successfully created!",
+        color: "#65902f",
+        success: true,
+      });
+      _props.reloadCalendar();
+    }
   }
   function makeTimeInputGridItems(
     callback: Function,
@@ -157,7 +169,11 @@ export function NewHabitForm(_props: any) {
     <Modal
       isOpen={_props.isOpen}
       onClose={() => {
-        setMessage("");
+        setUserSubmitInformation({
+          message: "",
+          color: "#65902f",
+          success: false,
+        });
         _props.setOpen(false);
       }}
     >
@@ -211,13 +227,15 @@ export function NewHabitForm(_props: any) {
           rounded="md"
           bgColor={bgColor}
         >
-          <Text>{message}</Text>
+          <Text color={userSubmitInformation.color}>
+            {userSubmitInformation.message}
+          </Text>
           <Button
             variant="unstyled"
             _focus={undefined}
             type="submit"
             form="habitForm"
-            disabled={message[0] === "T"}
+            disabled={userSubmitInformation.success}
           >
             Create
           </Button>
