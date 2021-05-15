@@ -24,7 +24,7 @@ export const ColorModeSwitcher: React.FC<ColorModeSwitcherProps> = (props) => {
     <IconButton
       id="changeColorModeButton"
       isDisabled={disable}
-      size="sm"
+      size="xs"
       fontSize="lg"
       variant="ghost"
       color="current"
@@ -32,7 +32,7 @@ export const ColorModeSwitcher: React.FC<ColorModeSwitcherProps> = (props) => {
       onClick={toggleColorMode}
       _active={{ bgColor: "none", border: "none" }}
       _focus={{ border: "none" }}
-      icon={<SwitchIcon />}
+      icon={<SwitchIcon size={window.innerHeight * 0.02} />}
       aria-label={`Switch to ${text} mode`}
       {...props}
     />
