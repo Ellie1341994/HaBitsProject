@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  useColorModeValue,
   Text,
   Flex,
   Modal,
@@ -12,6 +13,21 @@ import {
 } from "@chakra-ui/react";
 import { FaFrownOpen, FaGrinBeam, FaGrinTongue } from "react-icons/fa";
 export function CalendarModal(_props: any) {
+  const lightColors: any = {
+    bgColor: "#fff",
+    text: "#333",
+    gradient: { c1: "#7928CA", c2: "#FF0080", c3: "#bc14a5" },
+  };
+  const darkColors: any = {
+    bgColor: "#333",
+    text: "#fff",
+    gradient: { c1: "#788389", c2: "#A77", c3: "#927d80" },
+  };
+  let colorMode: any = useColorModeValue(lightColors, darkColors);
+  let gradient: string =
+    "linear(to-r," + colorMode.gradient.c1 + "," + colorMode.gradient.c2 + ")";
+  let textColor: any = colorMode.text;
+  let bgColor: any = colorMode.bgColor;
   let trackDate: string = _props.trackInformation?.dateCreated.substr(
     0,
     _props.trackInformation.dateCreated.indexOf("T")
@@ -31,41 +47,55 @@ export function CalendarModal(_props: any) {
   return (
     <Modal isOpen={_props.open} onClose={_props.setOpen}>
       <ModalOverlay />
-      <ModalContent w={{ base: "90%", md: "100%" }}>
-        <ModalHeader>Day Record Information</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody whiteSpace="pre-line">
-          <Flex p="4" justify="space-evenly">
+      <ModalContent
+        textColor={textColor}
+        bgGradient={gradient}
+        p="1"
+        w={{ base: "90%", md: "100%" }}
+      >
+        <ModalHeader rounded="md" bgColor={bgColor}>
+          <Flex p="0" justify="space-evenly">
+            <Text fontFamily="serif" fontSize={{ base: "md", md: "lg" }}>
+              Habit Daily Review
+            </Text>
             <FaFrownOpen
-              size="32"
-              opacity={setIconOpacity(
-                _props.trackInformation?.effectiveness,
-                "bad"
-              )}
+              size={"24"}
+              opacity={_props.trackInformation?.effectiveness === 1 ? 1 : 0.5}
+              color={
+                _props.trackInformation?.effectiveness === 1
+                  ? colorMode.gradient.c1
+                  : "black"
+              }
             />
             <FaGrinTongue
-              size="32"
-              opacity={setIconOpacity(
-                _props.trackInformation?.effectiveness,
-                "medium"
-              )}
+              size={"24"}
+              opacity={_props.trackInformation?.effectiveness === 2 ? 1 : 0.5}
+              color={
+                _props.trackInformation?.effectiveness === 2
+                  ? colorMode.gradient.c3
+                  : "black"
+              }
             />
             <FaGrinBeam
-              size="32"
-              opacity={setIconOpacity(
-                _props.trackInformation?.effectiveness,
-                "good"
-              )}
+              size={"24"}
+              opacity={_props.trackInformation?.effectiveness === 3 ? 1 : 0.5}
+              color={
+                _props.trackInformation?.effectiveness === 3
+                  ? colorMode.gradient.c2
+                  : "black"
+              }
             />
             <br />
           </Flex>
+        </ModalHeader>
+        <ModalCloseButton _focus={undefined} />
+        <ModalBody rounded="md" bgColor={bgColor} whiteSpace="pre-line">
           {_props.trackInformation?.note}
           <br />
-          <Text textAlign="right" w="100%" as="p">
-            On {trackDate}
-          </Text>
         </ModalBody>
-        <ModalFooter></ModalFooter>
+        <ModalFooter fontWeight="bold" rounded="md" bgColor={bgColor}>
+          On {trackDate}
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );
