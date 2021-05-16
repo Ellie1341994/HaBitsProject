@@ -122,15 +122,25 @@ export function NewHabitForm(_props: any) {
       name: form.habitName.value,
       user: localStorage.getItem("userURL"),
     };
-    let response: any = await axios.post(URL, data, { headers: headers });
-    console.log(response);
-    if (response.status === 201) {
+    try {
+      let response: any = await axios
+        .post(URL, data, { headers: headers })
+        .catch();
+      console.log(response);
+      if (response.status === 201) {
+        setUserSubmitInformation({
+          message: form.habitName.value + " successfully created!",
+          color: "#65902f",
+          success: true,
+        });
+        _props.reloadCalendar();
+      }
+    } catch (error) {
       setUserSubmitInformation({
-        message: form.habitName.value + " successfully created!",
-        color: "#65902f",
-        success: true,
+        message: "A " + error.response.data.name[0],
+        color: "#933",
+        success: false,
       });
-      _props.reloadCalendar();
     }
   }
   function makeTimeInputGridItems(
@@ -184,7 +194,7 @@ export function NewHabitForm(_props: any) {
         w={{ base: "90%", md: "100%" }}
         p="2"
       >
-        <ModalHeader rounded="md" bgColor={bgColor}>
+        <ModalHeader fontFamily="serif" rounded="md" bgColor={bgColor}>
           Habit
         </ModalHeader>
         <ModalCloseButton _focus={undefined} />
@@ -197,8 +207,9 @@ export function NewHabitForm(_props: any) {
         >
           <form onSubmit={handleNewHabitSubmit} name="habitForm" id="habitForm">
             <Input
+              rounded="md"
               required={true}
-              variant="unstyled"
+              variant="flushed"
               name="habitName"
               placeholder="Name"
               _placeholder={{ color: textColor }}
