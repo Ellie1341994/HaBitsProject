@@ -16,8 +16,8 @@ export class UserServices extends React.Component<any, any> {
   render() {
     return (
       <Flex width="100%" h="100%" direction="column" align="center">
-        <HabitCalendarInterface key={String(this.state.reloadCalendar)} />
-        <HabitsInterface reloadCalendar={this.setRealoadCalendar} />
+        <HabitCalendarInterface key={String(this.props.calendarReloadKey)} />
+        <HabitsInterface />
       </Flex>
     );
   }

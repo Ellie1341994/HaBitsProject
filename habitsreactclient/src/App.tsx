@@ -13,6 +13,7 @@ import AuthenticationPanelContainer from "./components/userAuthInterface/Authent
 import UserServicesContainer from "./components/UserServicesContainer";
 import { AppMenu } from "./components/AppMenu";
 import { BrowserRouter as Router } from "react-router-dom";
+import { HabitsMenu } from "./components/habitsInterface/HabitsMenu";
 interface AppState {
   headerTitle: string;
   authenticated: boolean;
@@ -22,6 +23,7 @@ interface AppState {
   appTitle: string;
   secondAppSectionWidth: string;
   horribleDoubleRenderSolution: boolean;
+  reloadCalendar: boolean;
 }
 interface AppProps {}
 
@@ -31,6 +33,7 @@ export class App extends React.Component<AppProps, AppState> {
     super(props);
     console.log("constructed");
     this.setUserCredentials = this.setUserCredentials.bind(this);
+    this.setRealoadCalendar = this.setRealoadCalendar.bind(this);
     this.logout = this.logout.bind(this);
     const isUserAuthenticated: boolean = localStorage.getItem("token") !== null;
     let userTitle: string = "";
@@ -51,9 +54,15 @@ export class App extends React.Component<AppProps, AppState> {
       authenticated: isUserAuthenticated,
       userTitle: userTitle,
       horribleDoubleRenderSolution: isUserAuthenticated,
+      reloadCalendar: false,
     };
   }
   URL: string = "http://127.0.0.1:8000";
+  setRealoadCalendar() {
+    this.setState((currentState: any, _currentProps: any) => {
+      return { reloadCalendar: !currentState.reloadCalendar };
+    });
+  }
   setUserCredentials(layOutChangeSpeed: number) {
     const userURL: string = this.URL + "/user/";
     axios
@@ -122,7 +131,9 @@ export class App extends React.Component<AppProps, AppState> {
               <AppMenu
                 displayAsUserMenu={this.state.authenticated}
                 logOutUser={this.logout}
-              />
+              >
+                <HabitsMenu reloadCalendar={this.setRealoadCalendar} />
+              </AppMenu>
               <Flex
                 direction={{
                   base: "column",
@@ -166,6 +177,7 @@ export class App extends React.Component<AppProps, AppState> {
                           hasRenderedTwice={
                             this.state.horribleDoubleRenderSolution
                           }
+                          calendarReloadKey={this.state.reloadCalendar}
                         />
                       </UserServicesContainer>
                     </>

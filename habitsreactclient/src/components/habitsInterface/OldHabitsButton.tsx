@@ -1,19 +1,18 @@
 import * as React from "react";
-import { Flex, Link } from "@chakra-ui/react";
-import { AiOutlineFile } from "react-icons/ai";
+import { Link } from "@chakra-ui/react";
 export class OldHabitsButton extends React.Component<any, any> {
   render() {
     return (
       <Link
-        mb="1"
-        mr="1"
+        _active={{ bgColor: "none", border: "none" }}
+        _focus={{ border: "none" }}
+        href=""
         fontSize={{ base: "10px", md: "14px" }}
-        variant="unstyled"
+        onClick={(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+          event?.preventDefault();
+        }}
       >
-        <Flex direction="row" align="center" justifyContent="space-evenly">
-          <AiOutlineFile />
-          Old Habits
-        </Flex>
+        Old Habits
       </Link>
     );
   }

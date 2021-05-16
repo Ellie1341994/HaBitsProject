@@ -21,7 +21,7 @@ export class AppMenu extends React.Component<any, any> {
         pos="absolute"
         right="1"
         fontSize={{ base: "10px", md: "14px" }}
-        w={{ base: "50%", md: "20%" }}
+        w={{ base: "100%", md: "35%" }}
         layout={true}
       >
         <AnimatePresence>
@@ -34,9 +34,10 @@ export class AppMenu extends React.Component<any, any> {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 justify="space-evenly"
-                w="85%"
+                w="100%"
                 as="span"
               >
+                {this.props.children}
                 <Link
                   _active={{ bgColor: "none", border: "none" }}
                   _focus={{ border: "none" }}
