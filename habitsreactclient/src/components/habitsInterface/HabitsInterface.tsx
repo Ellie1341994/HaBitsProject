@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Flex } from "@chakra-ui/react";
 import axios from "axios";
-import { HabitsMenu } from "./HabitsMenu";
 import { Habits } from "./Habits";
 
 export class HabitsInterface extends React.Component<any, any> {
@@ -12,17 +11,25 @@ export class HabitsInterface extends React.Component<any, any> {
     };
   }
   async componentDidMount() {
-    const habits: any = await this.getUserHabitList();
-    const state: any = { habits: habits };
-    this.setState(state);
+    try {
+      const habits: any = await this.getUserHabitList();
+      const state: any = { habits: habits };
+      this.setState(state);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getUserHabitList() {
-    const response: any = await axios.get("http://127.0.0.1:8000/habit", {
-      headers: { Authorization: "Token " + localStorage.getItem("token") },
-    });
-    let habits: any = response.data.results;
-    return habits;
+    try {
+      const response: any = await axios.get("http://127.0.0.1:8000/habit", {
+        headers: { Authorization: "Token " + localStorage.getItem("token") },
+      });
+      let habits: any = response.data.results;
+      return habits;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   render() {
@@ -38,7 +45,6 @@ export class HabitsInterface extends React.Component<any, any> {
           direction="column"
         >
           <Habits data={this.state.habits} />
-          <HabitsMenu reloadCalendar={this.props.reloadCalendar} />
         </Flex>
       </Flex>
     );
