@@ -32,10 +32,7 @@ export function UserServices(props: any) {
 
   return (
     <Flex width="100%" h="100%" direction="column" align="center">
-      <HabitCalendarInterface
-        liftUserHabitDataUp={setUserHabitData}
-        key={String(props.calendarReloadKey)}
-      />
+      <HabitCalendarInterface liftUserHabitDataUp={setUserHabitData} />
       <HabitsInterface
         themeProps={{
           gradient,

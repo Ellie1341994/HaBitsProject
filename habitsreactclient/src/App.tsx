@@ -156,7 +156,10 @@ export class App extends React.Component<AppProps, AppState> {
                     base: "100%",
                     md: this.state.secondAppSectionWidth,
                   }}
-                  h={{ base: "75%", md: "100%" }}
+                  h={{
+                    base: "75%",
+                    md: this.state.authenticated ? "75%" : "100%",
+                  }}
                 >
                   <AnimatePresence>
                     {!this.state.authenticated && (
@@ -178,6 +181,7 @@ export class App extends React.Component<AppProps, AppState> {
                             this.state.horribleDoubleRenderSolution
                           }
                           calendarReloadKey={this.state.reloadCalendar}
+                          key={String(this.state.reloadCalendar)}
                         />
                       </UserServicesContainer>
                     </>
