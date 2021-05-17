@@ -29,7 +29,11 @@ export class HabitCalendarInterface extends React.Component<any, any> {
   }
   baseURL = "http://127.0.0.1:8000";
   async componentDidMount() {
-    this.setHabitsData();
+    try {
+      this.setHabitsData();
+    } catch (error) {
+      console.log(error);
+    }
   }
   async setHabitsData(selectedHabit?: any) {
     let habits: any = undefined;
@@ -56,6 +60,7 @@ export class HabitCalendarInterface extends React.Component<any, any> {
       headers: { Authorization: "Token " + localStorage.getItem("token") },
     });
     let habits: any = response.data.results;
+    this.props.liftUserHabitDataUp(habits);
     return habits;
   }
   async getHabitData(habitId: number) {
