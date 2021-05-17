@@ -78,7 +78,7 @@ function AppHeading({ subText, userTitle }: any) {
       bgGradient={gradient}
       bgClip="text"
       as="h1"
-      fontSize={{ base: "18px", md: "54px" }}
+      fontSize={{ base: "32px", md: "54px" }}
       isTruncated={true}
       maxW="100%"
     >
