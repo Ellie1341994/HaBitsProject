@@ -83,9 +83,9 @@ export function NewHabitForm(_props: any) {
     const URL: string = "http://127.0.0.1:8000/habit/";
     const form: HTMLFormElement = event.target as HTMLFormElement;
     if (
-      form.EndHour.value < form.StartHour.value ||
+      form.EndHour.value > form.StartHour.value ||
       (form.EndHour.value === form.StartHour.value &&
-        form.StartMinutes.value >= form.EndMinutes.value)
+        form.StartMinutes.value <= form.EndMinutes.value)
     ) {
       setUserSubmitInformation({
         message: "Error! Start or End time values are incorrect",
