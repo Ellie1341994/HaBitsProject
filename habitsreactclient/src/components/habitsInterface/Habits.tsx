@@ -33,11 +33,11 @@ export function Habits(props: any) {
         <AnimatedBox
           key={habit.name}
           boxShadow="md"
-          w="100%"
+          w="95%"
           rounded="md"
           bgGradient={props.themeProps.gradient}
-          p="0.5"
-          m="0.5"
+          p="1"
+          m="1.5"
         >
           <AnimatedFlex
             textColor={props.themeProps.textColor}
@@ -89,18 +89,6 @@ export function Habits(props: any) {
               </Box>
               <AnimatedFlex rounded="md" w="100%" justify="flex-end">
                 <Button
-                  pr="1"
-                  pl="1"
-                  mr="1"
-                  ml="1"
-                  bgGradient={props.themeProps.altGradient}
-                  bgClip="text"
-                  variant="unstyled"
-                  size="xs"
-                >
-                  Check!
-                </Button>
-                <Button
                   size="xs"
                   variant="unstyled"
                   pr="1"
@@ -111,14 +99,16 @@ export function Habits(props: any) {
                   Edit
                 </Button>
                 <Button
-                  size="xs"
-                  variant="unstyled"
                   pr="1"
                   pl="1"
                   mr="1"
                   ml="1"
+                  bgGradient={props.themeProps.gradientText}
+                  bgClip="text"
+                  variant="unstyled"
+                  size="xs"
                 >
-                  Delete
+                  Daily Check!
                 </Button>
               </AnimatedFlex>
             </AnimatedFlex>
@@ -131,7 +121,9 @@ export function Habits(props: any) {
   }
   return (
     <>
-      <style>{".habitEntryTitle::first-letter { color: red;"}</style>
+      <style>
+        {".habitEntryTitle::first-letter {font-size: 1.5em; color: inherit;);}"}
+      </style>
       {components}
     </>
   );
