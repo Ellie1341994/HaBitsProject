@@ -7,6 +7,19 @@ import { Text, useColorModeValue } from "@chakra-ui/react";
 import { AnimatePresence } from "framer-motion";
 
 function AppHeading({ subText, userTitle }: any) {
+  const lightColors: any = {
+    bgColor: "#fff",
+    text: "#333",
+    gradient: { c1: "#7928CA", c2: "#FF0080" },
+  };
+  const darkColors: any = {
+    bgColor: "#333",
+    text: "#fff",
+    gradient: { c1: "#788389", c2: "#A77" },
+  };
+  let colorMode: any = useColorModeValue(lightColors, darkColors);
+  let gradient: string =
+    "linear(to-r," + colorMode.gradient.c1 + "," + colorMode.gradient.c2 + ")";
   const [animationType, setAnimationType] = React.useState(
     userTitle !== "" ? "standby" : "intro"
   );
@@ -62,16 +75,16 @@ function AppHeading({ subText, userTitle }: any) {
       exit={{ opacity: 0 }}
       variants={variants}
       fontFamily="serif"
+      bgGradient={gradient}
+      bgClip="text"
       as="h1"
-      mt="0"
-      mb="5"
-      fontSize={{ base: "18px", md: "36px" }}
+      fontSize={{ base: "18px", md: "54px" }}
       isTruncated={true}
       maxW="100%"
     >
       {userTitle?.replace(/^\w/, (fc: string) => fc.toUpperCase())}
       HaBits
-      <Text as="sub" fontSize="xs">
+      <Text color="#333" as="sub" fontSize="xs">
         {subText}
       </Text>
     </AnimatedHeading>

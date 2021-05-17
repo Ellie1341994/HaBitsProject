@@ -6,12 +6,10 @@ export default function AppTitleContainer(props: any) {
     <Flex
       direction="column"
       align="center"
-      justify={{
-        base: "flex-end",
-        md: props.displayAsUserTitle ? "flex-end" : "center",
-      }}
+      justify="flex-end"
       w="75%"
-      h="20%"
+      mt="10vh"
+      mb="2.5vh"
       textAlign="center"
       style={{ userSelect: "none" }}
     >
