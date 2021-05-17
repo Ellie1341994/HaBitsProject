@@ -38,20 +38,16 @@ export class HabitCalendarTitle extends React.Component<any, any> {
           w={{ base: "80%", md: "10%" }}
           m="0"
           p="0"
-          fontSize={{ base: "xs", md: "md" }}
-          value={
-            this.props.habitsList?.find(
-              (habit: any) => habit.name === this.props.text
-            ).id
-          }
+          fontSize={{ base: "md", md: "lg" }}
           defaultValue={
             this.props.habitsList?.find(
               (habit: any) => habit.name === this.props.text
             ).id
           }
+          textTransform="capitalize"
           isTruncated={true}
           textAlign="center"
-          variant="unstyled"
+          variant="outline"
           fontFamily="serif"
           fontWeight="bold"
           onChange={(e: any) => this.handleChangeHabit(e.target.value)}
