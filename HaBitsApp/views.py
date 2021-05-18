@@ -52,12 +52,8 @@ class HabitViewSet(viewsets.ModelViewSet):
             for the partial_update action are allowed to be modified or not
             """
             for field in data:
-                if ( field in ['name', 'dateEdited', 'effectiveness', 'dateCreated', 'user']
-                    or field not in [ 'description',
-                             'startTime',
-                             'endTime' ]):
+                if ( field in ['dateEdited', 'dateCreated', 'user']):
                     return False
-
             return True
 
         if ( self.action == 'create'
