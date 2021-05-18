@@ -1,10 +1,59 @@
 import * as React from "react";
+import axios from "axios";
 import { Text, Box, Button } from "@chakra-ui/react";
 import {
   AnimatedFlex,
   AnimatedBox,
 } from "../miscellaneous/AnimatedChakraComponents";
 import { HabitFormModal } from "./HabitFormModal";
+function DailyReviewButton(props: any) {
+  const habitDay: number = new Date(props.habitInfo.dateCreated).getDay();
+  const currentDay: number = new Date().getDay();
+  const habitIsToday: boolean = habitDay === currentDay;
+  const [show, setShow] = React.useState(
+    props.habitInfo?.tracks.length === 0 && habitIsToday
+  );
+  const headers: any = {
+    Authorization: "Token " + localStorage.getItem("token"),
+  };
+  React.useEffect(() => {
+    if (show === false) {
+      let todayDate: Date = new Date();
+      let today: string = todayDate
+        .toISOString()
+        .substr(0, todayDate.toISOString().indexOf("T"));
+      axios
+        .get(props.habitInfo?.tracks[0], { headers: headers })
+        .then((response) => {
+          let trackDate: string = response.data.dateCreated.substr(
+            0,
+            response.data.dateCreated.indexOf("T")
+          );
+          setShow(trackDate !== today && habitIsToday);
+        })
+        .catch((e) => console.log(e));
+    }
+  });
+  if (show) {
+    return (
+      <Button
+        _focus={{ border: "none" }}
+        pr="1"
+        pl="1"
+        mr="1"
+        ml="1"
+        bgGradient={props.themeProps.gradientText}
+        bgClip="text"
+        variant="unstyled"
+        size="xs"
+      >
+        Daily Check!
+      </Button>
+    );
+  } else {
+    return <></>;
+  }
+}
 export function Habits(props: any) {
   const habits: any = props.data;
   const [
@@ -21,7 +70,6 @@ export function Habits(props: any) {
   }
   const components: any = [];
   if (habits) {
-    let index: number = 0;
     let getHabitTime: Function = (date: string) =>
       new Date(date).toLocaleTimeString([], {
         hour: "2-digit",
@@ -40,6 +88,7 @@ export function Habits(props: any) {
       let habitStartTime: string = getHabitTime(habit.startTime);
       let habitEndTime: string = getHabitTime(habit.endTime);
       let habitDay: string = days[new Date(habit.endTime).getDay()];
+      console.log(habit);
       const habitComponent: any = (
         <AnimatedBox
           key={habit.name}
@@ -111,26 +160,16 @@ export function Habits(props: any) {
                 >
                   Edit
                 </Button>
-                <Button
-                  _focus={{ border: "none" }}
-                  pr="1"
-                  pl="1"
-                  mr="1"
-                  ml="1"
-                  bgGradient={props.themeProps.gradientText}
-                  bgClip="text"
-                  variant="unstyled"
-                  size="xs"
-                >
-                  Daily Check!
-                </Button>
+                <DailyReviewButton
+                  habitInfo={habit}
+                  themeProps={props.themeProps}
+                />
               </AnimatedFlex>
             </AnimatedFlex>
           </AnimatedFlex>
         </AnimatedBox>
       );
       components.push(habitComponent);
-      index++;
     }
   }
   return (
