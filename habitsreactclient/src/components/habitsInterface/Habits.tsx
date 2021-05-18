@@ -1,13 +1,24 @@
 import * as React from "react";
-import { Text, Box, Button, Link, Grid, GridItem } from "@chakra-ui/react";
+import { Text, Box, Button } from "@chakra-ui/react";
 import {
   AnimatedFlex,
   AnimatedBox,
-  TypingAnimation,
 } from "../miscellaneous/AnimatedChakraComponents";
+import { HabitFormModal } from "./HabitFormModal";
 export function Habits(props: any) {
   const habits: any = props.data;
-  console.log(habits);
+  const [
+    formModalDisplayInformation,
+    setFormModalDisplayInformation,
+  ] = React.useState({ isOpen: false, type: "default", url: "", name: "" });
+  function closeModal() {
+    setFormModalDisplayInformation({
+      isOpen: false,
+      type: "default",
+      url: "",
+      name: "",
+    });
+  }
   const components: any = [];
   if (habits) {
     let index: number = 0;
@@ -77,15 +88,7 @@ export function Habits(props: any) {
                 </Text>
               </AnimatedFlex>
               <Box rounded="md" whiteSpace="initial">
-                <Text p="1">
-                  {(() => {
-                    let a: string = "";
-                    for (let i = 0; i < 500; i++) {
-                      a = i % 10 === 0 ? a + " " : a + "t";
-                    }
-                    return a; //habit.description;
-                  })()}
-                </Text>
+                <Text p="1"> {habit.description} </Text>
               </Box>
               <AnimatedFlex rounded="md" w="100%" justify="flex-end">
                 <Button
@@ -95,10 +98,21 @@ export function Habits(props: any) {
                   pl="1"
                   mr="1"
                   ml="1"
+                  _focus={{ border: "none" }}
+                  onClick={(event: any) => {
+                    event.preventDefault();
+                    setFormModalDisplayInformation({
+                      isOpen: true,
+                      type: "Edit",
+                      url: habit.url,
+                      name: habit.name,
+                    });
+                  }}
                 >
                   Edit
                 </Button>
                 <Button
+                  _focus={{ border: "none" }}
                   pr="1"
                   pl="1"
                   mr="1"
@@ -121,6 +135,14 @@ export function Habits(props: any) {
   }
   return (
     <>
+      <HabitFormModal
+        reloadUS={props.setReloadUserServices}
+        isOpen={formModalDisplayInformation.isOpen}
+        url={formModalDisplayInformation.url}
+        type={formModalDisplayInformation.type}
+        name={formModalDisplayInformation.name}
+        setOpen={closeModal}
+      />
       <style>
         {".habitEntryTitle::first-letter {font-size: 1.5em; color: inherit;);}"}
       </style>
