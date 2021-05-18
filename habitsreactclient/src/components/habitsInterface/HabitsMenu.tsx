@@ -1,18 +1,19 @@
 import * as React from "react";
 import { NewHabitButton } from "./NewHabitButton";
-import { OldHabitsButton } from "./OldHabitsButton";
-import { NewHabitForm } from "./NewHabitForm";
+import { HabitFormModal } from "./HabitFormModal";
 export function HabitsMenu(props: any) {
   const [showForm, setShowForm] = React.useState(false);
   return (
     <>
-      <NewHabitForm
-        reloadCalendar={props.reloadCalendar}
+      <NewHabitButton setOpen={setShowForm} />
+      <HabitFormModal
+        reloadUS={props.reloadUS}
         isOpen={showForm}
         setOpen={setShowForm}
+        url={""}
+        type={"Create"}
+        name={"Habit"}
       />
-      <NewHabitButton setOpen={setShowForm} />
-      <OldHabitsButton />
     </>
   );
 }
