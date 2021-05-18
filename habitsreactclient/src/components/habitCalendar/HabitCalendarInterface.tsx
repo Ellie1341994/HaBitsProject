@@ -46,9 +46,11 @@ export class HabitCalendarInterface extends React.Component<any, any> {
       habit = habits[randomNumber];
       updatedState["habits"] = habits;
     }
+    let currentYearDate: number = new Date().getFullYear();
     const habitData: any = await this.getHabitData(habit.id);
-    const firstDate: string = habitData[habitData.length - 1]?.day;
-    const lastDate: string = habitData[0]?.day;
+    const firstDate: string =
+      habitData[habitData.length - 1]?.day ?? currentYearDate + "-01-02";
+    const lastDate: string = habitData[0]?.day ?? currentYearDate + "-12-31";
     updatedState["habitData"] = habitData;
     updatedState["startDate"] = firstDate;
     updatedState["endDate"] = lastDate;
@@ -121,12 +123,14 @@ export class HabitCalendarInterface extends React.Component<any, any> {
               : "You need HaBits!"
           }
         />
-        <HabitCalendar
-          popTrackInformation={this.popTrackInformation}
-          startDate={this.state.startDate}
-          endDate={this.state.endDate}
-          data={this.state.habitData}
-        />
+        {true && (
+          <HabitCalendar
+            popTrackInformation={this.popTrackInformation}
+            startDate={this.state.startDate}
+            endDate={this.state.endDate}
+            data={this.state.habitData}
+          />
+        )}
       </Flex>
     );
   }

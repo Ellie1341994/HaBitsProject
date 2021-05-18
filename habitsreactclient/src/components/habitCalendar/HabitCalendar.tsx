@@ -19,6 +19,9 @@ export function HabitCalendar(props: any): any {
   const lightColors: any = ["#7928CA", "#bc14a5", "#FF0080"];
   const entryColor: string[] = useColorModeValue(lightColors, darkColors);
   const [isWLessThan600] = useMediaQuery("(max-width: 600px)");
+  const calendarWidth: number = isWLessThan600
+    ? window.innerWidth * 3
+    : window.innerWidth * 0.8;
   //console.log(props.data);
   return (
     <Flex
@@ -29,24 +32,24 @@ export function HabitCalendar(props: any): any {
       w={{ base: "100%", md: "90%" }}
     >
       <Calendar
-        width={isWLessThan600 ? window.innerWidth * 3 : window.innerWidth * 0.8}
+        width={calendarWidth}
         height={150}
         theme={{ textColor: color.textColor }}
         data={props.data ? props.data : []}
-        from={props.startDate ?? new Date().getFullYear() + "-01-02"}
-        to={props.endDate ?? new Date().getFullYear() + "-11-31"}
+        from={props.startDate}
+        to={props.endDate}
         minValue={1}
         maxValue={3}
         emptyColor={"#eee0"}
         colors={entryColor}
         margin={{
-          top: window.innerHeight * 0.01,
+          top: 5,
           right: 0,
           bottom: 1,
           left: 50,
         }}
         onClick={(event: any) => {
-          if (event.data) {
+          if (event?.data) {
             props.popTrackInformation(event.data.url);
           }
         }}
