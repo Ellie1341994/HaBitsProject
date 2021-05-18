@@ -23,7 +23,7 @@ interface AppState {
   appTitle: string;
   secondAppSectionWidth: string;
   horribleDoubleRenderSolution: boolean;
-  reloadCalendar: boolean;
+  reloadUserServices: boolean;
 }
 interface AppProps {}
 
@@ -33,7 +33,7 @@ export class App extends React.Component<AppProps, AppState> {
     super(props);
     console.log("constructed");
     this.setUserCredentials = this.setUserCredentials.bind(this);
-    this.setRealoadCalendar = this.setRealoadCalendar.bind(this);
+    this.setReloadUserServices = this.setReloadUserServices.bind(this);
     this.logout = this.logout.bind(this);
     const isUserAuthenticated: boolean = localStorage.getItem("token") !== null;
     let userTitle: string = "";
@@ -54,13 +54,13 @@ export class App extends React.Component<AppProps, AppState> {
       authenticated: isUserAuthenticated,
       userTitle: userTitle,
       horribleDoubleRenderSolution: isUserAuthenticated,
-      reloadCalendar: false,
+      reloadUserServices: false,
     };
   }
   URL: string = "http://127.0.0.1:8000";
-  setRealoadCalendar() {
+  setReloadUserServices() {
     this.setState((currentState: any, _currentProps: any) => {
-      return { reloadCalendar: !currentState.reloadCalendar };
+      return { reloadUserServices: !currentState.reloadUserServices };
     });
   }
   setUserCredentials(layOutChangeSpeed: number) {
@@ -132,7 +132,7 @@ export class App extends React.Component<AppProps, AppState> {
                 displayAsUserMenu={this.state.authenticated}
                 logOutUser={this.logout}
               >
-                <HabitsMenu reloadCalendar={this.setRealoadCalendar} />
+                <HabitsMenu reloadUS={this.setReloadUserServices} />
               </AppMenu>
               <Flex
                 direction={{
@@ -157,8 +157,8 @@ export class App extends React.Component<AppProps, AppState> {
                     md: this.state.secondAppSectionWidth,
                   }}
                   h={{
-                    base: "75%",
-                    md: this.state.authenticated ? "75%" : "100%",
+                    base: "65%",
+                    md: this.state.authenticated ? "70%" : "100%",
                   }}
                 >
                   <AnimatePresence>
@@ -180,8 +180,8 @@ export class App extends React.Component<AppProps, AppState> {
                           hasRenderedTwice={
                             this.state.horribleDoubleRenderSolution
                           }
-                          calendarReloadKey={this.state.reloadCalendar}
-                          key={String(this.state.reloadCalendar)}
+                          key={String(this.state.reloadUserServices)}
+                          setReloadUserServices={this.setReloadUserServices}
                         />
                       </UserServicesContainer>
                     </>
