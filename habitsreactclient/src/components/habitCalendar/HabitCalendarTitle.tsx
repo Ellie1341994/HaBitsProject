@@ -39,7 +39,7 @@ export class HabitCalendarTitle extends React.Component<any, any> {
           m="0"
           p="0"
           fontSize={{ base: "md", md: "lg" }}
-          defaultValue={
+          value={
             this.props.habitsList?.find(
               (habit: any) => habit.name === this.props.text
             ).id
