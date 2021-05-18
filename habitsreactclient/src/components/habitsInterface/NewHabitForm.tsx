@@ -78,7 +78,7 @@ export function NewHabitForm(_props: any) {
     color: "#65902f",
     success: false,
   });
-  async function handleNewHabitSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const URL: string = "http://127.0.0.1:8000/habit/";
     const form: HTMLFormElement = event.target as HTMLFormElement;
@@ -137,7 +137,7 @@ export function NewHabitForm(_props: any) {
       }
     } catch (error) {
       setUserSubmitInformation({
-        message: "A " + error.response.data.name[0],
+        message: error.response.data.name[0],
         color: "#933",
         success: false,
       });
@@ -205,7 +205,7 @@ export function NewHabitForm(_props: any) {
           alignItems="center"
           whiteSpace="pre-line"
         >
-          <form onSubmit={handleNewHabitSubmit} name="habitForm" id="habitForm">
+          <form onSubmit={handleFormSubmit} name="habitForm" id="habitForm">
             <Input
               rounded="md"
               required={true}
@@ -238,7 +238,7 @@ export function NewHabitForm(_props: any) {
           rounded="md"
           bgColor={bgColor}
         >
-          <Text color={userSubmitInformation.color}>
+          <Text textTransform="capitalize" color={userSubmitInformation.color}>
             {userSubmitInformation.message}
           </Text>
           <Button
