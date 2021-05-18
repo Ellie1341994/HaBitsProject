@@ -7,9 +7,9 @@ export class HabitsInterface extends React.Component<any, any> {
     return (
       <Flex
         position="relative"
-        h={"80%"}
+        h={"75%"}
         w="100%"
-        align="center"
+        align="flex-end"
         justify="center"
       >
         <Flex
@@ -21,6 +21,7 @@ export class HabitsInterface extends React.Component<any, any> {
           align="center"
         >
           <Habits
+            setReloadUserServices={this.props.setReloadUserServices}
             themeProps={this.props.themeProps}
             data={this.props.userHabitData}
           />
