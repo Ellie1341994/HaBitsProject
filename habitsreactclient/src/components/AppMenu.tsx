@@ -9,7 +9,11 @@ export function AppMenu(props: any): any {
       fontFamily="serif"
       bgColor={useColorModeValue("#fcf6ef", "gray.800")}
       zIndex="2"
-      justify={props.displayAsUserMenu ? "space-evenly" : "flex-end"}
+      justify={
+        props.displayAsUserMenu && window.innerWidth <= 600
+          ? "space-evenly"
+          : "flex-end"
+      }
       align="center"
       position={props.displayAsUserMenu ? "fixed" : "absolute"}
       top="0"
@@ -28,7 +32,7 @@ export function AppMenu(props: any): any {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               justify="space-evenly"
-              w="80%"
+              w={{ base: "66%", md: "50%" }}
               as="span"
             >
               {props.children}
@@ -39,14 +43,6 @@ export function AppMenu(props: any): any {
                 onClick={props.logOutUser}
               >
                 Logout
-              </Link>
-              <Link
-                _active={{ bgColor: "none", border: "none" }}
-                _focus={{ border: "none" }}
-                href="instructions"
-                onClick={(e) => e.preventDefault()}
-              >
-                Instructions
               </Link>
             </AnimatedFlex>
           </>
