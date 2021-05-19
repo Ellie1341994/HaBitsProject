@@ -100,10 +100,12 @@ git clone https://github.com/Ellie1341994/HaBitsProject HaBitsProject
 cd HaBitsProject
 pip3 install --user pipenv
 pipenv shell
+```
+```
 pipenv install --dev
-./manage migrate
-./manage testData
-cd ../habitsreactclient
+./manage.py migrate
+./manage.py testData
+cd habitsreactclient
 npm install --include=dev
 ```
 In order to run the server in dev mode execute (assuming you're in the HaBitsProject directory)
