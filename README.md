@@ -139,4 +139,4 @@ npm run start
 
 ## Other
 - This project was started as the capstone assignment of [CS50 Web Programming with Python and JavaScrpt course](https://www.edx.org/course/cs50s-web-programming-with-python-and-javascript). Special thanks to Peter that I met on this course who helped me build this App
-- This project was particuarly distinct from all the other previous assignments I had to do in the course because the scope of the project was up to me with few technological constraints thus allowwing me to pursue whatever I might be interested in learning besides Django which I pretty much did by implementing React Framework algon several of its dependencies along with a lot of other complementary stuff such as Tailwind CSS, etc.
+- This project was particuarly distinct from all the other previous assignments I had to do in the course because the scope of the project was up to me with few technological constraints thus allowing me to pursue whatever I might be interested in learning besides Django which I pretty much did by implementing React Framework plus several of its dependencies along with a lot of other complementary stuff such as Tailwind CSS, etc.
