@@ -1,4 +1,4 @@
-# HaBits - W.I.P
+# HaBits 
 ## Introduction
 HaBits is a Web Application that can help you build habits and track data related to them
 
@@ -17,13 +17,13 @@ Finally, the Calendar entries are all clickable and will display more informatio
 - [Demonstrations On YouTube](https://www.youtube.com/playlist?list=PL5-tfLwc7d7HnUji9f3UjgYvCu4KNwOsT)
     <div>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p1.png?raw=true">
-    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p1.png?raw=true" width="20%"/>
+    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p1.png?raw=true" width="25%"/>
 </a>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p2.png?raw=true">
-    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p2.png?raw=true" width="20%"/>
+    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p2.png?raw=true" width="25%"/>
 </a>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p3.png?raw=true">
-    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p3.png?raw=true" width="20%"/>
+    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p3.png?raw=true" width="25%"/>
 </a>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p4.png?raw=true">
     <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p4.png?raw=true" width="20%"/>
@@ -31,16 +31,16 @@ Finally, the Calendar entries are all clickable and will display more informatio
 <div>
     <div>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p7.png?raw=true">
-    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p7.png?raw=true" width="20%"/>
+    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p7.png?raw=true" width="25%"/>
 </a>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p6.png?raw=true">
-    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p6.png?raw=true" width="20%"/>
+    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p6.png?raw=true" width="25%"/>
 </a>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p5.png?raw=true">
-    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p5.png?raw=true" width="20%"/>
+    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p5.png?raw=true" width="25%"/>
 </a>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p8.png?raw=true">
-    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p8.png?raw=true" width="20%"/>
+    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p8.png?raw=true" width="25%"/>
 </a>
 <div>
 
