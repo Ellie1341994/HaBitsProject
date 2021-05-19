@@ -42,7 +42,7 @@ class Habit(models.Model):
     dateEdited = models.DateTimeField(auto_now=True)
     description = models.CharField(max_length=500, default='')
         # Inmutable
-    name = models.CharField(max_length=25, unique=True)
+    name = models.CharField(max_length=25)
     dateCreated = models.DateTimeField(auto_now_add=True)
     # Relational fields
     # Inmutable

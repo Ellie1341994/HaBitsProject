@@ -39,6 +39,7 @@ class Command(BaseCommand):
             for data in habitsData:
                 try:
                     h = Habit.objects.create(name=data[habitName],
+                                             description="Test description for " + data[habitName],
                                          startTime=initialDate + timedelta(days=data[dayOffset]),
                                          endTime=initialDate + timedelta(days=data[dayOffset], hours=1, minutes=30),
                                          user=user

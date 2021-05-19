@@ -403,6 +403,7 @@ export function HabitFormModal(_props: any) {
             )}
             {_props.type === "Review" && <EffectivenessIcons />}
             <Textarea
+              required={true}
               mt="1"
               variant="outline"
               name={

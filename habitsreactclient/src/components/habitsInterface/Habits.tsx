@@ -17,7 +17,7 @@ function DailyReviewButton(props: any) {
     Authorization: "Token " + localStorage.getItem("token"),
   };
   React.useEffect(() => {
-    if (show === false) {
+    if (show === false && props.habitInfo?.tracks[0]) {
       let todayDate: Date = new Date();
       let today: string = todayDate
         .toISOString()
@@ -99,7 +99,7 @@ export function Habits(props: any) {
       let habitDay: string = days[new Date(habit.endTime).getDay()];
       const habitComponent: any = (
         <AnimatedBox
-          key={habit.name}
+          key={habit.name + habit.id}
           boxShadow="md"
           w="95%"
           rounded="md"

@@ -23,6 +23,7 @@ function AppHeading({ subText, userTitle }: any) {
   const [animationType, setAnimationType] = React.useState(
     userTitle !== "" ? "standby" : "intro"
   );
+  const textColor: string = colorMode.text;
   const variants: any = {
     intro: {
       y: "-50vh",
@@ -84,7 +85,7 @@ function AppHeading({ subText, userTitle }: any) {
     >
       {userTitle?.replace(/^\w/, (fc: string) => fc.toUpperCase())}
       HaBits
-      <Text color="#333" as="sub" fontSize="xs">
+      <Text color={textColor} as="sub" fontSize="xs">
         {subText}
       </Text>
     </AnimatedHeading>
