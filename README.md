@@ -104,7 +104,7 @@ cd HaBitsProject
 ./manage migrate
 ./manage testData
 cd ../habitsreactclient
-npm install
+npm install --include=dev
 ```
 In order to run the server in dev mode execute (assuming you're in the HaBitsProject directory)
 ```
