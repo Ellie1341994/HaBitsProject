@@ -99,8 +99,8 @@ In Linux Ubuntu 20 with Python 3.8.5 and git installed, run the following comman
 git clone https://github.com/Ellie1341994/HaBitsProject HaBitsProject
 cd HaBitsProject
 pip3 install --user pipenv
+pipenv shell
 pipenv install --dev
-cd HaBitsProject
 ./manage migrate
 ./manage testData
 cd ../habitsreactclient
