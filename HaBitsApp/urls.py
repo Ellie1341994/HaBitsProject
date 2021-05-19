@@ -6,7 +6,7 @@ from .views import HabitViewSet, UserViewSet, TrackViewSet
 router = DefaultRouter()
 router.register(r'habit', HabitViewSet)
 router.register(r'user', UserViewSet)
-router.register(r'trace', TrackViewSet)
+router.register(r'track', TrackViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
