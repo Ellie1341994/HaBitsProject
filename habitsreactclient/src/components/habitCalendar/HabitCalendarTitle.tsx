@@ -42,7 +42,7 @@ export class HabitCalendarTitle extends React.Component<any, any> {
           value={
             this.props.habitsList?.find(
               (habit: any) => habit.name === this.props.text
-            ).id
+            )?.id
           }
           textTransform="capitalize"
           isTruncated={true}

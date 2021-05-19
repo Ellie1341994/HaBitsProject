@@ -47,7 +47,7 @@ export class HabitCalendarInterface extends React.Component<any, any> {
       updatedState["habits"] = habits;
     }
     let currentYearDate: number = new Date().getFullYear();
-    const habitData: any = await this.getHabitData(habit.id);
+    const habitData: any = await this.getHabitData(habit?.id);
     const firstDate: string =
       habitData[habitData.length - 1]?.day ?? currentYearDate + "-01-02";
     const lastDate: string = habitData[0]?.day ?? currentYearDate + "-12-31";
@@ -66,9 +66,12 @@ export class HabitCalendarInterface extends React.Component<any, any> {
     return habits;
   }
   async getHabitData(habitId: number) {
+    if (habitId === undefined) {
+      return [];
+    }
     let tracksData: any = [];
     const response = await axios.get(
-      this.baseURL + "/trace/" + habitId + "/getHabitTracks",
+      this.baseURL + "/track/" + habitId + "/getHabitTracks",
       {
         headers: { Authorization: "Token " + localStorage.getItem("token") },
       }
