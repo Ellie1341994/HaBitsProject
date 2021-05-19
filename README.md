@@ -3,15 +3,15 @@
 HaBits is a Web Application that can help you build habits and track data related to them
 
 ## Features
-- Efficient routine overview
-- Easy HaBits tracking
-- Tracked data visualization
+- Habits tracking by daily reviews
+- Habit reviews easily visualized
 - Responsive behaviour
-- Beautiful Design
+- Clean and attractive Design
 - Light and Dark Mode
 
 ## Description
-- W.I.P
+The HaBits Web Aplication allows to store chronological information about one's habit by reviewing the day that that habit was scheduled. The stored data can be visualized on a Calendar Panel whose entries are colored by how the user had described its humour at the time of the habit review.
+Finally, the Calendar entries are all clickable and will display more information about that particular review.
 
 ## Application Previews
 - [Demonstrations On YouTube](https://www.youtube.com/playlist?list=PL5-tfLwc7d7HnUji9f3UjgYvCu4KNwOsT)
@@ -22,10 +22,16 @@ In order to be able to take advantage of the Application features
 an account is needed.
 To create an account you need a username, a password and a third-party e-mail provider. You
 can do so, by clicking on the link named "Sign Up instead" at the bottom of the form, which will show the Sign Up form.
-Once an account is created it can be accessed to start adding and tracking habits in addition to make use of the graphic chart to visualize a habits data
+Once an account is created it can be accessed to start adding and tracking habits in addition to make use of the graphical calendar to visualize a habits data
 
 ### Application Installation for Developers
-W.I.P
+In Linux Ubuntu 20 run the following commands in the directory you want the project on
+clone https://github.com/Ellie1341994/HaBitsProject/tree/main/HaBitsProject HaBitsProject
+cd HaBitsProject
+
+
+
+
 
 ## Technologies used to build this Web Application
 ### Server Side
