@@ -70,7 +70,13 @@ export class App extends React.Component<AppProps, AppState> {
         headers: { Authorization: "Token " + localStorage.getItem("token") },
       })
       .then((response) => {
-        const userInfo: any = response.data.results[0];
+        let userInfo: any = undefined;
+        for (let user of response.data.results) {
+          if (user.username === localStorage.getItem("userName")) {
+            userInfo = user;
+            break;
+          }
+        }
         console.log(userInfo);
         localStorage.setItem("userName", userInfo.username);
         localStorage.setItem("userId", userInfo.id);
@@ -101,7 +107,7 @@ export class App extends React.Component<AppProps, AppState> {
   }
   logout(e: any) {
     e.preventDefault();
-    for (let information of ["token", "userName", "id"]) {
+    for (let information of ["token", "userName", "id", "userURL"]) {
       localStorage.removeItem(information);
     }
     this.setState({
