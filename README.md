@@ -26,7 +26,7 @@ Finally, the Calendar entries are all clickable and will display more informatio
     <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p3.png?raw=true" width="25%"/>
 </a>
 <a href="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p4.png?raw=true">
-    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p4.png?raw=true" width="20%"/>
+    <img src="https://github.com/Ellie1341994/HaBitsProject/blob/main/AppScreenshots/p4.png?raw=true" width="25%"/>
 </a>
 <div>
     <div>
