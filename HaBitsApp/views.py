@@ -29,6 +29,8 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         UserViewSet method that sets each action permission:
         """
+        if self.action == 'list':
+            self.permission_classes = [permissions.IsAdminUser]
         if self.action == 'create' or '/user/' in self.request.path:
             self.permission_classes = [permissions.AllowAny]
         else:

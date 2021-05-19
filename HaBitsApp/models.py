@@ -78,7 +78,6 @@ class Track(models.Model):
     state = models.CharField(max_length=1, choices=Status.choices, default=Status.PENDING)
     note = models.CharField(max_length=300,default='')
     effectiveness = models.IntegerField(default=0 , validators=[MinValueValidator(1), MaxValueValidator(3)])
-
     # Relational fields
     habit = models.ForeignKey(Habit, on_delete=models.CASCADE, related_name="tracks")
     class Meta:
