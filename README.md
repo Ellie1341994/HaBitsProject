@@ -25,9 +25,11 @@ can do so, by clicking on the link named "Sign Up instead" at the bottom of the 
 Once an account is created it can be accessed to start adding and tracking habits in addition to make use of the graphical calendar to visualize a habits data
 
 ### Application Installation for Developers
-In Linux Ubuntu 20 run the following commands in the directory you want the project on
-clone https://github.com/Ellie1341994/HaBitsProject/tree/main/HaBitsProject HaBitsProject
+In Linux Ubuntu 20 with Python 3.8.5 installed, run the following commands in the directory you want the project on
+```
+clone https://github.com/Ellie1341994/HaBitsProject HaBitsProject
 cd HaBitsProject
+```
 
 
 
