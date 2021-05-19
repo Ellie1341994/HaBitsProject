@@ -104,7 +104,7 @@ export default class AuthenticationForm extends React.Component<
   login(event: any) {
     event.preventDefault();
     const loginURL: string = this.URL + "/login/";
-    const userListURL = this.URL + "/user/";
+    //const userListURL = this.URL + "/user/";
     const postData = {
       username: this.registerFields.username,
       password: this.registerFields.password1,
@@ -120,7 +120,8 @@ export default class AuthenticationForm extends React.Component<
             requestFeedbackMessages: "Successfully logged in",
           });
           localStorage.setItem("token", token);
-          axios
+          localStorage.setItem("userName", this.registerFields.username);
+          /*axios
             .get(userListURL, {
               headers: {
                 Authorization: "Token " + token,
@@ -128,6 +129,7 @@ export default class AuthenticationForm extends React.Component<
             })
             .then((response) => console.log(response.data))
             .catch((e) => console.log(e));
+           */
           setTimeout(() => {
             this.props.setUserCredentials(1000);
           }, 1000);
