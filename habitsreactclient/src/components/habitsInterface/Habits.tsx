@@ -7,7 +7,7 @@ import {
 } from "../miscellaneous/AnimatedChakraComponents";
 import { HabitFormModal } from "./HabitFormModal";
 function DailyReviewButton(props: any) {
-  const habitDay: number = new Date(props.habitInfo.dateCreated).getDay();
+  const habitDay: number = new Date(props.habitInfo.startTime).getDay();
   const currentDay: number = new Date().getDay();
   const habitIsToday: boolean = habitDay === currentDay;
   const [show, setShow] = React.useState(
@@ -37,6 +37,15 @@ function DailyReviewButton(props: any) {
   if (show) {
     return (
       <Button
+        onClick={(event: any) => {
+          event.preventDefault();
+          props.setFormModalDisplayInformation({
+            isOpen: true,
+            type: "Review",
+            url: props.habitInfo.url,
+            name: props.habitInfo.name,
+          });
+        }}
         _focus={{ border: "none" }}
         pr="1"
         pl="1"
@@ -88,7 +97,6 @@ export function Habits(props: any) {
       let habitStartTime: string = getHabitTime(habit.startTime);
       let habitEndTime: string = getHabitTime(habit.endTime);
       let habitDay: string = days[new Date(habit.endTime).getDay()];
-      console.log(habit);
       const habitComponent: any = (
         <AnimatedBox
           key={habit.name}
@@ -163,6 +171,9 @@ export function Habits(props: any) {
                 <DailyReviewButton
                   habitInfo={habit}
                   themeProps={props.themeProps}
+                  setFormModalDisplayInformation={
+                    setFormModalDisplayInformation
+                  }
                 />
               </AnimatedFlex>
             </AnimatedFlex>
