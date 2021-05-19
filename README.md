@@ -25,15 +25,25 @@ can do so, by clicking on the link named "Sign Up instead" at the bottom of the 
 Once an account is created it can be accessed to start adding and tracking habits in addition to make use of the graphical calendar to visualize a habits data
 
 ### Application Installation for Developers
-In Linux Ubuntu 20 with Python 3.8.5 installed, run the following commands in the directory you want the project on
+In Linux Ubuntu 20 with Python 3.8.5 installed, run the following commands to install all the projects dependencies in the directory you want the project on
 ```
 clone https://github.com/Ellie1341994/HaBitsProject HaBitsProject
 cd HaBitsProject
+pip3 install --user pipenv
+pipenv install -dev
+./manage migrate
+./manage testData
+cd habitsreactclient
+npm install
 ```
-
-
-
-
+In order to run the server in dev mode execute (assuming you're in the HaBitsProject directory)
+```
+python3 manage.py runserver
+```
+and to run the creat-react-app in dev mode (assuming you're in the habitsreactclient directory)
+```
+npm run start
+```
 
 ## Technologies used to build this Web Application
 ### Server Side
@@ -59,3 +69,4 @@ cd HaBitsProject
 
 ## Other
 This project was started as the capstone assignment of [CS50 Web Programming with Python and JavaScrpt course](https://www.edx.org/course/cs50s-web-programming-with-python-and-javascript)
+Special thanks to Peter that I met on this course who helped me build this App
